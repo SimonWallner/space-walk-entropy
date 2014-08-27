@@ -69,7 +69,7 @@ p {
     margin-left: 35px; }
   #selfIformation .element {
     width: 600px;
-    height: 1.5em;
+    height: 5em;
     font-weight: 400;
     padding-top: 0.1em;
     border: solid 1px #b6ce4e;
@@ -92,7 +92,7 @@ p {
     float: right; }
   #selfIformation .bit {
     width: 3px;
-    height: 1.4em;
+    height: 4.9em;
     background-color: #e89f49;
     display: inline-block;
     margin-right: 2px;

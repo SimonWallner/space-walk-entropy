@@ -1,6 +1,10 @@
 // TODO 
 // - regularise data to a fixed dt
 // 		- make it exact, time wise. use time stamp
+// - limited width used for transition probs
+
+// monkeypath
+Math.log2 = Math.log2 || function(a) { return Math.log(a) / Math.LN2; };
 
 
 var libsw = new LibSpaceWalk();
@@ -22,6 +26,8 @@ for (var i = 0; i < 1024; i++) {
 }
 
 var historyData = [];
+var maxHistoryLength = 120;
+var maxInformation = 1; // bits
 
 
 
@@ -44,7 +50,7 @@ var updateGraph = function() {
 		.append('div')
 			.attr('class', 'bit')
 	bits
-		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d) + ')';});
+		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
 }
 
 var addSample = function() {
@@ -58,21 +64,31 @@ var addSample = function() {
 		SparseTransitionMatrix[currentLength][0]++;
 		sums[currentLength]++;
 		
+		var info = selfInformation(pTransitionTo0(currentLength));
+		historyData.push(info);
 		currentLength = 0;
+		maxInformation = Math.max(maxInformation, info);
 	} else {
 		SparseTransitionMatrix[currentLength][1]++;
 		sums[currentLength]++;
 
+		var info = selfInformation(pTransitionToNext(currentLength));
+		historyData.push(info);
 		currentLength++;
+		maxInformation = Math.max(maxInformation, info);
 	}
 
-	if (lastValue === 1) {
-		historyData.push(pTransitionTo0(currentLength));
-	} else {
-		historyData.push(pTransitionToNext(currentLength));
-	}
-
+	truncateHistory();
 	updateGraph();
+}
+
+var truncateHistory = function() {
+	if (historyData.length > maxHistoryLength) {
+		historyData = historyData.splice(historyData.length - maxHistoryLength);
+		maxInformation = historyData.reduce(function(prev, current) {
+			return Math.max(prev, current);
+		}, 1);
+	}
 }
 
 var pTransitionToNext = function(from) {
@@ -89,4 +105,12 @@ var pTransitionTo0 = function(from) {
 	}
 
 	return SparseTransitionMatrix[from][0] / sums[from];
+}
+
+var selfInformation = function(prop) {
+	if (prop === 0) {
+		return 0;
+	}
+
+	return Math.log2(1 / prop);
 }
