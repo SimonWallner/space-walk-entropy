@@ -1,0 +1,217 @@
+/*
+ * Markov Chain styel sheet
+ */
+
+/* some colors */
+$orange: #e89f49;
+$lime: #b6ce4e;
+$turquise: #5dd1a4;
+$blue: #3fc0c9;
+$lightBlue: #C1DFE1;
+$lavender: #8885ed;
+$rose: #c673d8;
+$red: #e25454;
+
+$darkGrey: #333;
+$grey: #555;
+$lighterGrey: #666;
+$lightGrey: #ccc;
+
+$backgroundColor: #eee;
+
+.clear {
+	clear: both;
+	display: block;
+	overflow: hidden;
+	visibility: hidden;
+	width: 0;
+	height: 0;
+}
+
+body {
+	background-color: #333;
+	font-size: 16px;
+	font-family: 'Dosis';
+	font-weight: 400;
+	color: #E8E8E8;
+	/* come on iOS webkit, be a good citizen! */
+	-webkit-text-size-adjust: 100%;
+	// padding: 1em;
+}
+
+#container {
+	margin-left: 1em;
+	padding-bottom: 1em;
+}
+
+h1, h2 {
+	font-size: 2em;
+	margin-bottom: 0.2em;
+	color: #E8E8E8;
+	text-transform: uppercase;
+	font-weight: 200;
+}
+
+
+p {
+	color: #E8E8E8;
+	margin-top: 1em;
+}
+
+.button {
+	border-radius: 0.3em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+	background-color: $blue * 0.5;
+	margin-right: 0.5em;
+}
+
+.interactive {
+	cursor: pointer;
+}
+
+.active {
+	background-color: $blue;
+}
+
+// === input complexity stuff ===
+#selfIformation {
+	margin-top: 1em;
+
+	font-family: 'Dosis';
+	font-weight: 200;
+	.labelBox {
+		.label {
+			transform: rotate(90deg);
+			transform-origin: left top 0;
+			display: inline-block;
+			margin: 0.5em;
+			margin-left: 1.6em;
+		}
+
+		float: left;
+		background-color: $grey;
+		border-radius: 0.3em;
+		height: 5.5em;
+		width: 30px;
+	}
+	.data {
+		margin-left: 35px;
+	}
+
+	.element {
+		width: 600px;
+		height: 1.5em;
+		font-weight: 400;
+		padding-top: 0.1em;
+		border: solid 1px $lime;
+		border-radius: 0.3em;
+		margin-bottom: 3px;
+		margin-right: 3px;
+		overflow: hidden;
+		white-space: nowrap;
+		position: relative;
+		// background-color: $grey;
+		
+		.label {
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			width: 300px;
+			padding: 0.5em;
+			padding-top: 0.2em;
+			background: linear-gradient(to right, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
+			z-index: 1;
+		}
+	}
+
+	.bits-wrapper {
+		float: right;
+	}
+
+	.bit {
+		width: 3px;
+		height: 1.4em;
+		background-color: $orange;
+		display: inline-block;
+		margin-right: 2px;
+		transform-origin: bottom left;
+	}
+	
+	
+	#history {
+		float: left;
+
+		.group {
+			&:nth-child(1) {
+				.element {
+					border: solid 1px $lime;
+				}
+				.bit {
+					background-color: $lime;
+				}
+			}
+
+			&:nth-child(2) {
+				.element {
+					border: solid 1px $orange;
+				}
+				.bit {
+					background-color: $orange;
+				}
+			}
+			&:nth-child(3) {
+				.element {
+					border: solid 1px $lavender;
+				}
+				.bit {
+					background-color: $lavender;
+				}
+			}
+		}
+	}
+
+	.divider {
+		height: 270px;
+		// width: 10px;
+		border-left: dashed 2px $grey;
+		margin-left: 2px;
+		float: left;
+	}
+
+	#live {
+		.element {
+			width: 200px;
+			overflow: visible;
+		}
+		margin-left: 613px;
+
+		.group {
+			&:nth-child(1) {
+				.element {
+					background-color: $lime;
+					border: solid 1px $lime;
+				}
+			}			
+
+			&:nth-child(2) {
+				.element {
+					background-color: $orange;
+					border: solid 1px $orange;
+				}
+			}
+			&:nth-child(3) {
+				.element {
+					background-color: $lavender;
+					border: solid 1px $lavender;
+				}
+			}
+		}
+		.label {
+			background: none;
+		}
+	}
+
+}

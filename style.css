@@ -1,0 +1,134 @@
+/*
+ * Markov Chain styel sheet
+ */
+/* some colors */
+.clear {
+  clear: both;
+  display: block;
+  overflow: hidden;
+  visibility: hidden;
+  width: 0;
+  height: 0; }
+
+body {
+  background-color: #333;
+  font-size: 16px;
+  font-family: 'Dosis';
+  font-weight: 400;
+  color: #E8E8E8;
+  /* come on iOS webkit, be a good citizen! */
+  -webkit-text-size-adjust: 100%; }
+
+#container {
+  margin-left: 1em;
+  padding-bottom: 1em; }
+
+h1, h2 {
+  font-size: 2em;
+  margin-bottom: 0.2em;
+  color: #E8E8E8;
+  text-transform: uppercase;
+  font-weight: 200; }
+
+p {
+  color: #E8E8E8;
+  margin-top: 1em; }
+
+.button {
+  border-radius: 0.3em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  background-color: #1f6064;
+  margin-right: 0.5em; }
+
+.interactive {
+  cursor: pointer; }
+
+.active {
+  background-color: #3fc0c9; }
+
+#selfIformation {
+  margin-top: 1em;
+  font-family: 'Dosis';
+  font-weight: 200; }
+  #selfIformation .labelBox {
+    float: left;
+    background-color: #555555;
+    border-radius: 0.3em;
+    height: 5.5em;
+    width: 30px; }
+    #selfIformation .labelBox .label {
+      transform: rotate(90deg);
+      transform-origin: left top 0;
+      display: inline-block;
+      margin: 0.5em;
+      margin-left: 1.6em; }
+  #selfIformation .data {
+    margin-left: 35px; }
+  #selfIformation .element {
+    width: 600px;
+    height: 1.5em;
+    font-weight: 400;
+    padding-top: 0.1em;
+    border: solid 1px #b6ce4e;
+    border-radius: 0.3em;
+    margin-bottom: 3px;
+    margin-right: 3px;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative; }
+    #selfIformation .element .label {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 300px;
+      padding: 0.5em;
+      padding-top: 0.2em;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.65) 0%, transparent 100%);
+      z-index: 1; }
+  #selfIformation .bits-wrapper {
+    float: right; }
+  #selfIformation .bit {
+    width: 3px;
+    height: 1.4em;
+    background-color: #e89f49;
+    display: inline-block;
+    margin-right: 2px;
+    transform-origin: bottom left; }
+  #selfIformation #history {
+    float: left; }
+    #selfIformation #history .group:nth-child(1) .element {
+      border: solid 1px #b6ce4e; }
+    #selfIformation #history .group:nth-child(1) .bit {
+      background-color: #b6ce4e; }
+    #selfIformation #history .group:nth-child(2) .element {
+      border: solid 1px #e89f49; }
+    #selfIformation #history .group:nth-child(2) .bit {
+      background-color: #e89f49; }
+    #selfIformation #history .group:nth-child(3) .element {
+      border: solid 1px #8885ed; }
+    #selfIformation #history .group:nth-child(3) .bit {
+      background-color: #8885ed; }
+  #selfIformation .divider {
+    height: 270px;
+    border-left: dashed 2px #555555;
+    margin-left: 2px;
+    float: left; }
+  #selfIformation #live {
+    margin-left: 613px; }
+    #selfIformation #live .element {
+      width: 200px;
+      overflow: visible; }
+    #selfIformation #live .group:nth-child(1) .element {
+      background-color: #b6ce4e;
+      border: solid 1px #b6ce4e; }
+    #selfIformation #live .group:nth-child(2) .element {
+      background-color: #e89f49;
+      border: solid 1px #e89f49; }
+    #selfIformation #live .group:nth-child(3) .element {
+      background-color: #8885ed;
+      border: solid 1px #8885ed; }
+    #selfIformation #live .label {
+      background: none; }
