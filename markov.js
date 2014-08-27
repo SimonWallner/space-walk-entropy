@@ -2,8 +2,15 @@
 // - regularise data to a fixed dt
 // 		- make it exact, time wise. use time stamp
 // - limited width used for transition probs
+// - add y axis grid and max value
+// - add numerical value 
+// - potentially smooth current value
+// - try sequences of last n data points not just last
+// - visualise transition props, (the return to 0 propb, i.e.)
+// - extend transition matrix to something larger, better handle loooong skips
+// - beats instead of just presses --> holding button down
 
-// monkeypath
+// monkey patch
 Math.log2 = Math.log2 || function(a) { return Math.log(a) / Math.LN2; };
 
 
