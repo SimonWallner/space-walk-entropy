@@ -9,6 +9,8 @@
 // - visualise transition props, (the return to 0 propb, i.e.)
 // - extend transition matrix to something larger, better handle loooong skips
 // - beats instead of just presses --> holding button down
+// - continuous data for analog input
+// - extend to all buttons, how to mix ???
 
 // monkey patch
 Math.log2 = Math.log2 || function(a) { return Math.log(a) / Math.LN2; };
@@ -18,9 +20,11 @@ var libsw = new LibSpaceWalk();
 
 var lastValue = null;
 
-var lengths = [];
 var currentLength = 0;
-var sum = 0;
+var enfOfTheLineLength = 0;
+var dataWindow = [];
+var windowLength = 100;
+var samplingF = 100; // ms
 
 // sparse[0]: transition to 0
 // sparse[1]: transition to l+1
@@ -39,7 +43,7 @@ var maxInformation = 1; // bits
 
 
 window.onload = function() {
-	window.setInterval(addSample, 100);
+	window.setInterval(addSample, samplingF);
 }
 
 
@@ -58,6 +62,10 @@ var updateGraph = function() {
 			.attr('class', 'bit')
 	bits
 		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
+
+
+	$('#markov-value').text(historyData[historyData.length-1].toFixed(2));
+	$('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
 }
 
 var addSample = function() {
@@ -65,7 +73,6 @@ var addSample = function() {
 	if (currentLength > 1023) {
 		currentLength = 0;
 	}
-
 
 	if (lastValue === 1) {
 		SparseTransitionMatrix[currentLength][0]++;
@@ -85,6 +92,7 @@ var addSample = function() {
 		maxInformation = Math.max(maxInformation, info);
 	}
 
+	// truncateDataWindow();
 	truncateHistory();
 	updateGraph();
 }
