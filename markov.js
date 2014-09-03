@@ -48,7 +48,7 @@ window.onload = function() {
 
 
 libsw.onMessage = function(data) {
-	if (data.type === "input") {
+	if (data.type === "ext.input.gamePad.sample") {
 		if (data.payload.name === "button-0") {
 			lastValue = data.payload.value;
 		}
