@@ -1,6 +1,6 @@
 // TODO 
 // - regularise data to a fixed dt
-// 		- make it exact, time wise. use time stamp
+// 		- make it exact, time wise. use time stamps
 // - limited width used for transition probs
 // - add y axis grid and max value
 // - add numerical value 
@@ -17,11 +17,11 @@ Math.log2 = Math.log2 || function(a) { return Math.log(a) / Math.LN2; };
 
 
 var libsw = new LibSpaceWalk();
+var mm = new MarkovModel();
 
-var lastValue = null;
+var lastValue = 0;
+var lastInteractionT = 0;
 
-var currentLength = 0;
-var enfOfTheLineLength = 0;
 var dataWindow = [];
 var windowLength = 100;
 var samplingF = 100; // ms
@@ -43,14 +43,19 @@ var maxInformation = 1; // bits
 
 
 window.onload = function() {
-	window.setInterval(addSample, samplingF);
+	window.setInterval(function() {
+		truncateHistory();
+		updateGraph();
+	}, samplingF);
+
+	
 }
 
 
 libsw.onMessage = function(data) {
 	if (data.type === "ext.input.gamePad.sample") {
 		if (data.payload.name === "button-0") {
-			lastValue = data.payload.value;
+			addSample(data.payload);
 		}
 	}
 }
@@ -68,33 +73,20 @@ var updateGraph = function() {
 	$('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
 }
 
-var addSample = function() {
-	// just reset it for now
-	if (currentLength > 1023) {
-		currentLength = 0;
-	}
+var addSample = function(sample) {
 
-	if (lastValue === 1) {
-		SparseTransitionMatrix[currentLength][0]++;
-		sums[currentLength]++;
-		
-		var info = selfInformation(pTransitionTo0(currentLength));
-		historyData.push(info);
-		currentLength = 0;
-		maxInformation = Math.max(maxInformation, info);
+	if (sample.value !== lastValue) { // something changed --> interaction!
+		var length = sample.time - lastInteractionT;
+		var info = selfInformation(mm.pReturn(length));
+
+		lastInteractionT = sample.time;
+		lastValue = sample.value;
 	} else {
-		SparseTransitionMatrix[currentLength][1]++;
-		sums[currentLength]++;
-
-		var info = selfInformation(pTransitionToNext(currentLength));
-		historyData.push(info);
-		currentLength++;
-		maxInformation = Math.max(maxInformation, info);
+		var length = sample.time - lastInteractionT;
+		var info = selfInformation(mm.pContinue(length));
 	}
 
-	// truncateDataWindow();
-	truncateHistory();
-	updateGraph();
+	historyData.push(info);
 }
 
 var truncateHistory = function() {
@@ -106,21 +98,7 @@ var truncateHistory = function() {
 	}
 }
 
-var pTransitionToNext = function(from) {
-	if (sums[from] === 0) {
-		return 0;
-	}
 
-	return SparseTransitionMatrix[from][1] / sums[from];
-}
-
-var pTransitionTo0 = function(from) {
-	if (sums[from] === 0) {
-		return 0;
-	}
-
-	return SparseTransitionMatrix[from][0] / sums[from];
-}
 
 var selfInformation = function(prop) {
 	if (prop === 0) {
