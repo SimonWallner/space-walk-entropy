@@ -64,7 +64,7 @@ var MarkovModel = function() {
 		var index = Math.max(0, getIndex(length) - 1);
 		var t = transitions[index];
 		if (t) {
-			var sum = t.cReturn + t.cReturn;
+			var sum = t.cContinue + t.cReturn;
 			return t.cReturn / sum;
 		} else {
 			return 1;

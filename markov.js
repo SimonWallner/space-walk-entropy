@@ -19,43 +19,57 @@ Math.log2 = Math.log2 || function(a) { return Math.log(a) / Math.LN2; };
 var libsw = new LibSpaceWalk();
 var mm = new MarkovModel();
 
-var lastValue = 0;
+var lastSample = {};
+var currentSample = {};
+
 var lastInteractionT = 0;
 
 var dataWindow = [];
 var windowLength = 100;
 var samplingF = 100; // ms
 
-// sparse[0]: transition to 0
-// sparse[1]: transition to l+1
-var SparseTransitionMatrix = [];
-var sums = [];
-
-for (var i = 0; i < 1024; i++) {
-	SparseTransitionMatrix[i] = [0, 0];
-	sums[i] = 0;
-}
-
-var historyData = [];
+var historyData = [0];
 var maxHistoryLength = 120;
 var maxInformation = 1; // bits
 
+// in seconds
+var Timer = function() {
+	var that = this;
+
+	this.lastT = performance.now() / 1000;
+	this.deltaT = 0;
+
+	this.tick = function() {
+		var currentT = performance.now() / 1000;
+		this.deltaT = currentT - this.lastT;
+		this.lastT = currentT;
+	};
+};
+var timer = new Timer();
+
+var approximateTime = 0;
 
 
 window.onload = function() {
 	window.setInterval(function() {
-		truncateHistory();
-		updateGraph();
+		plot();
 	}, samplingF);
-
-	
 }
 
 
 libsw.onMessage = function(data) {
 	if (data.type === "ext.input.gamePad.sample") {
 		if (data.payload.name === "button-0") {
-			addSample(data.payload);
+			lastSample = currentSample;
+			currentSample = data.payload;
+			approximateTime = currentSample.time;
+
+			if (lastSample.value !== currentSample.value) {// interaction!
+				var length = currentSample.time - lastInteractionT;
+				mm.addEndPoint(length);
+
+				lastInteractionT = currentSample.time;
+			}
 		}
 	}
 }
@@ -73,20 +87,21 @@ var updateGraph = function() {
 	$('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
 }
 
-var addSample = function(sample) {
+var plot = function() {
+	var length = approximateTime - lastInteractionT;
 
-	if (sample.value !== lastValue) { // something changed --> interaction!
-		var length = sample.time - lastInteractionT;
+	if (lastSample.value !== currentSample.value) {// interaction!
 		var info = selfInformation(mm.pReturn(length));
-
-		lastInteractionT = sample.time;
-		lastValue = sample.value;
 	} else {
-		var length = sample.time - lastInteractionT;
 		var info = selfInformation(mm.pContinue(length));
 	}
 
 	historyData.push(info);
+
+	truncateHistory();
+	updateGraph();
+
+	approximateTime += (samplingF / 1000);
 }
 
 var truncateHistory = function() {
