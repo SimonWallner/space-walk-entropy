@@ -89,6 +89,19 @@ var updateMarkovPlot = function() {
 			.attr('class', 'bar');
 	bars
 		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d) + ')';});
+
+
+	var selfInfo = mm.getPReturnVector().map(function(p) {
+		return selfInformation(p);
+	})
+	var maxSelfInfo = Math.max(1, d3.max(selfInfo));
+
+	var bars = d3.select('#markovInformation').selectAll('.bar').data(selfInfo);
+	bars.enter()
+		.append('div')
+			.attr('class', 'bar');
+	bars
+		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxSelfInfo) + ')';});
 }
 
 var updateGraph = function() {
@@ -102,6 +115,7 @@ var updateGraph = function() {
 
 	$('#markov-value').text(historyData[historyData.length-1].toFixed(2));
 	$('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
+	$('#maxValue').text(maxInformation.toFixed(2));
 }
 
 var plot = function() {

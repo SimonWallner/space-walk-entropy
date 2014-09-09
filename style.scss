@@ -125,6 +125,16 @@ p {
 			background: linear-gradient(to right, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
 			z-index: 1;
 		}
+
+		.highValue {
+			position: absolute;
+			right: 0px;
+			top: 0px;
+			padding: 0.5em;
+			padding-top: 0.2em;
+			z-index: 1;
+			background-color: rgba(0, 0, 0, 0.5);
+		}
 	}
 
 	.bits-wrapper {
@@ -217,11 +227,12 @@ p {
 }
 
 #pReturn {
-	#pReturnWrapper {
+	#pReturnWrapper, #markovInformation {
 		width: 600px;
 		height: 30px;
 		border: 1px solid $orange;
 		padding: 2px;
+		margin: 2px;
 
 		.bar {
 			width: 2px;
