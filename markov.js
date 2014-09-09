@@ -32,6 +32,8 @@ var historyData = [0];
 var maxHistoryLength = 120;
 var maxInformation = 1; // bits
 
+var primed = false;
+
 // in seconds
 var Timer = function() {
 	var that = this;
@@ -64,14 +66,29 @@ libsw.onMessage = function(data) {
 			currentSample = data.payload;
 			approximateTime = currentSample.time;
 
-			if (lastSample.value !== currentSample.value) {// interaction!
-				var length = currentSample.time - lastInteractionT;
-				mm.addEndPoint(length);
+			if (primed) {
+				if (lastSample.value !== currentSample.value) {// interaction!
+					var length = currentSample.time - lastInteractionT;
+					mm.addEndPoint(length);
+					updateMarkovPlot();
 
+					lastInteractionT = currentSample.time;
+				}
+			} else {
 				lastInteractionT = currentSample.time;
+				primed = true;
 			}
 		}
 	}
+}
+
+var updateMarkovPlot = function() {
+	var bars = d3.select('#pReturnWrapper').selectAll('.bar').data(mm.getPReturnVector);
+	bars.enter()
+		.append('div')
+			.attr('class', 'bar');
+	bars
+		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d) + ')';});
 }
 
 var updateGraph = function() {

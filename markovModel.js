@@ -3,20 +3,21 @@
 // with the addition of (s_k --> 0) that is possible for all s_k in S.
 var MarkovModel = function() {
 
-	var transitions = [{
-		upperBound: 0,
-		cContinue: 0, 
-		cReturn: 0
-	}];
+	var transitions = [];
 
 	var getBound = function(index) {
 		// linear case
 		// n per second
-		return index * 0.1;
+		return (index + 1) * 0.1;
 	}
 
 	var getIndex = function(bound) {
-		return Math.floor(bound / getBound(1));
+		return Math.floor(bound / getBound(0));
+	}
+
+	var pReturnOfTranstion = function(t) {
+		var sum = t.cContinue + t.cReturn;
+		return t.cReturn / sum;
 	}
 
 	// add the length of the endpoint of a chain.
@@ -49,6 +50,12 @@ var MarkovModel = function() {
 		return transitions;
 	}
 
+	this.getPReturnVector = function() {
+		return transitions.map(function(t) {
+			return pReturnOfTranstion(t);
+		})
+	}
+
 	this.pContinue = function(length) {
 		var index = Math.max(0, getIndex(length) - 1);
 		var t = transitions[index];
@@ -61,11 +68,10 @@ var MarkovModel = function() {
 	}
 
 	this.pReturn = function(length) {
-		var index = Math.max(0, getIndex(length) - 1);
+		var index = getIndex(length);
 		var t = transitions[index];
 		if (t) {
-			var sum = t.cContinue + t.cReturn;
-			return t.cReturn / sum;
+			return pReturnOfTranstion(t);
 		} else {
 			return 1;
 		}

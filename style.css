@@ -132,3 +132,16 @@ p {
       border: solid 1px #8885ed; }
     #selfIformation #live .label {
       background: none; }
+
+#pReturn #pReturnWrapper {
+  width: 600px;
+  height: 30px;
+  border: 1px solid #e89f49;
+  padding: 2px; }
+  #pReturn #pReturnWrapper .bar {
+    width: 2px;
+    height: 28px;
+    margin: 1px;
+    background-color: #e89f49;
+    float: left;
+    transform-origin: bottom left; }
