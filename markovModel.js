@@ -1,18 +1,33 @@
 // 1D Markov Model to model the length of something
 // Transitions are strictly monotonous (s_n --> s_n+1) with s_n < s_n+1
 // with the addition of (s_k --> 0) that is possible for all s_k in S.
-var MarkovModel = function() {
+var MarkovModel = function(stepSize, kind) {
 
 	var transitions = [];
+	var buffer = [];
 
-	var getBound = function(index) {
-		// linear case
-		// n per second
-		return (index + 1) * 0.1;
-	}
+	if (kind === 'linear') {
+		var getBound = function(index) {
+			return (index + 1) * stepSize;
+		}
 
-	var getIndex = function(bound) {
-		return Math.floor(bound / getBound(0));
+		var getIndex = function(bound) {
+			return Math.floor(bound / getBound(0));
+		}
+	} else if (kind === 'exponential') { // exponential
+		var base = 1.5;
+		var getBound = function(index) {
+			return stepSize * Math.pow(base, (index));
+		}
+
+		var getIndex = function(bound) {
+			if (bound < 0) {
+				return 0;
+			}
+
+			var i = Math.log(bound / stepSize) / Math.log(base);
+			return Math.floor(i);
+		}
 	}
 
 	var pReturnOfTranstion = function(t) {
@@ -20,8 +35,15 @@ var MarkovModel = function() {
 		return t.cReturn / sum;
 	}
 
+
 	// add the length of the endpoint of a chain.
 	this.addEndPoint = function(length) {
+
+		var currentTime = performance.now() / 1000;
+		buffer.push({
+			length: length,
+			time: currentTime
+		});
 
 		for (var i = 0; i < getIndex(length); i++) {
 			if (!transitions[i]) {
@@ -45,14 +67,33 @@ var MarkovModel = function() {
 		transitions[i].cReturn++;
 	}
 
+	var removeEndPoint = function(length) {
+		for (var i = 0; i < getIndex(length); i++) {
+			transitions[i].cContinue--;
+		}
+		transitions[i].cReturn--;
+	}
+
+	this.unlearn = function(timeSeconds) {
+		var currentTime = performance.now() / 1000;
+		while (buffer[0] && (currentTime - buffer[0].time) > timeSeconds) {
+			removeEndPoint(buffer[0].length);
+			buffer = buffer.slice(1);
+		}
+	}
+
 	
 	this.getTransitions = function() {
 		return transitions;
 	}
 
 	this.getPReturnVector = function() {
-		return transitions.map(function(t) {
-			return pReturnOfTranstion(t);
+		return transitions.map(function(t, i) {
+			return {
+				p: pReturnOfTranstion(t),
+				upperBound: getBound(i),
+				width: getBound(i) - getBound(i-1)
+			};
 		})
 	}
 

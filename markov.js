@@ -17,7 +17,7 @@ Math.log2 = Math.log2 || function(a) { return Math.log(a) / Math.LN2; };
 
 
 var libsw = new LibSpaceWalk();
-var mm = new MarkovModel();
+var mm = new MarkovModel(0.1, 'exponential');
 
 var lastSample = {};
 var currentSample = {};
@@ -90,20 +90,23 @@ var updateMarkovPlot = function() {
 		.append('div')
 			.attr('class', 'bar');
 	bars
-		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d) + ')';});
+		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d.p) + ')';})
+		.style('width', function(d) { return d.width * 200 + 'px'; });
 
 
-	var selfInfo = mm.getPReturnVector().map(function(p) {
-		return selfInformation(p);
+	var selfInfo = mm.getPReturnVector().map(function(t) {
+		t.selfInfo = selfInformation(t.p)
+		return t;
 	})
-	var maxSelfInfo = Math.max(1, d3.max(selfInfo));
+	var maxSelfInfo = Math.max(1, d3.max(selfInfo, function(d) { return d.selfInfo; }));
 
 	var bars = d3.select('#markovInformation').selectAll('.bar').data(selfInfo);
 	bars.enter()
 		.append('div')
 			.attr('class', 'bar');
 	bars
-		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxSelfInfo) + ')';});
+		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d.selfInfo / maxSelfInfo) + ')';})
+		.style('width', function(d) { return d.width * 200 + 'px'; });
 }
 
 var updateGraph = function() {
@@ -159,6 +162,7 @@ var plot = function() {
 	maxInformation = Math.max(maxInformation, info);
 
 	truncateHistory();
+	mm.unlearn(3);
 	updateGraph();
 
 	approximateTime += (samplingF / 1000);
