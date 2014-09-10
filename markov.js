@@ -114,8 +114,19 @@ var updateGraph = function() {
 
 
 	$('#markov-value').text(historyData[historyData.length-1].toFixed(2));
-	$('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
+	// $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
 	$('#maxValue').text(maxInformation.toFixed(2));
+
+	// gaussian
+	var kernel = gaussian(9)
+	var gaussianFiltered = filter(historyData, kernel);
+	bits = d3.select('#gaussianBits').selectAll('.bit').data(gaussianFiltered);
+	bits.enter()
+		.append('div')
+			.attr('class', 'bit')
+	bits
+		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
+
 }
 
 var plot = function() {
@@ -128,6 +139,7 @@ var plot = function() {
 	}
 
 	historyData.push(info);
+	maxInformation = Math.max(maxInformation, info);
 
 	truncateHistory();
 	updateGraph();
@@ -138,9 +150,9 @@ var plot = function() {
 var truncateHistory = function() {
 	if (historyData.length > maxHistoryLength) {
 		historyData = historyData.splice(historyData.length - maxHistoryLength);
-		maxInformation = historyData.reduce(function(prev, current) {
-			return Math.max(prev, current);
-		}, 1);
+		// maxInformation = historyData.reduce(function(prev, current) {
+		// 	return Math.max(prev, current);
+		// }, 1);
 	}
 }
 
@@ -152,4 +164,59 @@ var selfInformation = function(prop) {
 	}
 
 	return Math.log2(1 / prop);
+}
+
+
+// ================================= util ================================
+
+// create a linear space of size 'size' spanning [a, b]
+// the first element is a, the last is b
+function linspace(a, b, size) {
+	var result = [];
+	for (var i = 0; i < size; i++) {
+		var t = i / (size - 1);
+		result[i] = (a * (1 - t) + b * t);
+	}
+
+	return result;
+}
+
+// half sided gaussian bell curve, with 0 at [0] and the max at [size-1]
+// non normalised
+function leftGaussian(size) {
+	var ls = linspace(0, 1, size);
+	var sigma = 1/3; // going to 6 sigma width
+	var gaussian = ls.map(function(x) {
+		return Math.exp(-0.5 * Math.pow(x / sigma, 2));
+	});
+
+	return gaussian.reverse();
+}
+
+// non normalised gaussian
+function gaussian(size) {
+	var ls = linspace(-1, 1, size);
+	var sigma = 1/3; // going to 6 sigma width
+	return ls.map(function(x) {
+		return Math.exp(-0.5 * Math.pow(x / sigma, 2));
+	});
+}
+
+function filter(data, kernel) {
+	var mid = Math.floor(kernel.length / 2);
+
+	return data.map(function(_, i) {
+		var sum = 0;
+		var weightsSum = 0;
+
+		for (var j = 0; j < kernel.length; j++) {
+			var index = (i - mid + j);
+			if (index < 0 || index > (data.length - 1)) {
+				continue;
+			}
+			sum += (data[index] * kernel[j]);
+			weightsSum += kernel[j];
+		}
+		return (sum / weightsSum) || 0;
+	});
 }
