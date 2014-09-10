@@ -28,9 +28,11 @@ var dataWindow = [];
 var windowLength = 100;
 var samplingF = 100; // ms
 
-var historyData = [0];
+var historyData = [];
+var entropyHistoryData = [];
 var maxHistoryLength = 120;
 var maxInformation = 1; // bits
+var maxEntropy = 1;
 
 var primed = false;
 
@@ -117,6 +119,7 @@ var updateGraph = function() {
 	// $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
 	$('#maxValue').text(maxInformation.toFixed(2));
 
+
 	// gaussian
 	var kernel = gaussian(9)
 	var gaussianFiltered = filter(historyData, kernel);
@@ -127,6 +130,20 @@ var updateGraph = function() {
 	bits
 		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
 
+
+	// entropy
+	var entropy = mm.entropy();
+	entropyHistoryData.push(entropy);
+	maxEntropy = Math.max(maxEntropy, entropy);
+
+	bits = d3.select('#entropyBits').selectAll('.bit').data(entropyHistoryData);
+	bits.enter()
+		.append('div')
+			.attr('class', 'bit')
+	bits
+		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxEntropy) + ')';});
+
+	$('#maxEntropy').text(maxEntropy.toFixed(2));
 }
 
 var plot = function() {
@@ -150,9 +167,7 @@ var plot = function() {
 var truncateHistory = function() {
 	if (historyData.length > maxHistoryLength) {
 		historyData = historyData.splice(historyData.length - maxHistoryLength);
-		// maxInformation = historyData.reduce(function(prev, current) {
-		// 	return Math.max(prev, current);
-		// }, 1);
+		entropyHistoryData = entropyHistoryData.splice(entropyHistoryData.length - maxHistoryLength);
 	}
 }
 

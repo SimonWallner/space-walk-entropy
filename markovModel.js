@@ -76,4 +76,41 @@ var MarkovModel = function() {
 			return 1;
 		}
 	}
+
+	// util
+	var log2 = function(a) {
+		if (a <= 0) {
+			return 0
+		}
+		return Math.log(a) / Math.LN2;
+	};
+
+	var h = function(p) {
+		if (p === 0) {
+			return 0;
+		}
+		return p * log2(1 / p);
+	}
+
+
+	this.entropy = function() {
+		var sum = transitions.reduce(function(prev, current) {
+			var sum = current.cContinue + current.cReturn;
+			return prev + (sum > 0);
+		}, 0);
+
+		var sumEntropy = transitions.reduce(function(prev, current) {
+			var sum = current.cContinue + current.cReturn;
+			var pContinue = (current.cContinue / sum);
+			var pReturn = (current.cReturn / sum);
+
+			return prev + h(pContinue) + h(pReturn);
+		}, 0)
+
+		if (sum === 0) {
+			return 0;
+		} else {
+			return sumEntropy / sum;
+		}
+	}
 }

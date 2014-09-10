@@ -34,9 +34,6 @@ body {
 	font-family: 'Dosis';
 	font-weight: 400;
 	color: #E8E8E8;
-	/* come on iOS webkit, be a good citizen! */
-	-webkit-text-size-adjust: 100%;
-	// padding: 1em;
 }
 
 #container {
@@ -79,6 +76,7 @@ p {
 // === input complexity stuff ===
 #selfIformation {
 	margin-top: 1em;
+	padding-bottom: 1em;
 
 	font-family: 'Dosis';
 	font-weight: 200;
@@ -119,7 +117,7 @@ p {
 			position: absolute;
 			top: 0px;
 			left: 0px;
-			width: 00px;
+			width: 300px;
 			padding: 0.5em;
 			padding-top: 0.2em;
 			background: linear-gradient(to right, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
