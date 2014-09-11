@@ -32,7 +32,11 @@ var MarkovModel = function(stepSize, kind) {
 
 	var pReturnOfTranstion = function(t) {
 		var sum = t.cContinue + t.cReturn;
-		return t.cReturn / sum;
+		if (sum > 0) {
+			return t.cReturn / sum;	
+		} else {
+			return 0;
+		}
 	}
 
 
@@ -142,10 +146,14 @@ var MarkovModel = function(stepSize, kind) {
 
 		var sumEntropy = transitions.reduce(function(prev, current) {
 			var sum = current.cContinue + current.cReturn;
-			var pContinue = (current.cContinue / sum);
-			var pReturn = (current.cReturn / sum);
+			if (sum > 0) {
+				var pContinue = (current.cContinue / sum);
+				var pReturn = (current.cReturn / sum);
 
-			return prev + h(pContinue) + h(pReturn);
+				return prev + h(pContinue) + h(pReturn);
+			} else {
+				return 0;
+			}
 		}, 0)
 
 		if (sum === 0) {

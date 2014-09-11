@@ -164,6 +164,7 @@ var plot = function() {
 	truncateHistory();
 	mm.unlearn(3);
 	updateGraph();
+	updateMarkovPlot();
 
 	approximateTime += (samplingF / 1000);
 }

@@ -74,6 +74,8 @@ p {
 }
 
 // === input complexity stuff ===
+$height: 50px;
+
 #selfIformation {
 	margin-top: 1em;
 	padding-bottom: 1em;
@@ -92,7 +94,7 @@ p {
 		float: left;
 		background-color: $grey;
 		border-radius: 0.3em;
-		height: 9.5em;
+		height: 7em;
 		width: 30px;
 	}
 	.data {
@@ -101,7 +103,7 @@ p {
 
 	.element {
 		width: 600px;
-		height: 5em;
+		height: $height;
 		font-weight: 400;
 		padding-top: 0.1em;
 		border: solid 1px $lime;
@@ -124,6 +126,10 @@ p {
 			z-index: 1;
 		}
 
+		.background {
+			z-index: -1;
+		}
+
 		.highValue {
 			position: absolute;
 			right: 0px;
@@ -141,8 +147,7 @@ p {
 
 	.bit {
 		width: 3px;
-		height: 4.9em;
-		background-color: $orange;
+		height: $height - 2;
 		display: inline-block;
 		margin-right: 2px;
 		transform-origin: bottom left;
@@ -155,19 +160,19 @@ p {
 		.group {
 			&:nth-child(1) {
 				.element {
-					border: solid 1px $lime;
+					border: solid 1px $lavender;
 				}
 				.bit {
-					background-color: $lime;
+					background-color: $lavender;
 				}
 			}
 
 			&:nth-child(2) {
 				.element {
-					border: solid 1px $orange;
+					border: solid 1px $blue;
 				}
 				.bit {
-					background-color: $orange;
+					background-color: $blue;
 				}
 			}
 			&:nth-child(3) {
@@ -226,18 +231,18 @@ p {
 
 #pReturn {
 	#pReturnWrapper, #markovInformation {
-		width: 600px;
-		height: 50px;
-		border: 1px solid $orange;
-		padding: 2px;
-		margin: 2px;
+		// width: 600px;
+		// height: 50px;
+		// border: 1px solid $orange;
+		// padding: 2px;
+		// margin: 2px;
 		overflow: hidden;
 
 		.bar {
 			width: 2px;
-			height: 48px;
+			height: $height - 2;
 			margin: 1px;
-			background-color: $orange;
+			background-color: $lavender;
 			float: left;
 			transform-origin: bottom left;
 		}

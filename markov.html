@@ -15,24 +15,26 @@
 </head>
 <body>
 	<h1>Markov Chain</h1>
-	<div id="pReturn">
-		<div id="pReturnWrapper">
-		</div>
-	</div>
-
-	<div id="pReturn">
-		<div id="markovInformation">
-		</div>
-	</div>
-
-	<div class="clear"></div>
-
-
-
+	
 	<div id="selfIformation">
 		<div id="history">
 			<div class="group" id="">
-				<div class="labelBox"><span class="label">Linear&nbsp;Markov</span></div>
+				<div class="labelBox"><span class="label">Markov&nbsp;Chain</span></div>
+				<div id="pReturn" class="data">
+					<div id="pReturnWrapper" class="element markov">
+						<span class="label background">p_return</span>
+					</div>
+				</div>
+
+				<div id="pReturn" class="data">
+					<div id="markovInformation" class="element markov">
+						<span class="label background">Self Information</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="group" id="">
+				<div class="labelBox"><span class="label">History</span></div>
 				<div class="data">
 					<div class="element">
 						<span class="label">Self Information</span>
@@ -42,6 +44,7 @@
 						</div>
 					</div>
 				</div>
+
 				<div class="data">
 					<div class="element">
 						<span class="label">Gaussian width: 9</span>
