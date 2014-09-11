@@ -141,12 +141,14 @@ p {
     #selfIformation #live .label {
       background: none; }
 
-#pReturn #pReturnWrapper, #pReturn #markovInformation {
-  overflow: hidden; }
-  #pReturn #pReturnWrapper .bar, #pReturn #markovInformation .bar {
+.pReturn .pReturnWrapper, .pReturn #markovInformation {
+  white-space: nowrap;
+  padding-left: 2px; }
+  .pReturn .pReturnWrapper .bar, .pReturn #markovInformation .bar {
     width: 2px;
     height: 48px;
-    margin: 1px;
+    border-right: 2px solid #333;
     background-color: #8885ed;
-    float: left;
-    transform-origin: bottom left; }
+    box-sizing: border-box;
+    transform-origin: bottom left;
+    display: inline-block; }

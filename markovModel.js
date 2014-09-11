@@ -1,7 +1,7 @@
 // 1D Markov Model to model the length of something
 // Transitions are strictly monotonous (s_n --> s_n+1) with s_n < s_n+1
 // with the addition of (s_k --> 0) that is possible for all s_k in S.
-var MarkovModel = function(stepSize, kind) {
+var MarkovModel = function(stepSize, kind, base) {
 
 	var transitions = [];
 	var buffer = [];
@@ -15,7 +15,6 @@ var MarkovModel = function(stepSize, kind) {
 			return Math.floor(bound / getBound(0));
 		}
 	} else if (kind === 'exponential') { // exponential
-		var base = 1.5;
 		var getBound = function(index) {
 			return stepSize * Math.pow(base, (index));
 		}
