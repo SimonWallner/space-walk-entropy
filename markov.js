@@ -25,8 +25,8 @@ for (var i = 0; i < windowLengths.length; i++) {
 	mm[i] = new MarkovModel(stepSize[0], 'exponential', base[i]);
 }
 
-var lastSample = {};
-var currentSample = {};
+var lastSample = [];
+var currentSample = [];
 
 var lastInteractionT = 0;
 
@@ -38,6 +38,11 @@ var entropyHistoryData = [];
 var maxHistoryLength = 120;
 var maxInformation = 1; // bits
 var maxEntropy = 1;
+
+var buttonLastActive = [];
+var presHoldReleaseThresholdSeconds = 0.1;
+var lastActivity = 0;
+var activityThresholdSeconds = 0.2;
 
 var primed = false;
 
@@ -68,24 +73,27 @@ window.onload = function() {
 
 libsw.onMessage = function(data) {
 	if (data.type === "ext.input.gamePad.sample") {
-		if (data.payload.name === "button-0") {
-			lastSample = currentSample;
-			currentSample = data.payload;
-			approximateTime = currentSample.time;
+		approximateTime = data.payload.time;
 
+		if (data.payload.type === "digital") {
 			if (primed) {
-				if (lastSample.value !== currentSample.value) {// interaction!
-					var length = currentSample.time - lastInteractionT;
+				if (!buttonLastActive[data.payload.name]) {
+					buttonLastActive[data.payload.name] = data.payload.time;
+				}
+				
+				if (buttonLastActive[data.payload.name] + presHoldReleaseThresholdSeconds < data.payload.time) { // interaction!
+					var length = data.payload.time - lastInteractionT;
+
 					for (var i = 0; i < mm.length; i++) {
 						mm[i].addEndPoint(length);	
 					}
 					
 					updateMarkovPlot();
 
-					lastInteractionT = currentSample.time;
+					lastInteractionT = data.payload.time;
 				}
 			} else {
-				lastInteractionT = currentSample.time;
+				lastInteractionT = data.payload.time;
 				primed = true;
 			}
 		}
@@ -162,7 +170,7 @@ var updateGraph = function() {
 var plot = function() {
 	var length = approximateTime - lastInteractionT;
 
-	if (lastSample.value !== currentSample.value) {// interaction!
+	if (length > presHoldReleaseThresholdSeconds) { // interaction!
 		var info = selfInformation(mm[0].pReturn(length));
 	} else {
 		var info = selfInformation(mm[0].pContinue(length));
