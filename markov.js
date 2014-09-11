@@ -44,7 +44,11 @@ var presHoldReleaseThresholdSeconds = 0.1;
 var lastActivity = 0;
 var activityThresholdSeconds = 0.2;
 
+var analogLastValue = [];
+var analogActivationThresholdAbs = 0.2;
+
 var primed = false;
+
 
 // in seconds
 var Timer = function() {
@@ -74,13 +78,41 @@ window.onload = function() {
 libsw.onMessage = function(data) {
 	if (data.type === "ext.input.gamePad.sample") {
 		approximateTime = data.payload.time;
+		if (primed) {
 
-		if (data.payload.type === "digital") {
-			if (primed) {
+			if (data.payload.type === 'analog') {
+				if (!analogLastValue[data.payload.name]) {
+					analogLastValue[data.payload.name] = {
+						value: data.payload.value,
+						time: data.payload.time
+					}
+				}
+
+				if (Math.abs(data.payload.value - analogLastValue[data.payload.name].value) > analogActivationThresholdAbs) {
+
+					var length = data.payload.time - lastInteractionT;
+
+					for (var i = 0; i < mm.length; i++) {
+						mm[i].addEndPoint(length);	
+					}
+
+					updateMarkovPlot();
+
+					lastInteractionT = data.payload.time;
+				}
+
+				analogLastValue[data.payload.name] = {
+					value: data.payload.value,
+					time: data.payload.time
+				}
+			}
+
+			if (data.payload.type === 'digital') {
+
 				if (!buttonLastActive[data.payload.name]) {
 					buttonLastActive[data.payload.name] = data.payload.time;
 				}
-				
+
 				if (buttonLastActive[data.payload.name] + presHoldReleaseThresholdSeconds < data.payload.time) { // interaction!
 					var length = data.payload.time - lastInteractionT;
 
@@ -92,10 +124,10 @@ libsw.onMessage = function(data) {
 
 					lastInteractionT = data.payload.time;
 				}
-			} else {
-				lastInteractionT = data.payload.time;
-				primed = true;
 			}
+		} else {
+			lastInteractionT = data.payload.time;
+			primed = true;
 		}
 	}
 }
