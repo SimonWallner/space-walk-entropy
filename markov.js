@@ -40,12 +40,15 @@ libsw.onMessage = function(data) {
 }
 
 var sample = function() {
-	var stateId = generateId(currentSample);
-	mc.learn(lastSample, currentSample);
-	var p = mc.p(lastSample, currentSample);
-	console.log('from: ' + lastSample + ' to: ' + currentSample + ', p: ' + p);
+	var currentStateID = generateId(currentSample);
+	var lastStateID = generateId(lastSample);
 
-	lastSample = currentSample;
+	mc.learn(lastStateID, currentStateID);
+	var p = mc.p(lastStateID, currentStateID);
+
+	console.log('from: ' + lastStateID + ' to: ' + currentStateID + ', p: ' + p);
+
+	lastSample = currentSample.slice(0); // force copy
 }
 
 var updateMarkovPlot = function() {
