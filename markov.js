@@ -1,36 +1,17 @@
 // TODO 
-// - regularise data to a fixed dt
-// 		- make it exact, time wise. use time stamps
-// - limited width used for transition probs
-// - add y axis grid and max value
-// - add numerical value 
-// - potentially smooth current value
-// - try sequences of last n data points not just last
-// - visualise transition props, (the return to 0 propb, i.e.)
-// - extend transition matrix to something larger, better handle loooong skips
-// - beats instead of just presses --> holding button down
-// - continuous data for analog input
-// - extend to all buttons, how to mix ???
+// avoid missing high f events when sampling the current sample
+//		accumulate conservatively instead...
+
 
 // monkey patch
 Math.log2 = Math.log2 || function(a) { return Math.log(a) / Math.LN2; };
 
 
 var libsw = new LibSpaceWalk();
+
+var mc = new MarkovChain();
+
 var windowLengths = [15, 30, 60, 120, 240];
-var stepSize = [0.1, 0.5, 0.25, 0.125, 0.0725];
-var base = [1.6105, 1.4641, 1.331, 1.21, 1.21];
-var mm = [];
-for (var i = 0; i < windowLengths.length; i++) {
-	mm[i] = new MarkovModel(stepSize[0], 'exponential', base[i]);
-}
-
-var lastSample = [];
-var currentSample = [];
-
-var lastInteractionT = 0;
-
-var dataWindow = [];
 var samplingF = 100; // ms
 
 var historyData = [];
@@ -39,97 +20,32 @@ var maxHistoryLength = 120;
 var maxInformation = 1; // bits
 var maxEntropy = 1;
 
-var buttonLastActive = [];
-var presHoldReleaseThresholdSeconds = 0.1;
-var lastActivity = 0;
-var activityThresholdSeconds = 0.2;
-
-var analogLastValue = [];
-var analogActivationThresholdAbs = 0.2;
-
-var primed = false;
-
-
-// in seconds
-var Timer = function() {
-	var that = this;
-
-	this.lastT = performance.now() / 1000;
-	this.deltaT = 0;
-
-	this.tick = function() {
-		var currentT = performance.now() / 1000;
-		this.deltaT = currentT - this.lastT;
-		this.lastT = currentT;
-	};
-};
-var timer = new Timer();
-
-var approximateTime = 0;
-
+// reserving space for up to 16 buttons
+var currentSample = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var lastSample = currentSample;
 
 window.onload = function() {
 	window.setInterval(function() {
-		plot();
+		sample()
 	}, samplingF);
 }
 
 
 libsw.onMessage = function(data) {
 	if (data.type === "ext.input.gamePad.sample") {
-		approximateTime = data.payload.time;
-		if (primed) {
-
-			if (data.payload.type === 'analog') {
-				if (!analogLastValue[data.payload.name]) {
-					analogLastValue[data.payload.name] = {
-						value: data.payload.value,
-						time: data.payload.time
-					}
-				}
-
-				if (Math.abs(data.payload.value - analogLastValue[data.payload.name].value) > analogActivationThresholdAbs) {
-
-					var length = data.payload.time - lastInteractionT;
-
-					for (var i = 0; i < mm.length; i++) {
-						mm[i].addEndPoint(length);	
-					}
-
-					updateMarkovPlot();
-
-					lastInteractionT = data.payload.time;
-				}
-
-				analogLastValue[data.payload.name] = {
-					value: data.payload.value,
-					time: data.payload.time
-				}
-			}
-
-			if (data.payload.type === 'digital') {
-
-				if (!buttonLastActive[data.payload.name]) {
-					buttonLastActive[data.payload.name] = data.payload.time;
-				}
-
-				if (buttonLastActive[data.payload.name] + presHoldReleaseThresholdSeconds < data.payload.time) { // interaction!
-					var length = data.payload.time - lastInteractionT;
-
-					for (var i = 0; i < mm.length; i++) {
-						mm[i].addEndPoint(length);	
-					}
-					
-					updateMarkovPlot();
-
-					lastInteractionT = data.payload.time;
-				}
-			}
-		} else {
-			lastInteractionT = data.payload.time;
-			primed = true;
+		if (data.payload.type === 'digital') {
+			currentSample[data.payload.number] = data.payload.value;
 		}
 	}
+}
+
+var sample = function() {
+	var stateId = generateId(currentSample);
+	mc.learn(lastSample, currentSample);
+	var p = mc.p(lastSample, currentSample);
+	console.log('from: ' + lastSample + ' to: ' + currentSample + ', p: ' + p);
+
+	lastSample = currentSample;
 }
 
 var updateMarkovPlot = function() {
@@ -239,6 +155,11 @@ var selfInformation = function(prop) {
 	return Math.log2(1 / prop);
 }
 
+var generateId = function(arr) {
+	return arr.reduce(function(prev, current) {
+		return prev + current;
+	}, '');
+}
 
 // ================================= util ================================
 
