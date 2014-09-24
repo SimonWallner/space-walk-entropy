@@ -4,6 +4,7 @@
 	<title>Space Walk Markov Chain</title>
 	<script type="text/javascript" src="http://spacewalk.simonwallner.at/app/lib-space-walk.js"></script>
 	
+	<script type="text/javascript" src="discSampler.js"></script>
 	<script type="text/javascript" src="markovChain.js"></script>
 	<script type="text/javascript" src="markov.js"></script>
 
@@ -98,13 +99,41 @@
 			</div>
 		</div>
 		<div class="clear"></div>
-		<!-- <div id="live">
+
+		<!-- analog stuff -->
+		<div id="analog">
 			<div class="group">
+				<div class="labelBox"><span class="label">Analog&nbsp;Self&nbsp;Information</span></div>
+
 				<div class="data">
-					<div class="element" id="markov-bar"><span class="label" id="markov-value">--</span></div>
+					<div class="element">
+						<span class="label">15s</span>
+						<div class="bits-wrapper">
+							<span class="highValue" id="maxAnalogInformation">--</span>
+							<div class="bits" id="analogInfo15"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">30s</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="analogInfo30"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">60</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="analogInfo60"></div>
+						</div>
+					</div>
 				</div>
 			</div>
-		</div> -->
+		</div>
 	</div>
 </body>
 </html>

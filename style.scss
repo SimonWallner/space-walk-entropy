@@ -76,7 +76,7 @@ p {
 // === input complexity stuff ===
 $height: 50px;
 
-#selfIformation {
+#selfIformation, #analog {
 	margin-top: 1em;
 	padding-bottom: 1em;
 
@@ -154,7 +154,7 @@ $height: 50px;
 	}
 	
 	
-	#history {
+	#history, #analog {
 		float: left;
 
 		.group {

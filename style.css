@@ -47,26 +47,26 @@ p {
 .active {
   background-color: #3fc0c9; }
 
-#selfIformation {
+#selfIformation, #analog {
   margin-top: 1em;
   padding-bottom: 1em;
   font-family: 'Dosis';
   font-weight: 200; }
-  #selfIformation .labelBox {
+  #selfIformation .labelBox, #analog .labelBox {
     float: left;
     background-color: #555555;
     border-radius: 0.3em;
     height: 7em;
     width: 30px; }
-    #selfIformation .labelBox .label {
+    #selfIformation .labelBox .label, #analog .labelBox .label {
       transform: rotate(90deg);
       transform-origin: left top 0;
       display: inline-block;
       margin: 0.5em;
       margin-left: 1.6em; }
-  #selfIformation .data {
+  #selfIformation .data, #analog .data {
     margin-left: 35px; }
-  #selfIformation .element {
+  #selfIformation .element, #analog .element {
     width: 600px;
     height: 50px;
     font-weight: 400;
@@ -78,7 +78,7 @@ p {
     overflow: hidden;
     white-space: nowrap;
     position: relative; }
-    #selfIformation .element .label {
+    #selfIformation .element .label, #analog .element .label {
       position: absolute;
       top: 0px;
       left: 0px;
@@ -87,9 +87,9 @@ p {
       padding-top: 0.2em;
       background: linear-gradient(to right, rgba(0, 0, 0, 0.65) 0%, transparent 100%);
       z-index: 1; }
-    #selfIformation .element .background {
+    #selfIformation .element .background, #analog .element .background {
       z-index: -1; }
-    #selfIformation .element .highValue {
+    #selfIformation .element .highValue, #analog .element .highValue {
       position: absolute;
       right: 0px;
       top: 0px;
@@ -97,48 +97,48 @@ p {
       padding-top: 0.2em;
       z-index: 1;
       background-color: rgba(0, 0, 0, 0.5); }
-  #selfIformation .bits-wrapper {
+  #selfIformation .bits-wrapper, #analog .bits-wrapper {
     float: right; }
-  #selfIformation .bit {
+  #selfIformation .bit, #analog .bit {
     width: 3px;
     height: 48px;
     display: inline-block;
     margin-right: 2px;
     transform-origin: bottom left; }
-  #selfIformation #history {
+  #selfIformation #history, #selfIformation #analog, #analog #history, #analog #analog {
     float: left; }
-    #selfIformation #history .group:nth-child(1) .element {
+    #selfIformation #history .group:nth-child(1) .element, #selfIformation #analog .group:nth-child(1) .element, #analog #history .group:nth-child(1) .element, #analog #analog .group:nth-child(1) .element {
       border: solid 1px #8885ed; }
-    #selfIformation #history .group:nth-child(1) .bit {
+    #selfIformation #history .group:nth-child(1) .bit, #selfIformation #analog .group:nth-child(1) .bit, #analog #history .group:nth-child(1) .bit, #analog #analog .group:nth-child(1) .bit {
       background-color: #8885ed; }
-    #selfIformation #history .group:nth-child(2) .element {
+    #selfIformation #history .group:nth-child(2) .element, #selfIformation #analog .group:nth-child(2) .element, #analog #history .group:nth-child(2) .element, #analog #analog .group:nth-child(2) .element {
       border: solid 1px #3fc0c9; }
-    #selfIformation #history .group:nth-child(2) .bit {
+    #selfIformation #history .group:nth-child(2) .bit, #selfIformation #analog .group:nth-child(2) .bit, #analog #history .group:nth-child(2) .bit, #analog #analog .group:nth-child(2) .bit {
       background-color: #3fc0c9; }
-    #selfIformation #history .group:nth-child(3) .element {
+    #selfIformation #history .group:nth-child(3) .element, #selfIformation #analog .group:nth-child(3) .element, #analog #history .group:nth-child(3) .element, #analog #analog .group:nth-child(3) .element {
       border: solid 1px #8885ed; }
-    #selfIformation #history .group:nth-child(3) .bit {
+    #selfIformation #history .group:nth-child(3) .bit, #selfIformation #analog .group:nth-child(3) .bit, #analog #history .group:nth-child(3) .bit, #analog #analog .group:nth-child(3) .bit {
       background-color: #8885ed; }
-  #selfIformation .divider {
+  #selfIformation .divider, #analog .divider {
     height: 270px;
     border-left: dashed 2px #555555;
     margin-left: 2px;
     float: left; }
-  #selfIformation #live {
+  #selfIformation #live, #analog #live {
     margin-left: 613px; }
-    #selfIformation #live .element {
+    #selfIformation #live .element, #analog #live .element {
       width: 200px;
       overflow: visible; }
-    #selfIformation #live .group:nth-child(1) .element {
+    #selfIformation #live .group:nth-child(1) .element, #analog #live .group:nth-child(1) .element {
       background-color: #b6ce4e;
       border: solid 1px #b6ce4e; }
-    #selfIformation #live .group:nth-child(2) .element {
+    #selfIformation #live .group:nth-child(2) .element, #analog #live .group:nth-child(2) .element {
       background-color: #e89f49;
       border: solid 1px #e89f49; }
-    #selfIformation #live .group:nth-child(3) .element {
+    #selfIformation #live .group:nth-child(3) .element, #analog #live .group:nth-child(3) .element {
       background-color: #8885ed;
       border: solid 1px #8885ed; }
-    #selfIformation #live .label {
+    #selfIformation #live .label, #analog #live .label {
       background: none; }
 
 .pReturn .pReturnWrapper, .pReturn #markovInformation {

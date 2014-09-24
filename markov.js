@@ -28,6 +28,21 @@ var maxInformation = 1; // bits
 var currentSample = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var lastSample = currentSample;
 
+// analog fun
+var analogWindowLengths = [15, 30, 60];
+var analogMc = [];
+var analogHistoryData = []
+for (var i = 0; i < analogWindowLengths.length; i++) {
+	analogMc[i] = new MarkovChain(false);
+	analogHistoryData[i] = [];
+}
+var discSampler = new DiscSampler();
+var currentAnalogSample = {x: 0, y: 0};
+var lastAnalogID = discSampler.getID(currentAnalogSample);
+var maxAnalogInformation = 1;
+
+
+
 window.onload = function() {
 	window.setInterval(function() {
 		sample();
@@ -41,11 +56,18 @@ libsw.onMessage = function(data) {
 	if (data.type === "ext.input.gamePad.sample") {
 		if (data.payload.type === 'digital') {
 			currentSample[data.payload.buttonNumber] = data.payload.value;
+		} else if(data.payload.type === 'analog') {
+			if (data.payload.name === 'axis-0') {
+				currentAnalogSample.x = data.payload.value;
+			} else if (data.payload.name === 'axis-1') {
+				currentAnalogSample.y = data.payload.value;
+			}
 		}
 	}
 }
 
 var sample = function() {
+	// digital
 	var currentStateID = generateId(currentSample);
 	var lastStateID = generateId(lastSample);
 
@@ -61,6 +83,22 @@ var sample = function() {
 	}
 
 	lastSample = currentSample.slice(0); // force copy
+
+	// analog
+	var currentAnalogId = discSampler.getID(currentAnalogSample);
+	
+	for (var i = 0; i < analogWindowLengths.length; i++) {
+		analogMc[i].learn(lastAnalogID, currentAnalogId);
+		var p = analogMc[i].p(lastAnalogID, currentAnalogId);
+		var info = selfInformation(p);
+
+		analogHistoryData[i].push(info);
+		maxAnalogInformation = Math.max(maxAnalogInformation, info);
+
+		analogMc[i].truncate(analogWindowLengths[i]);
+	}
+
+	lastAnalogID = currentAnalogId;
 }
 
 
@@ -94,22 +132,20 @@ var updateGraph = function() {
 			.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
 	}
 
+	// analog
+	for (var i = 0; i < analogMc.length; i++) {
+		var bits = d3.select('#analogInfo' + analogWindowLengths[i]).selectAll('.bit').data(analogHistoryData[i]);
+		bits.enter()
+			.append('div')
+				.attr('class', 'bit')
+		bits
+			.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxAnalogInformation) + ')';});
 
-	
 
-	// // entropy
-	// var entropy = mm[0].entropy();
-	// entropyHistoryData.push(entropy);
-	// maxEntropy = Math.max(maxEntropy, entropy);
-
-	// bits = d3.select('#entropyBits').selectAll('.bit').data(entropyHistoryData);
-	// bits.enter()
-	// 	.append('div')
-	// 		.attr('class', 'bit')
-	// bits
-	// 	.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxEntropy) + ')';});
-
-	// $('#maxEntropy').text(maxEntropy.toFixed(2));
+		// $('#markov-value').text(historyData[historyData.length-1].toFixed(2));
+		// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
+		$('#maxAnalogInformation').text(maxAnalogInformation.toFixed(2));
+	}
 }
 
 
@@ -117,6 +153,11 @@ var truncateHistory = function() {
 	for (var i = 0; i < historyData.length; i++)
 	if (historyData[i].length > maxHistoryLength) {
 		historyData[i] = historyData[i].splice(historyData[i].length - maxHistoryLength);
+	}
+
+	for (var i = 0; i < analogHistoryData.length; i++)
+	if (analogHistoryData[i].length > maxHistoryLength) {
+		analogHistoryData[i] = analogHistoryData[i].splice(analogHistoryData[i].length - maxHistoryLength);
 	}
 }
 
