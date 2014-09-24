@@ -12,7 +12,7 @@ var libsw = new LibSpaceWalk();
 var windowLengths = [15, 30, 60, 120, 240];
 var mc = [];
 for (var i = 0; i < windowLengths.length; i++) {
-	mc[i] = new MarkovChain();
+	mc[i] = new MarkovChain(true);
 }
 
 var samplingF = 100; // ms
