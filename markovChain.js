@@ -2,6 +2,8 @@
 // - who to init Q? all with transitions to {0}*???
 
 
+// Discrete time, discrete space markov model
+// states are identified as strings
 var MarkovChain = function() {
 
 	var Q = []; // transition matrix storing transition counts;
@@ -44,7 +46,7 @@ var MarkovChain = function() {
 			Q[historyBuffer[0].from][historyBuffer[0].to]--;
 			sums[historyBuffer[0]]--;
 
-			buffer = buffer.slice(1);
+			historyBuffer = historyBuffer.slice(1);
 		}
 	}
 

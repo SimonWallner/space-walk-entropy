@@ -9,16 +9,20 @@ Math.log2 = Math.log2 || function(a) { return Math.log(a) / Math.LN2; };
 
 var libsw = new LibSpaceWalk();
 
-var mc = new MarkovChain();
-
 var windowLengths = [15, 30, 60, 120, 240];
+var mc = [];
+for (var i = 0; i < windowLengths.length; i++) {
+	mc[i] = new MarkovChain();
+}
+
 var samplingF = 100; // ms
 
 var historyData = [];
-var entropyHistoryData = [];
+for (var i = 0; i < windowLengths.length; i++) {
+	historyData[i] = [];
+}
 var maxHistoryLength = 120;
 var maxInformation = 1; // bits
-var maxEntropy = 1;
 
 // reserving space for up to 16 buttons
 var currentSample = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -26,7 +30,9 @@ var lastSample = currentSample;
 
 window.onload = function() {
 	window.setInterval(function() {
-		sample()
+		sample();
+		truncateHistory();
+		updateGraph();
 	}, samplingF);
 }
 
@@ -34,7 +40,7 @@ window.onload = function() {
 libsw.onMessage = function(data) {
 	if (data.type === "ext.input.gamePad.sample") {
 		if (data.payload.type === 'digital') {
-			currentSample[data.payload.number] = data.payload.value;
+			currentSample[data.payload.buttonNumber] = data.payload.value;
 		}
 	}
 }
@@ -43,108 +49,70 @@ var sample = function() {
 	var currentStateID = generateId(currentSample);
 	var lastStateID = generateId(lastSample);
 
-	mc.learn(lastStateID, currentStateID);
-	var p = mc.p(lastStateID, currentStateID);
+	for (var i = 0; i < windowLengths.length; i++) {
+		mc[i].learn(lastStateID, currentStateID);
+		var p = mc[i].p(lastStateID, currentStateID);
+		var info = selfInformation(p);
 
-	console.log('from: ' + lastStateID + ' to: ' + currentStateID + ', p: ' + p);
+		historyData[i].push(info);
+		maxInformation = Math.max(maxInformation, info);
+
+		mc[i].truncate(windowLengths[i]);
+	}
 
 	lastSample = currentSample.slice(0); // force copy
 }
 
-var updateMarkovPlot = function() {
-	for (var i = 0; i < mm.length; i++) {
-		var bars = d3.select('#pReturnWrapper' + windowLengths[i]).selectAll('.bar').data(mm[i].getPReturnVector());
-		bars.enter()
-			.append('div')
-				.attr('class', 'bar');
-		bars
-			.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d.p) + ')';})
-			.style('width', function(d) { return d.width * 200 + 'px'; });
-	}
-
-
-	// var selfInfo = mm.getPReturnVector().map(function(t) {
-	// 	t.selfInfo = selfInformation(t.p)
-	// 	return t;
-	// })
-	// var maxSelfInfo = Math.max(1, d3.max(selfInfo, function(d) { return d.selfInfo; }));
-
-	// var bars = d3.select('#markovInformation').selectAll('.bar').data(selfInfo);
-	// bars.enter()
-	// 	.append('div')
-	// 		.attr('class', 'bar');
-	// bars
-	// 	.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d.selfInfo / maxSelfInfo) + ')';})
-	// 	.style('width', function(d) { return d.width * 200 + 'px'; });
-}
 
 var updateGraph = function() {
-	var bits = d3.select('#bits').selectAll('.bit').data(historyData);
-	bits.enter()
-		.append('div')
-			.attr('class', 'bit')
-	bits
-		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
 
 
-	$('#markov-value').text(historyData[historyData.length-1].toFixed(2));
-	// $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
-	$('#maxValue').text(maxInformation.toFixed(2));
+	for (var i = 0; i < mc.length; i++) {
+		var bits = d3.select('#info' + windowLengths[i]).selectAll('.bit').data(historyData[i]);
+		bits.enter()
+			.append('div')
+				.attr('class', 'bit')
+		bits
+			.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
 
 
-	// gaussian
-	var kernel = gaussian(9)
-	var gaussianFiltered = filter(historyData, kernel);
-	bits = d3.select('#gaussianBits').selectAll('.bit').data(gaussianFiltered);
-	bits.enter()
-		.append('div')
-			.attr('class', 'bit')
-	bits
-		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
-
-
-	// entropy
-	var entropy = mm[0].entropy();
-	entropyHistoryData.push(entropy);
-	maxEntropy = Math.max(maxEntropy, entropy);
-
-	bits = d3.select('#entropyBits').selectAll('.bit').data(entropyHistoryData);
-	bits.enter()
-		.append('div')
-			.attr('class', 'bit')
-	bits
-		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxEntropy) + ')';});
-
-	$('#maxEntropy').text(maxEntropy.toFixed(2));
-}
-
-var plot = function() {
-	var length = approximateTime - lastInteractionT;
-
-	if (length > presHoldReleaseThresholdSeconds) { // interaction!
-		var info = selfInformation(mm[0].pReturn(length));
-	} else {
-		var info = selfInformation(mm[0].pContinue(length));
+		// $('#markov-value').text(historyData[historyData.length-1].toFixed(2));
+		// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
+		// $('#maxValue').text(maxInformation.toFixed(2));
 	}
 
-	historyData.push(info);
-	maxInformation = Math.max(maxInformation, info);
 
-	truncateHistory();
-	for (var i = 0; i < mm.length; i++) {
-		mm[i].unlearn(windowLengths[i]);
-	}
+	// // gaussian
+	// var kernel = gaussian(9)
+	// var gaussianFiltered = filter(historyData, kernel);
+	// bits = d3.select('#gaussianBits').selectAll('.bit').data(gaussianFiltered);
+	// bits.enter()
+	// 	.append('div')
+	// 		.attr('class', 'bit')
+	// bits
+	// 	.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
 
-	updateGraph();
-	updateMarkovPlot();
 
-	approximateTime += (samplingF / 1000);
+	// // entropy
+	// var entropy = mm[0].entropy();
+	// entropyHistoryData.push(entropy);
+	// maxEntropy = Math.max(maxEntropy, entropy);
+
+	// bits = d3.select('#entropyBits').selectAll('.bit').data(entropyHistoryData);
+	// bits.enter()
+	// 	.append('div')
+	// 		.attr('class', 'bit')
+	// bits
+	// 	.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxEntropy) + ')';});
+
+	// $('#maxEntropy').text(maxEntropy.toFixed(2));
 }
+
 
 var truncateHistory = function() {
-	if (historyData.length > maxHistoryLength) {
-		historyData = historyData.splice(historyData.length - maxHistoryLength);
-		entropyHistoryData = entropyHistoryData.splice(entropyHistoryData.length - maxHistoryLength);
+	for (var i = 0; i < historyData.length; i++)
+	if (historyData[i].length > maxHistoryLength) {
+		historyData[i] = historyData[i].splice(historyData[i].length - maxHistoryLength);
 	}
 }
 
