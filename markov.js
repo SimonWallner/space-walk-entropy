@@ -78,20 +78,24 @@ var updateGraph = function() {
 
 		// $('#markov-value').text(historyData[historyData.length-1].toFixed(2));
 		// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
-		// $('#maxValue').text(maxInformation.toFixed(2));
+		$('#maxInformation').text(maxInformation.toFixed(2));
+	}
+
+	// gaussian
+	var kernel = gaussian(9)
+
+	for (var i = 0; i < 3; i++)	{
+		var gaussianFiltered = filter(historyData[i], kernel);
+		bits = d3.select('#filtered' + windowLengths[i]).selectAll('.bit').data(gaussianFiltered);
+		bits.enter()
+			.append('div')
+				.attr('class', 'bit')
+		bits
+			.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
 	}
 
 
-	// // gaussian
-	// var kernel = gaussian(9)
-	// var gaussianFiltered = filter(historyData, kernel);
-	// bits = d3.select('#gaussianBits').selectAll('.bit').data(gaussianFiltered);
-	// bits.enter()
-	// 	.append('div')
-	// 		.attr('class', 'bit')
-	// bits
-	// 	.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
-
+	
 
 	// // entropy
 	// var entropy = mm[0].entropy();

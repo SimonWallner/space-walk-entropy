@@ -44,7 +44,7 @@ var MarkovChain = function() {
 		var currentTime = getTime();
 		while (historyBuffer[0] && (currentTime - historyBuffer[0].time) > timeSeconds) {
 			Q[historyBuffer[0].from][historyBuffer[0].to]--;
-			sums[historyBuffer[0]]--;
+			sums[historyBuffer[0].from]--;
 
 			historyBuffer = historyBuffer.slice(1);
 		}

@@ -19,69 +19,79 @@
 	<div id="selfIformation">
 		<div id="history">
 			<div class="group">
-				<div class="labelBox"><span class="label">Markov&nbsp;Chain</span></div>
-				<div class="pReturn data" class="data">
-					<div id="info15" class="pReturnWrapper element markov">
-						<span class="label background">15s</span>
-					</div>
-				</div>
-				<div class="pReturn data" class="data">
-					<div id="info30" class="pReturnWrapper element markov">
-						<span class="label background">30s</span>
+				<div class="labelBox"><span class="label">Self&nbsp;Information</span></div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">15s</span>
+						<div class="bits-wrapper">
+							<span class="highValue" id="maxInformation">--</span>
+							<div class="bits" id="info15"></div>
+						</div>
 					</div>
 				</div>
 
-				<div class="pReturn data" class="data">
-					<div id="info60" class="pReturnWrapper element markov">
-						<span class="label background">60s</span>
+				<div class="data">
+					<div class="element">
+						<span class="label">30s</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="info30"></div>
+						</div>
 					</div>
 				</div>
 
-				<div class="pReturn data" class="data">
-					<div id="info120" class="pReturnWrapper element markov">
-						<span class="label background">120s</span>
+				<div class="data">
+					<div class="element">
+						<span class="label">60</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="info60"></div>
+						</div>
 					</div>
 				</div>
 
-				<div class="pReturn data" class="data">
-					<div id="info240" class="pReturnWrapper element markov">
-						<span class="label background">240s</span>
+				<div class="data">
+					<div class="element">
+						<span class="label">120</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="info120"></div>
+						</div>
 					</div>
 				</div>
 
-<!-- 			<div id="pReturn" class="data">
-					<div id="markovInformation" class="element markov">
-						<span class="label background">Self Information</span>
+				<div class="data">
+					<div class="element">
+						<span class="label">240</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="info240"></div>
+						</div>
 					</div>
-				</div> -->
+				</div>
 			</div>
 
 			<div class="group" id="">
-				<div class="labelBox"><span class="label">History</span></div>
+				<div class="labelBox"><span class="label">Filtered</span></div>
 				<div class="data">
 					<div class="element">
-						<span class="label">Self Information</span>
-						<span class="highValue" id="maxValue">--</span>
+						<span class="label">15s</span>
 						<div class="bits-wrapper">
-							<div class="bits" id="bits"></div>
+							<div class="bits" id="filtered15"></div>
 						</div>
 					</div>
 				</div>
 
 				<div class="data">
 					<div class="element">
-						<span class="label">Gaussian width: 9</span>
+						<span class="label">30s</span>
 						<div class="bits-wrapper">
-							<div class="bits" id="gaussianBits"></div>
+							<div class="bits" id="filtered30"></div>
 						</div>
 					</div>
 				</div>
 				<div class="data">
 					<div class="element">
-						<span class="label">Entropy</span>
-						<span class="highValue" id="maxEntropy">--</span>
+						<span class="label">60s</span>
 						<div class="bits-wrapper">
-							<div class="bits" id="entropyBits"></div>
+							<div class="bits" id="filtered60"></div>
 						</div>
 					</div>
 				</div>
