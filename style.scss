@@ -278,5 +278,8 @@ $height: 50px;
 }
 
 svg {
-	background-color: white;
+	path {
+		stroke: $darkGrey;
+		stroke-width: 3px;
+	}
 }

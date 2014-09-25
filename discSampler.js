@@ -3,7 +3,26 @@ var DiscSampler = function() {
 
 	var voronoi = new Voronoi();
 	var bbox = {xl: -1, xr: 1, yt: -1, yb: 1};
-	var sites = [{x: 0, y: 0}, {x: 0.75, y: 0.75}, {x: -0.75, y: 0.75}, {x: -0.75, y: -0.75}, {x: 0.75, y: -0.75}];
+
+	var circleDistances = [0.3, 0.6, 0.95];
+	var circleCounts = [5, 10, 20];
+	var sites = [{x: 0, y: 0}]
+
+	circleDistances.forEach(function(distance, index) {
+		var count = circleCounts[index];
+			
+		var angleInc = (2 * Math.PI) / count;
+		for (var i = 0; i < count; i++) {
+			var point = {
+				x: distance * Math.cos(angleInc * i),
+				y: distance * Math.sin(angleInc * i),
+			}
+			sites.push(point);
+		}
+	})
+
+
+	 // {x: 0.75, y: 0.75}, {x: -0.75, y: 0.75}, {x: -0.75, y: -0.75}, {x: 0.75, y: -0.75}];
 	var diagram = voronoi.compute(sites, bbox);
 
 	this.getID = function(x, y) {
@@ -47,6 +66,10 @@ var DiscSampler = function() {
 		})
 
 		return paths;
+	}
+
+	this.getSites = function() {
+		return sites;
 	}
 
 	// utils

@@ -175,5 +175,6 @@ p {
     transform-origin: bottom left;
     display: inline-block; }
 
-svg {
-  background-color: white; }
+svg path {
+  stroke: #333333;
+  stroke-width: 3px; }

@@ -53,13 +53,18 @@ window.onload = function() {
 		.attr('width', svgSize + 'px')
 		.attr('height', svgSize + 'px');
 
-	var paths = discSampler.getPaths();
-
 	var x = d3.scale.linear()
 		.domain([-1, 1])
-		.range([10, svgSize - 20]);
+		.range([0, svgSize]);
 
-	paths.forEach(function(path) {
+	svg.append('defs').append('clipPath')
+		.attr('id', 'clip')
+		.append('circle')
+			.attr('cx', x(0))
+			.attr('cy', x(0))
+			.attr('r', svgSize / 2);
+
+	discSampler.getPaths().forEach(function(path) {
 		var lineFunc = d3.svg.line()
 			.x(function(d) { return x(d.x); })
  			.y(function(d) { return x(d.y); })
@@ -67,11 +72,17 @@ window.onload = function() {
 
 		svg.append('path')
 			.attr('d', lineFunc(path.path))
-			.attr('stroke', 'white')
-			.attr('stroke-width', 2)
-			.attr('fill', 'blue')
-			.attr('id', 'cell' + path.id);
+			.attr('fill', '#666')
+			.attr('id', 'cell' + path.id)
+			.attr('clip-path', 'url(#clip)');
 	});
+
+	// discSampler.getSites().forEach(function(site) {
+	// 	svg.append('circle')
+	// 		.attr('cx', x(site.x))
+	// 		.attr('cy', x(site.y))
+	// 		.attr('r', 5)
+	// });
 
 	drawControllerSelect();
 
@@ -157,7 +168,7 @@ var sample = function() {
 
 	var c = d3.scale.linear()
 		.domain([0, 1])
-		.range(['blue', 'red']);
+		.range(['#666', '#e25454']);
 
 	var probs = analogMc[2].transitionP(currentAnalogId);
 	probs.forEach(function(element) {
