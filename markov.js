@@ -84,18 +84,11 @@ libsw.onMessage = function(data) {
 			currentSample[data.payload.buttonNumber] = data.payload.value;
 		} else if(data.payload.type === 'analog') {
 
-			var lastID = discSampler.getID(currentAnalogSample);
-
 			if (data.payload.name === 'axis-0') {
 				currentAnalogSample.x = data.payload.value;
 			} else if (data.payload.name === 'axis-1') {
 				currentAnalogSample.y = data.payload.value;
 			}
-
-			var currentID = discSampler.getID(currentAnalogSample);
-			svg.select('#cell' + lastID).attr('fill', 'blue');
-			svg.select('#cell' + currentID).attr('fill', 'red');
-
 		}
 	}
 }
@@ -131,6 +124,15 @@ var sample = function() {
 
 		analogMc[i].truncate(analogWindowLengths[i]);
 	}
+
+	var c = d3.scale.linear()
+		.domain([0, 1])
+		.range(['blue', 'red']);
+
+	var probs = analogMc[0].transitionP(currentAnalogId);
+	probs.forEach(function(element) {
+		svg.select('#cell' + element.id).attr('fill', c(element.p));
+	});
 
 	lastAnalogID = currentAnalogId;
 }

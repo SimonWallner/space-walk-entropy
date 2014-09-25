@@ -48,7 +48,7 @@ var MarkovChain = function(biased) {
 					}
 				}
 
-				tos[to] = true;;
+				tos[to] = true;
 			}
 
 		} else {
@@ -56,10 +56,12 @@ var MarkovChain = function(biased) {
 			if (Q[from] === undefined) {
 				Q[from] = {};
 				sums[from] = 0;
+				froms[from] = true;
 			}
 
 			if (Q[from][to] === undefined) {
 				Q[from][to] = 0;
+				tos[to] = true;
 			}
 		}
 		
@@ -95,5 +97,19 @@ var MarkovChain = function(biased) {
 		}
 
 		return Q[from][to] / sums[from];
+	}
+
+	// return a list of transitions probs starting at 'from'
+	this.transitionP = function(from) {
+		var transition = []
+		for(t in tos) {
+			if (tos.hasOwnProperty(t)) {
+				transition.push({
+					id: t,
+					p: this.p(from, t)})
+			}
+		}
+
+		return transition;
 	}
 }
