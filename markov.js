@@ -63,10 +63,11 @@ window.onload = function() {
 			.interpolate("linear");
 
 		svg.append('path')
-			.attr('d', lineFunc(path))
-			.attr("stroke", "white")
-			.attr("stroke-width", 2)
-			.attr("fill", "blue");
+			.attr('d', lineFunc(path.path))
+			.attr('stroke', 'white')
+			.attr('stroke-width', 2)
+			.attr('fill', 'blue')
+			.attr('id', 'cell' + path.id);
 	});
 
 	window.setInterval(function() {
@@ -82,11 +83,19 @@ libsw.onMessage = function(data) {
 		if (data.payload.type === 'digital') {
 			currentSample[data.payload.buttonNumber] = data.payload.value;
 		} else if(data.payload.type === 'analog') {
+
+			var lastID = discSampler.getID(currentAnalogSample);
+
 			if (data.payload.name === 'axis-0') {
 				currentAnalogSample.x = data.payload.value;
 			} else if (data.payload.name === 'axis-1') {
 				currentAnalogSample.y = data.payload.value;
 			}
+
+			var currentID = discSampler.getID(currentAnalogSample);
+			svg.select('#cell' + lastID).attr('fill', 'blue');
+			svg.select('#cell' + currentID).attr('fill', 'red');
+
 		}
 	}
 }
