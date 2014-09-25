@@ -178,3 +178,7 @@ p {
 svg path {
   stroke: #333333;
   stroke-width: 3px; }
+svg circle.outline {
+  stroke-width: 1px;
+  stroke: #cccccc;
+  fill: none; }
