@@ -1,7 +1,10 @@
 // sampling on a disc
 var DiscSampler = function() {
 
-	var divisions = 5;
+	var voronoi = new Voronoi();
+	var bbox = {xl: -1, xr: 1, yt: -1, yb: 1};
+	var sites = [{x: 0, y: 0}, {x: 0.75, y: 0.75}, {x: -0.75, y: 0.75}, {x: -0.75, y: -0.75}, {x: 0.75, y: -0.75}];
+	var diagram = voronoi.compute(sites, bbox);
 
 	this.getID = function(x, y) {
 		if (y === undefined) { // passing in an object instead of coords...
@@ -9,29 +12,40 @@ var DiscSampler = function() {
 			x = x.x;
 		}
 
-		// simple grid based sampling
-		// map [-1, 1] to discrete [0, 4]
-		var idX = Math.max(0, Math.min(divisions - 1, Math.floor(map(-1, 1, 0, divisions, x))));
-		var idy = Math.max(0, Math.min(divisions - 1, Math.floor(map(-1, 1, 0, divisions, y))));
+		var minDistance = Infinity;
+		var minIndex = -1;
 
-		return idX.toString() + idy.toString();
+		sites.forEach(function(element, index) {
+			var d = distance(element, {x: x, y: y});
+			if (d < minDistance) {
+				minDistance = d;
+				minIndex = index;
+			}
+		})
+
+		if (minIndex > -1) {
+			return minIndex.toString();
+		}
+
+		return 'index-not-found';
 	}
 
 	this.getPaths = function() {
+		var that = this;
 		var paths = [];
-		var inc = 2 / divisions;
-		for (var i = 0; i < divisions; i++) {
-			for (var j = 0; j < divisions; j++) {
-				paths.push({
-					path: [
-						{x: -1 + i * inc, 		y: -1 + j * inc},
-						{x: -1 + i * inc, 		y: -1 + (j + 1) * inc},
-						{x: -1 + (i + 1) * inc, y: -1 + (j + 1) * inc},
-						{x: -1 + (i + 1) * inc, y: -1 + j * inc}],
-					id: this.getID({x: -1 + (i + 0.5) * inc, y: -1 + (j + 0.5) * inc})
-				})
-			}
-		}
+		
+		diagram.cells.forEach(function(cell) {
+			var path = [];
+			path.push(cell.halfedges[0].getStartpoint());
+			cell.halfedges.forEach(function(edge) {
+				path.push(edge.getEndpoint());
+			})
+			paths.push({
+				path: path,
+				id: that.getID(cell.site)
+			});
+		})
+
 		return paths;
 	}
 
@@ -41,5 +55,14 @@ var DiscSampler = function() {
 	var map = function(a, b, r, s, x) {
 		var t = (x - a) / (b - a);
 		return r + (t * s - r);
+	}
+
+	var distance = function(a, b) {
+		var v = {
+			x: b.x - a.x,
+			y: b.y - a.y,
+		}
+
+		return (v.x * v.x) + (v.y * v.y);
 	}
 }
