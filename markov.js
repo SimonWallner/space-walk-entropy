@@ -41,9 +41,34 @@ var currentAnalogSample = {x: 0, y: 0};
 var lastAnalogID = discSampler.getID(currentAnalogSample);
 var maxAnalogInformation = 1;
 
-
+var svg;
+var svgSize = 300;
 
 window.onload = function() {
+
+	svg = d3.select('#graph').append('svg')
+		.attr('width', svgSize + 'px')
+		.attr('height', svgSize + 'px');
+
+	var paths = discSampler.getPaths();
+
+	var x = d3.scale.linear()
+		.domain([-1, 1])
+		.range([10, svgSize - 20]);
+
+	paths.forEach(function(path) {
+		var lineFunc = d3.svg.line()
+			.x(function(d) { return x(d.x); })
+ 			.y(function(d) { return x(d.y); })
+			.interpolate("linear");
+
+		svg.append('path')
+			.attr('d', lineFunc(path))
+			.attr("stroke", "white")
+			.attr("stroke-width", 2)
+			.attr("fill", "blue");
+	});
+
 	window.setInterval(function() {
 		sample();
 		truncateHistory();

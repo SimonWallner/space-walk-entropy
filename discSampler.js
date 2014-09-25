@@ -17,6 +17,22 @@ var DiscSampler = function() {
 		return idX.toString() + idy.toString();
 	}
 
+	this.getPaths = function() {
+		var paths = [];
+		var inc = 2 / divisions;
+		for (var i = 0; i < divisions; i++) {
+			for (var j = 0; j < divisions; j++) {
+				paths.push([
+					{x: -1 + i * inc, 		y: -1 + j * inc},
+					{x: -1 + i * inc, 		y: -1 + (j + 1) * inc},
+					{x: -1 + (i + 1) * inc, y: -1 + (j + 1) * inc},
+					{x: -1 + (i + 1) * inc, y: -1 + j * inc}
+				])
+			}
+		}
+		return paths;
+	}
+
 	// utils
 
 	// map x from [a, b] to [r, s]

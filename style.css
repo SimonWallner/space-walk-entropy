@@ -152,3 +152,6 @@ p {
     box-sizing: border-box;
     transform-origin: bottom left;
     display: inline-block; }
+
+svg {
+  background-color: white; }
