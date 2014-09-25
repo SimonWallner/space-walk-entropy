@@ -73,6 +73,36 @@ p {
 	background-color: $blue;
 }
 
+#controllerSelect {
+	border: 1px solid $lightGrey;
+	padding: 0.5em;
+	border-radius: 0.3em;
+	display: inline-block;
+	span {
+		margin-right: 0.5em;
+	}
+
+	div {
+		width: 2em;
+		height: 2em;
+		border-radius: 0.2em;
+		padding: 0.3em;
+		background-color: $lighterGrey;
+		display: inline-block;
+		margin-right: 0.5em;
+		cursor: pointer;
+
+		&:last-child {
+			margin-right: 0px;
+		}
+
+		&.active {
+			cursor: default;
+			background-color: $blue;
+		}
+	}
+}
+
 // === input complexity stuff ===
 $height: 50px;
 

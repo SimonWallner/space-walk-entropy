@@ -9,6 +9,9 @@ Math.log2 = Math.log2 || function(a) { return Math.log(a) / Math.LN2; };
 
 var libsw = new LibSpaceWalk();
 
+var activeController = 0;
+var knownControllers = [0];
+
 var windowLengths = [15, 30, 60, 120, 240];
 var mc = [];
 for (var i = 0; i < windowLengths.length; i++) {
@@ -70,6 +73,8 @@ window.onload = function() {
 			.attr('id', 'cell' + path.id);
 	});
 
+	drawControllerSelect();
+
 	window.setInterval(function() {
 		sample();
 		truncateHistory();
@@ -77,17 +82,42 @@ window.onload = function() {
 	}, samplingF);
 }
 
+var drawControllerSelect = function() {
+	var divs = d3.select('#controllerSelect').selectAll('div').data(knownControllers);
+	divs.enter()
+		.append('div')
+			.text(function(d) { return d; })
+			.attr('id', function(d) { return 'controller' + d; })
+			.on('click', function(d) {
+				activeController = d;
+				drawControllerSelect();
+			})
+
+	divs.text(function(d) { return d; })
+		.attr('class', '');
+
+	$('#controller' + activeController).addClass('active');
+}
 
 libsw.onMessage = function(data) {
 	if (data.type === "ext.input.gamePad.sample") {
-		if (data.payload.type === 'digital') {
-			currentSample[data.payload.buttonNumber] = data.payload.value;
-		} else if(data.payload.type === 'analog') {
 
-			if (data.payload.name === 'axis-0') {
-				currentAnalogSample.x = data.payload.value;
-			} else if (data.payload.name === 'axis-1') {
-				currentAnalogSample.y = data.payload.value;
+		if (data.payload.controllerNumber === activeController) {
+			if (data.payload.type === 'digital') {
+				currentSample[data.payload.buttonNumber] = data.payload.value;
+			} else if(data.payload.type === 'analog') {
+
+				if (data.payload.name === 'axis-0') {
+					currentAnalogSample.x = data.payload.value;
+				} else if (data.payload.name === 'axis-1') {
+					currentAnalogSample.y = data.payload.value;
+				}
+			}
+		} else {
+			if (knownControllers.indexOf(data.payload.controllerNumber) === -1) {
+				knownControllers.push(data.payload.controllerNumber);
+
+				drawControllerSelect();
 			}
 		}
 	}
@@ -129,7 +159,7 @@ var sample = function() {
 		.domain([0, 1])
 		.range(['blue', 'red']);
 
-	var probs = analogMc[0].transitionP(currentAnalogId);
+	var probs = analogMc[2].transitionP(currentAnalogId);
 	probs.forEach(function(element) {
 		svg.select('#cell' + element.id).attr('fill', c(element.p));
 	});
