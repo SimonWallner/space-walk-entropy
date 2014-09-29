@@ -47,6 +47,9 @@ var maxAnalogInformation = 1;
 var svg;
 var svgSize = 300;
 
+var MatrixRoundRobin = 0;
+var matrixIDs;
+
 window.onload = function() {
 
 	svg = d3.select('#graph').append('svg')
@@ -101,7 +104,7 @@ window.onload = function() {
 	setupMatrixPlot();
 	window.setInterval(function() {
 		updateMatrixPlot();
-	}, 500);
+	}, 100);
 }
 
 var drawControllerSelect = function() {
@@ -267,10 +270,10 @@ var generateId = function(arr) {
 
 
 var setupMatrixPlot = function() {
-	var ids = discSampler.getAllIDs();
+	matrixIDs = discSampler.getAllIDs();
 	var size = 100;
 
-	d3.select('#matrixPlot').data(ids)
+	d3.select('#matrixPlot').data(matrixIDs)
 		.enter()
 			.append('svg')
 			.attr('class', 'matrix')
@@ -283,7 +286,7 @@ var setupMatrixPlot = function() {
 		.range([3, size - 3]);
 
 
-	ids.forEach(function(id) {
+	matrixIDs.forEach(function(id) {
 
 		var svg = d3.select('#matrix-' + id);
 		var g = svg.append('g');
@@ -326,18 +329,18 @@ var setupMatrixPlot = function() {
 }
 
 var updateMatrixPlot = function() {
-	var ids = discSampler.getAllIDs();
-
 	var c = d3.scale.linear()
 		.domain([0, 1])
 		.range(['#444', '#e25454']);
 
-	ids.forEach(function(id) {
-		var probs = analogMc[2].transitionP(id);
-		probs.forEach(function(element) {
-			d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.p));
-		});
+	var id = matrixIDs[MatrixRoundRobin]
+
+	var probs = analogMc[2].transitionP(id);
+	probs.forEach(function(element) {
+		d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.p));
 	});
+
+	MatrixRoundRobin = (MatrixRoundRobin + 1) % matrixIDs.length;
 }
 
 
