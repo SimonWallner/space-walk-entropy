@@ -34,9 +34,6 @@ body {
 	font-family: 'Dosis';
 	font-weight: 400;
 	color: #E8E8E8;
-	/* come on iOS webkit, be a good citizen! */
-	-webkit-text-size-adjust: 100%;
-	// padding: 1em;
 }
 
 #container {
@@ -76,9 +73,42 @@ p {
 	background-color: $blue;
 }
 
+#controllerSelect {
+	border: 1px solid $lightGrey;
+	padding: 0.5em;
+	border-radius: 0.3em;
+	display: inline-block;
+	span {
+		margin-right: 0.5em;
+	}
+
+	div {
+		width: 2em;
+		height: 2em;
+		border-radius: 0.2em;
+		padding: 0.3em;
+		background-color: $lighterGrey;
+		display: inline-block;
+		margin-right: 0.5em;
+		cursor: pointer;
+
+		&:last-child {
+			margin-right: 0px;
+		}
+
+		&.active {
+			cursor: default;
+			background-color: $blue;
+		}
+	}
+}
+
 // === input complexity stuff ===
-#selfIformation {
+$height: 50px;
+
+#selfIformation, #analog {
 	margin-top: 1em;
+	padding-bottom: 1em;
 
 	font-family: 'Dosis';
 	font-weight: 200;
@@ -94,7 +124,7 @@ p {
 		float: left;
 		background-color: $grey;
 		border-radius: 0.3em;
-		height: 5.5em;
+		height: 7em;
 		width: 30px;
 	}
 	.data {
@@ -103,7 +133,7 @@ p {
 
 	.element {
 		width: 600px;
-		height: 5em;
+		height: $height;
 		font-weight: 400;
 		padding-top: 0.1em;
 		border: solid 1px $lime;
@@ -125,6 +155,20 @@ p {
 			background: linear-gradient(to right, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
 			z-index: 1;
 		}
+
+		.background {
+			z-index: -1;
+		}
+
+		.highValue {
+			position: absolute;
+			right: 0px;
+			top: 0px;
+			padding: 0.5em;
+			padding-top: 0.2em;
+			z-index: 1;
+			background-color: rgba(0, 0, 0, 0.5);
+		}
 	}
 
 	.bits-wrapper {
@@ -133,33 +177,32 @@ p {
 
 	.bit {
 		width: 3px;
-		height: 4.9em;
-		background-color: $orange;
+		height: $height - 2;
 		display: inline-block;
 		margin-right: 2px;
 		transform-origin: bottom left;
 	}
 	
 	
-	#history {
+	#history, #analog {
 		float: left;
 
 		.group {
 			&:nth-child(1) {
 				.element {
-					border: solid 1px $lime;
+					border: solid 1px $lavender;
 				}
 				.bit {
-					background-color: $lime;
+					background-color: $lavender;
 				}
 			}
 
 			&:nth-child(2) {
 				.element {
-					border: solid 1px $orange;
+					border: solid 1px $blue;
 				}
 				.bit {
-					background-color: $orange;
+					background-color: $blue;
 				}
 			}
 			&:nth-child(3) {
@@ -214,4 +257,50 @@ p {
 		}
 	}
 
+}
+
+.pReturn {
+	.pReturnWrapper, #markovInformation {
+		white-space: nowrap;
+		padding-left: 2px;
+
+		.bar {
+			width: 2px;
+			height: $height - 2;
+			border-right: 2px solid #333;
+			background-color: $lavender;
+			box-sizing: border-box;
+			// float: left;
+			transform-origin: bottom left;
+			display: inline-block;
+		}
+	}
+}
+
+svg {
+	path {
+		stroke: $darkGrey;
+		stroke-width: 3px;
+	}
+
+	circle.outline {
+		stroke-width: 1px;
+		stroke: $lightGrey;
+		fill: none;
+	}
+}
+
+svg.matrix {
+	// background-color: white;
+	margin-right: 1px;
+	path {
+		stroke-width: 1.5px;
+		&.anchor {
+			stroke: $blue;
+		}
+	}
+
+	circle.outline {
+		stroke-width: 0.5px;
+	}
 }

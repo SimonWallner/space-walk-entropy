@@ -3,30 +3,146 @@
 <head>
 	<title>Space Walk Markov Chain</title>
 	<script type="text/javascript" src="http://spacewalk.simonwallner.at/app/lib-space-walk.js"></script>
-	<script type="text/javascript" src="markov.js"></script>
 
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	
+	<script type="text/javascript" src="lib/voronoi/rhill-voronoi-core.js"></script>
+	<script type="text/javascript" src="discSampler.js"></script>
+	<script type="text/javascript" src="markovChain.js"></script>
+	<script type="text/javascript" src="markov.js"></script>
 
 	<link href='http://spacewalk.simonwallner.at/app/css/base.css' rel='stylesheet' type='text/css'>
 	<link href='style.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
 	<h1>Markov Chain</h1>
+	<div id="controllerSelect"><span>active controller: </span></div>
+	<div class="clear"></div>
+	
 	<div id="selfIformation">
 		<div id="history">
-			<div class="group" id="">
-				<div class="labelBox"><span class="label">Markov</span></div>
+			<div class="group">
+				<div class="labelBox"><span class="label">Self&nbsp;Information</span></div>
+
 				<div class="data">
 					<div class="element">
-						<span class="label">something something</span>
+						<span class="label">15s</span>
 						<div class="bits-wrapper">
-							<div class="bits" id="bits"></div>
+							<span class="highValue" id="maxInformation">--</span>
+							<div class="bits" id="info15"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">30s</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="info30"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">60</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="info60"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">120</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="info120"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">240</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="info240"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="group" id="">
+				<div class="labelBox"><span class="label">Filtered</span></div>
+				<div class="data">
+					<div class="element">
+						<span class="label">15s</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="filtered15"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">30s</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="filtered30"></div>
+						</div>
+					</div>
+				</div>
+				<div class="data">
+					<div class="element">
+						<span class="label">60s</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="filtered60"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<div class="clear"></div>
+
+		<!-- analog stuff -->
+		<div id="analog">
+			<div class="group">
+				<div class="labelBox"><span class="label">Analog&nbsp;Self&nbsp;Information</span></div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">15s</span>
+						<div class="bits-wrapper">
+							<span class="highValue" id="maxAnalogInformation">--</span>
+							<div class="bits" id="analogInfo15"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">30s</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="analogInfo30"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="data">
+					<div class="element">
+						<span class="label">60</span>
+						<div class="bits-wrapper">
+							<div class="bits" id="analogInfo60"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="clear"></div>
+		<div id="graph"></div>
+
+		<div class="clear"></div>
+		<div id="matrixPlot"></div>
 	</div>
 </body>
 </html>
