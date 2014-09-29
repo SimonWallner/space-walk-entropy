@@ -1,5 +1,5 @@
 // TODO/questions
-// - who to init Q? all with transitions to {0}*???
+// - how to init Q? all with transitions to {0}*???
 
 
 // Discrete time, discrete space markov model

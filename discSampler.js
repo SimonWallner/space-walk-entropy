@@ -49,6 +49,22 @@ var DiscSampler = function() {
 		return 'index-not-found';
 	}
 
+	this.getAllIDs = function() {
+		var that = this;
+		var sorted = sites.slice();
+		sorted.sort(function(a, b) {
+			if (a.x !== b.x) {
+				return a.y - b.y;
+			} else {
+				return a.x - b.x;
+			}
+			return 0;
+		});
+		return sorted.map(function(element) {
+			return that.getID(element);
+		})
+	}
+
 	this.getPaths = function() {
 		var that = this;
 		var paths = [];

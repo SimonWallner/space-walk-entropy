@@ -289,3 +289,18 @@ svg {
 		fill: none;
 	}
 }
+
+svg.matrix {
+	// background-color: white;
+	margin-right: 1px;
+	path {
+		stroke-width: 1.5px;
+		&.anchor {
+			stroke: $blue;
+		}
+	}
+
+	circle.outline {
+		stroke-width: 0.5px;
+	}
+}

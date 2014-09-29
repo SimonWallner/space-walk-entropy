@@ -182,3 +182,12 @@ svg circle.outline {
   stroke-width: 1px;
   stroke: #cccccc;
   fill: none; }
+
+svg.matrix {
+  margin-right: 1px; }
+  svg.matrix path {
+    stroke-width: 1.5px; }
+    svg.matrix path.anchor {
+      stroke: #3fc0c9; }
+  svg.matrix circle.outline {
+    stroke-width: 0.5px; }

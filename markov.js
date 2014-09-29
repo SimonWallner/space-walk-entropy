@@ -97,6 +97,11 @@ window.onload = function() {
 		truncateHistory();
 		updateGraph();
 	}, samplingF);
+
+	setupMatrixPlot();
+	window.setInterval(function() {
+		updateMatrixPlot();
+	}, 500);
 }
 
 var drawControllerSelect = function() {
@@ -259,6 +264,85 @@ var generateId = function(arr) {
 		return prev + current;
 	}, '');
 }
+
+
+var setupMatrixPlot = function() {
+	var ids = discSampler.getAllIDs();
+	var size = 100;
+
+	d3.select('#matrixPlot').data(ids)
+		.enter()
+			.append('svg')
+			.attr('class', 'matrix')
+			.attr('id', function(d) { return 'matrix-' + d; })
+			.attr('width', size + 'px')
+			.attr('height', size + 'px');
+
+	var x = d3.scale.linear()
+		.domain([-1, 1])
+		.range([3, size - 3]);
+
+
+	ids.forEach(function(id) {
+
+		var svg = d3.select('#matrix-' + id);
+		var g = svg.append('g');
+
+		svg.append('defs').append('clipPath')
+			.attr('id', 'matrixClip')
+			.append('circle')
+				.attr('cx', x(0))
+				.attr('cy', x(0))
+				.attr('r', size / 2 - 4);
+		
+		svg.append('circle')
+			.attr('cx', x(0))
+			.attr('cy', x(0))
+			.attr('r', size / 2 - 2)
+			.attr('class', 'outline');
+
+		discSampler.getPaths().forEach(function(path) {
+			var lineFunc = d3.svg.line()
+				.x(function(d) { return x(d.x); })
+	 			.y(function(d) { return x(d.y); })
+				.interpolate("linear");
+	
+			if (id === path.id) {
+				svg.append('path')
+				.attr('d', lineFunc(path.path))
+				.attr('fill', '#444')
+				.attr('id', 'cell-' + id + '-' + path.id)
+				.attr('clip-path', 'url(#matrixClip)')
+				.attr('class', 'anchor');
+			} else {
+				g.append('path')
+				.attr('d', lineFunc(path.path))
+				.attr('fill', '#444')
+				.attr('id', 'cell-' + id + '-' + path.id)
+				.attr('clip-path', 'url(#matrixClip)');
+			}
+		});	
+	})
+}
+
+var updateMatrixPlot = function() {
+	var ids = discSampler.getAllIDs();
+
+	var c = d3.scale.linear()
+		.domain([0, 1])
+		.range(['#444', '#e25454']);
+
+	ids.forEach(function(id) {
+		var probs = analogMc[2].transitionP(id);
+		probs.forEach(function(element) {
+			d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.p));
+		});
+	});
+}
+
+
+
+
 
 // ================================= util ================================
 
