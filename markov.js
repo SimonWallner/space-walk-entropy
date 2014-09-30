@@ -44,10 +44,7 @@ var currentAnalogSample = {x: 0, y: 0};
 var lastAnalogID = discSampler.getID(currentAnalogSample);
 var maxAnalogInformation = 1;
 
-var svg;
 var svgSize = 300;
-
-var sumSvg;
 
 var MatrixRoundRobin = 0;
 var matrixIDs;
@@ -68,80 +65,20 @@ var c = d3.scale.linear()
 
 
 window.onload = function() {
-
-	svg = d3.select('#graph').append('svg')
-		.attr('width', svgSize + 'px')
-		.attr('height', svgSize + 'px');
-
-	var x = d3.scale.linear()
-		.domain([-1, 1])
-		.range([3, svgSize - 3]);
-
-	svg.append('defs').append('clipPath')
-		.attr('id', 'clip')
-		.append('circle')
-			.attr('cx', x(0))
-			.attr('cy', x(0))
-			.attr('r', svgSize / 2 - 6);
-	
-	svg.append('circle')
-		.attr('cx', x(0))
-		.attr('cy', x(0))
-		.attr('r', svgSize / 2 - 2)
-		.attr('class', 'outline');
-
-	discSampler.getPaths().forEach(function(path) {
-		var lineFunc = d3.svg.line()
-			.x(function(d) { return x(d.x); })
- 			.y(function(d) { return x(d.y); })
-			.interpolate("linear");
-
-		svg.append('path')
-			.attr('d', lineFunc(path.path))
-			.attr('fill', '#444')
-			.attr('id', 'cell' + path.id)
-			.attr('clip-path', 'url(#clip)');
-	});
-
-	// sum svg
-	sumSvg = d3.select('#graph').append('svg')
-		.attr('width', svgSize + 'px')
-		.attr('height', svgSize + 'px');
-
-	sumSvg.append('defs').append('clipPath')
-		.attr('id', 'sumClip')
-		.append('circle')
-			.attr('cx', x(0))
-			.attr('cy', x(0))
-			.attr('r', svgSize / 2 - 6);
-	
-	sumSvg.append('circle')
-		.attr('cx', x(0))
-		.attr('cy', x(0))
-		.attr('r', svgSize / 2 - 2)
-		.attr('class', 'outline');
-
-	discSampler.getPaths().forEach(function(path) {
-		var lineFunc = d3.svg.line()
-			.x(function(d) { return x(d.x); })
- 			.y(function(d) { return x(d.y); })
-			.interpolate("linear");
-
-		sumSvg.append('path')
-			.attr('d', lineFunc(path.path))
-			.attr('fill', '#444')
-			.attr('id', 'cell-sum-' + path.id)
-			.attr('clip-path', 'url(#sumClip)');
-	});
-
-
 	drawControllerSelect();
+
+	setupAnalog();
 
 	window.setInterval(function() {
 		sample();
 		truncateHistory();
 		updateGraph();
 	}, samplingF);
+
+	setupFlowVis();
+	window.setInterval(function() {
+		updateFlowVis();
+	}, 500);
 
 	setupMatrixPlot();
 	window.setInterval(function() {
@@ -237,7 +174,7 @@ var sample = function() {
 
 	var probs = analogMc[2].transitionP(currentAnalogId);
 	probs.forEach(function(element) {
-		svg.select('#cell' + element.id).attr('fill', c(element.pLog));
+		d3.select('#graph-cell-' + element.id).attr('fill', c(element.pLog));
 	});
 
 	lastAnalogID = currentAnalogId;
@@ -319,6 +256,44 @@ var generateId = function(arr) {
 	return arr.reduce(function(prev, current) {
 		return prev + current;
 	}, '');
+}
+
+var setupAnalog = function() {
+		var x = d3.scale.linear()
+			.domain([-1, 1])
+			.range([3, svgSize - 3]);
+
+	['graph', 'sumSvg', 'flowVis'].forEach(function(id) {
+		var svg = d3.select('#' + id).append('svg')
+			.attr('width', svgSize + 'px')
+			.attr('height', svgSize + 'px');
+
+		svg.append('defs').append('clipPath')
+			.attr('id', 'clip-' + id)
+			.append('circle')
+				.attr('cx', x(0))
+				.attr('cy', x(0))
+				.attr('r', svgSize / 2 - 6);
+		
+		svg.append('circle')
+			.attr('cx', x(0))
+			.attr('cy', x(0))
+			.attr('r', svgSize / 2 - 2)
+			.attr('class', 'outline');
+
+		discSampler.getPaths().forEach(function(path) {
+			var lineFunc = d3.svg.line()
+				.x(function(d) { return x(d.x); })
+	 			.y(function(d) { return x(d.y); })
+				.interpolate("linear");
+
+			svg.append('path')
+				.attr('d', lineFunc(path.path))
+				.attr('fill', '#444')
+				.attr('id', id + '-cell-' + path.id)
+				.attr('clip-path', 'url(#clip-' + id +')');
+		});		
+	})
 }
 
 
@@ -403,7 +378,7 @@ var updateSumSvg = function() {
 
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
-			d3.select('#cell-sum-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));	
+			d3.select('#sumSvg-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));	
 		}
 	}
 }
@@ -467,6 +442,35 @@ var updateLinearPlot = function() {
 	}
 }
 
+var setupFlowVis = function() {
+	d3.select('#flowVis svg defs').append('marker')
+		.attr('id', 'markerArrow')
+		.attr('viewBox', '0 0 10 10')
+		.attr('markerWidth', 5)
+		.attr('markerHeight', 4)
+		.attr('refX', 2)
+		.attr('refY', 5)
+		.attr('orient', 'auto')
+		.append('path')
+			.attr('d', 'M0,0 L0,10 L10,5 L0,0')
+			.attr('fill', '#3fc0c9')
+			// .attr('stroke-width', '0px')
+			.attr('style', 'stroke-width: 0px')
+}
+
+var updateFlowVis = function() {
+	var data = discSampler.getFlowData();
+
+	var x = d3.scale.linear()
+		.domain([-1, 1])
+		.range([3, svgSize - 3]);
+
+	var selection = d3.select('#flowVis svg').selectAll('path.glyph').data(data);
+	selection.enter()
+		.append('path')
+			.attr('d', function(d) { return 'M' + x(d.x1) + ',' + x(d.y1) + ' L' + x(d.x2) + ',' + x(d.y2); })
+			.attr('class', 'glyph');
+}
 
 
 

@@ -277,6 +277,10 @@ $height: 50px;
 	}
 }
 
+div.inline {
+	display: inline-block;
+}
+
 svg {
 	path {
 		stroke: $darkGrey;
@@ -290,6 +294,11 @@ svg {
 	}
 	rect.outline {
 		shape-rendering: crispEdges;
+	}
+
+	path.glyph {
+		stroke: $blue;
+		marker-end: url(#markerArrow);
 	}
 }
 

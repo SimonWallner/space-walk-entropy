@@ -175,6 +175,9 @@ p {
     transform-origin: bottom left;
     display: inline-block; }
 
+div.inline {
+  display: inline-block; }
+
 svg path {
   stroke: #333333;
   stroke-width: 3px; }
@@ -184,6 +187,9 @@ svg .outline {
   fill: none; }
 svg rect.outline {
   shape-rendering: crispEdges; }
+svg path.glyph {
+  stroke: #3fc0c9;
+  marker-end: url(#markerArrow); }
 
 svg.matrix {
   margin-right: 1px; }

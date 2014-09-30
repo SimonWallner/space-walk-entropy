@@ -88,6 +88,19 @@ var DiscSampler = function() {
 		return sites;
 	}
 
+	// get flow data for a certain site
+	this.getFlowData = function() {
+		// compute center of mass
+		// return difference vector to site
+
+		return sites.map(function(site) {
+			return {
+				x1: site.x, 		y1: site.y,
+				x2: site.x + 0.1, 	y2: site.y + 0.1
+			};
+		})
+	}
+
 	// utils
 
 	// map x from [a, b] to [r, s]

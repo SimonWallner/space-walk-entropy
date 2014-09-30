@@ -3,8 +3,8 @@ var LinearSampler = function() {
 	var domain = {min: 0, max: 1};
 	var numSamples = 4;
 
-	var upperLimits = [0.25, 0.5, 0.75, 1];
-	var lowerLimits = [0, 0.25, 0.5, 0.75];
+	var upperLimits = [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
+	var lowerLimits = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875];
 
 	this.getID = function(x) {
 		
