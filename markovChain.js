@@ -99,6 +99,18 @@ var MarkovChain = function(biased) {
 		return Q[from][to] / sums[from];
 	}
 
+	this.pLog = function(from, to) {
+		if (Q[from] === undefined || Q[from][to] === undefined) {
+			return 0;
+		}
+
+		if (sums[from] === undefined || sums[from] <= 1) {
+			return 0;
+		}
+
+		return Math.max(0, Math.log(Q[from][to])) / Math.log(sums[from]);
+	}
+
 	// return a list of transitions probs starting at 'from'
 	this.transitionP = function(from) {
 		var transition = []
@@ -106,10 +118,14 @@ var MarkovChain = function(biased) {
 			if (tos.hasOwnProperty(t)) {
 				transition.push({
 					id: t,
-					p: this.p(from, t)})
+					p: this.p(from, t),
+					pLog: this.pLog(from, t)})
 			}
 		}
-
 		return transition;
+	}
+
+	this.sums = function() {
+		return sums;
 	}
 }

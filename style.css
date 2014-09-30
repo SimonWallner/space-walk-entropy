@@ -178,10 +178,12 @@ p {
 svg path {
   stroke: #333333;
   stroke-width: 3px; }
-svg circle.outline {
+svg .outline {
   stroke-width: 1px;
   stroke: #cccccc;
   fill: none; }
+svg rect.outline {
+  shape-rendering: crispEdges; }
 
 svg.matrix {
   margin-right: 1px; }

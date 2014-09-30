@@ -32,7 +32,9 @@ var LinearSampler = function() {
 				{x: upperLimits[i], y: 0},
 				{x: upperLimits[i], y: 1}
 			];
-			paths.push(path);
+			paths.push({
+				path: path,
+				id: i});
 		}
 		return paths;
 	}

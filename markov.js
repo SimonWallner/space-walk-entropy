@@ -32,7 +32,7 @@ var currentSample = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var lastSample = currentSample;
 
 // analog fun
-var analogWindowLengths = [15, 30, 60];
+var analogWindowLengths = [150, 300, 600];
 var analogMc = [];
 var analogHistoryData = []
 for (var i = 0; i < analogWindowLengths.length; i++) {
@@ -47,8 +47,25 @@ var maxAnalogInformation = 1;
 var svg;
 var svgSize = 300;
 
+var sumSvg;
+
 var MatrixRoundRobin = 0;
 var matrixIDs;
+
+// linear stuff
+var linearMc = new MarkovChain(false);
+var linearSampler = new LinearSampler();
+var linearSVGSize = {w: 300, h: 50};
+var linearSvg;
+var linearCurrentID;
+var linearLastID;
+
+
+// shared
+var c = d3.scale.linear()
+	.domain([0, 1])
+	.range(['#444', '#e25454']);
+
 
 window.onload = function() {
 
@@ -86,12 +103,37 @@ window.onload = function() {
 			.attr('clip-path', 'url(#clip)');
 	});
 
-	// discSampler.getSites().forEach(function(site) {
-	// 	svg.append('circle')
-	// 		.attr('cx', x(site.x))
-	// 		.attr('cy', x(site.y))
-	// 		.attr('r', 5)
-	// });
+	// sum svg
+	sumSvg = d3.select('#graph').append('svg')
+		.attr('width', svgSize + 'px')
+		.attr('height', svgSize + 'px');
+
+	sumSvg.append('defs').append('clipPath')
+		.attr('id', 'sumClip')
+		.append('circle')
+			.attr('cx', x(0))
+			.attr('cy', x(0))
+			.attr('r', svgSize / 2 - 6);
+	
+	sumSvg.append('circle')
+		.attr('cx', x(0))
+		.attr('cy', x(0))
+		.attr('r', svgSize / 2 - 2)
+		.attr('class', 'outline');
+
+	discSampler.getPaths().forEach(function(path) {
+		var lineFunc = d3.svg.line()
+			.x(function(d) { return x(d.x); })
+ 			.y(function(d) { return x(d.y); })
+			.interpolate("linear");
+
+		sumSvg.append('path')
+			.attr('d', lineFunc(path.path))
+			.attr('fill', '#444')
+			.attr('id', 'cell-sum-' + path.id)
+			.attr('clip-path', 'url(#sumClip)');
+	});
+
 
 	drawControllerSelect();
 
@@ -105,6 +147,15 @@ window.onload = function() {
 	window.setInterval(function() {
 		updateMatrixPlot();
 	}, 100);
+
+	window.setInterval(function() {
+		updateSumSvg();
+	}, 500);
+
+	setupLinearPlot();
+	window.setInterval(function() {
+		updateLinearPlot();
+	}, 500);
 }
 
 var drawControllerSelect = function() {
@@ -136,6 +187,10 @@ libsw.onMessage = function(data) {
 					currentAnalogSample.x = data.payload.value;
 				} else if (data.payload.name === 'axis-1') {
 					currentAnalogSample.y = data.payload.value;
+				}
+
+				if (data.payload.name === 'axis-5') { // right trigger (XB360)
+					linearCurrentID = linearSampler.getID(data.payload.value);
 				}
 			}
 		} else {
@@ -180,22 +235,20 @@ var sample = function() {
 		analogMc[i].truncate(analogWindowLengths[i]);
 	}
 
-	var c = d3.scale.linear()
-		.domain([0, 1])
-		.range(['#444', '#e25454']);
-
 	var probs = analogMc[2].transitionP(currentAnalogId);
 	probs.forEach(function(element) {
-		svg.select('#cell' + element.id).attr('fill', c(element.p));
+		svg.select('#cell' + element.id).attr('fill', c(element.pLog));
 	});
 
 	lastAnalogID = currentAnalogId;
+
+	// linear
+	linearMc.learn(linearLastID, linearCurrentID);
+	linearLastID = linearCurrentID;
 }
 
 
 var updateGraph = function() {
-
-
 	for (var i = 0; i < mc.length; i++) {
 		var bits = d3.select('#info' + windowLengths[i]).selectAll('.bit').data(historyData[i]);
 		bits.enter()
@@ -273,7 +326,7 @@ var setupMatrixPlot = function() {
 	matrixIDs = discSampler.getAllIDs();
 	var size = 100;
 
-	d3.select('#matrixPlot').data(matrixIDs)
+	d3.select('#matrixPlot').selectAll('svg').data(matrixIDs)
 		.enter()
 			.append('svg')
 			.attr('class', 'matrix')
@@ -329,18 +382,89 @@ var setupMatrixPlot = function() {
 }
 
 var updateMatrixPlot = function() {
-	var c = d3.scale.linear()
-		.domain([0, 1])
-		.range(['#444', '#e25454']);
-
 	var id = matrixIDs[MatrixRoundRobin]
 
 	var probs = analogMc[2].transitionP(id);
 	probs.forEach(function(element) {
-		d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.p));
+		d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.pLog));
 	});
 
 	MatrixRoundRobin = (MatrixRoundRobin + 1) % matrixIDs.length;
+}
+
+var updateSumSvg = function() {
+	var sums = analogMc[2].sums();
+	var total = 0;
+	for (var from in sums) {
+		if (sums.hasOwnProperty(from)) {
+			total += sums[from];
+		}
+	}
+
+	for (var from in sums) {
+		if (sums.hasOwnProperty(from)) {
+			d3.select('#cell-sum-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));	
+		}
+	}
+}
+
+var setupLinearPlot = function() {
+
+	var dimension = function(d) {
+		d.attr('width', linearSVGSize.w)
+		.attr('height', linearSVGSize.h);
+	}
+	linearSvg = d3.select('#linearPlot').append('svg').call(dimension);
+	linearSumsSvg = d3.select('#linearSums').append('svg').call(dimension);
+
+	var x = d3.scale.linear()
+		.domain([0, 1])
+		.range([4, linearSVGSize.w - 4]);
+
+	var y = d3.scale.linear()
+		.domain([0, 1])
+		.range([4, linearSVGSize.h - 4]);
+
+	[linearSvg, linearSumsSvg].forEach(function(svg) {
+		linearSampler.getPaths().forEach(function(path) {
+			var lineFunc = d3.svg.line()
+				.x(function(d) { return x(d.x); })
+	 			.y(function(d) { return y(d.y); })
+				.interpolate("linear");
+
+			svg.append('path')
+				.attr('d', lineFunc(path.path))
+				.attr('fill', '#444')
+				.attr('id', svg[0][0].parentElement.id + '-cell-' + path.id)
+		});
+
+		svg.append('rect')
+			.attr('x', 1)
+			.attr('y', 1)
+			.attr('width', linearSVGSize.w - 2)
+			.attr('height', linearSVGSize.h - 2)
+			.attr('class', 'outline');
+	});
+}
+
+var updateLinearPlot = function() {
+	linearMc.transitionP(linearCurrentID).forEach(function(p) {
+		d3.select('#linearPlot-cell-' + p.id).attr('fill', c(p.p));
+	})
+
+	var sums = linearMc.sums();
+	var total = 0;
+	for (var from in sums) {
+		if (sums.hasOwnProperty(from)) {
+			total += sums[from];
+		}
+	}
+
+	for (var from in sums) {
+		if (sums.hasOwnProperty(from)) {
+			d3.select('#linearSums-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));	
+		}
+	}
 }
 
 

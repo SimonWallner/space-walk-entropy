@@ -283,10 +283,13 @@ svg {
 		stroke-width: 3px;
 	}
 
-	circle.outline {
+	.outline {
 		stroke-width: 1px;
 		stroke: $lightGrey;
 		fill: none;
+	}
+	rect.outline {
+		shape-rendering: crispEdges;
 	}
 }
 
