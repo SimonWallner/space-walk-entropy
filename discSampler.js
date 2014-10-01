@@ -95,8 +95,10 @@ var DiscSampler = function() {
 
 		return sites.map(function(site) {
 			return {
-				x1: site.x, 		y1: site.y,
-				x2: site.x + 0.1, 	y2: site.y + 0.1
+				x: site.x,
+				y: site.y,
+				direction: 0,
+				strength: 1
 			};
 		})
 	}

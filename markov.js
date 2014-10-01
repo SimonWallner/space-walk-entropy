@@ -464,11 +464,24 @@ var updateFlowVis = function() {
 	var x = d3.scale.linear()
 		.domain([-1, 1])
 		.range([3, svgSize - 3]);
+	var s = d3.scale.linear()
+		.domain([0, 1])
+		.range([0, 10]);
+
+	var pathSpec = function(d) { 
+		var dirVector = {
+			x: Math.cos(d.direction),
+			y: -Math.sin(d.direction)
+		};
+
+		return 'M' + (x(d.x) - s(dirVector.x * d.strength)) + ',' + (x(d.y) - s(dirVector.y * d.strength))
+		 + ' L' + (x(d.x) + s(dirVector.x * d.strength)) + ',' + (x(d.y) + s(dirVector.y * d.strength));
+	};
 
 	var selection = d3.select('#flowVis svg').selectAll('path.glyph').data(data);
 	selection.enter()
 		.append('path')
-			.attr('d', function(d) { return 'M' + x(d.x1) + ',' + x(d.y1) + ' L' + x(d.x2) + ',' + x(d.y2); })
+			.attr('d', pathSpec)
 			.attr('class', 'glyph');
 }
 
