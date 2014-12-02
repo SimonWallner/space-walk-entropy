@@ -1,4 +1,4 @@
-// TODO 
+// TODO
 // avoid missing high f events when sampling the current sample
 //		accumulate conservatively instead...
 
@@ -160,7 +160,7 @@ var sample = function() {
 
 	// analog
 	var currentAnalogId = discSampler.getID(currentAnalogSample);
-	
+
 	for (var i = 0; i < analogWindowLengths.length; i++) {
 		analogMc[i].learn(lastAnalogID, currentAnalogId);
 		var p = analogMc[i].p(lastAnalogID, currentAnalogId);
@@ -196,7 +196,7 @@ var updateGraph = function() {
 
 
 		// $('#markov-value').text(historyData[historyData.length-1].toFixed(2));
-		// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
+		// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));
 		$('#maxInformation').text(maxInformation.toFixed(2));
 	}
 
@@ -224,7 +224,7 @@ var updateGraph = function() {
 
 
 		// $('#markov-value').text(historyData[historyData.length-1].toFixed(2));
-		// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));	
+		// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));
 		$('#maxAnalogInformation').text(maxAnalogInformation.toFixed(2));
 	}
 }
@@ -274,7 +274,7 @@ var setupAnalog = function() {
 				.attr('cx', x(0))
 				.attr('cy', x(0))
 				.attr('r', svgSize / 2 - 6);
-		
+
 		svg.append('circle')
 			.attr('cx', x(0))
 			.attr('cy', x(0))
@@ -292,7 +292,7 @@ var setupAnalog = function() {
 				.attr('fill', '#444')
 				.attr('id', id + '-cell-' + path.id)
 				.attr('clip-path', 'url(#clip-' + id +')');
-		});		
+		});
 	})
 }
 
@@ -325,7 +325,7 @@ var setupMatrixPlot = function() {
 				.attr('cx', x(0))
 				.attr('cy', x(0))
 				.attr('r', size / 2 - 4);
-		
+
 		svg.append('circle')
 			.attr('cx', x(0))
 			.attr('cy', x(0))
@@ -337,7 +337,7 @@ var setupMatrixPlot = function() {
 				.x(function(d) { return x(d.x); })
 	 			.y(function(d) { return x(d.y); })
 				.interpolate("linear");
-	
+
 			if (id === path.id) {
 				svg.append('path')
 				.attr('d', lineFunc(path.path))
@@ -352,7 +352,7 @@ var setupMatrixPlot = function() {
 				.attr('id', 'cell-' + id + '-' + path.id)
 				.attr('clip-path', 'url(#matrixClip)');
 			}
-		});	
+		});
 	})
 }
 
@@ -378,7 +378,7 @@ var updateSumSvg = function() {
 
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
-			d3.select('#sumSvg-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));	
+			d3.select('#sumSvg-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));
 		}
 	}
 }
@@ -437,7 +437,7 @@ var updateLinearPlot = function() {
 
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
-			d3.select('#linearSums-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));	
+			d3.select('#linearSums-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));
 		}
 	}
 }
@@ -459,7 +459,7 @@ var setupFlowVis = function() {
 }
 
 var updateFlowVis = function() {
-	var data = discSampler.getFlowData();
+	var data = discSampler.getFlowData(analogMc[0].Q(), analogMc[0].sums());
 
 	var x = d3.scale.linear()
 		.domain([-1, 1])
@@ -468,21 +468,25 @@ var updateFlowVis = function() {
 		.domain([0, 1])
 		.range([0, 10]);
 
-	var pathSpec = function(d) { 
+	var pathSpec = function(d) {
 		var dirVector = {
-			x: Math.cos(d.direction),
-			y: -Math.sin(d.direction)
+			x: (d.centerX - d.x) / 2,
+			y: (d.centerY - d.y) / 2
 		};
 
-		return 'M' + (x(d.x) - s(dirVector.x * d.strength)) + ',' + (x(d.y) - s(dirVector.y * d.strength))
-		 + ' L' + (x(d.x) + s(dirVector.x * d.strength)) + ',' + (x(d.y) + s(dirVector.y * d.strength));
+		// return 'M' + (x(d.x) - s(dirVector.x * d.strength)) + ',' + (x(d.y) - s(dirVector.y * d.strength))
+		//  + ' L' + (x(d.x) + s(dirVector.x * d.strength)) + ',' + (x(d.y) + s(dirVector.y * d.strength));
+		return 'M' + x(d.x) + ',' + x(d.y)
+			+ ' L' + x(d.x + dirVector.x) + ',' + x(d.y + dirVector.y);
 	};
 
 	var selection = d3.select('#flowVis svg').selectAll('path.glyph').data(data);
 	selection.enter()
 		.append('path')
-			.attr('d', pathSpec)
-			.attr('class', 'glyph');
+		.attr('class', 'glyph');
+
+	selection // update
+		.attr('d', pathSpec);
 }
 
 

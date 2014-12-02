@@ -7,7 +7,7 @@
 var MarkovChain = function(biased) {
 
 	var Q = {}; // transition matrix storing transition counts;
-	// this ends up to be a 2D matrix that is addressed as 
+	// this ends up to be a 2D matrix that is addressed as
 	// Q[from][to]
 
 	var sums = {}; // storing the out-degree of each state
@@ -64,7 +64,7 @@ var MarkovChain = function(biased) {
 				tos[to] = true;
 			}
 		}
-		
+
 
 		Q[from][to]++;
 		sums[from]++;
@@ -127,5 +127,9 @@ var MarkovChain = function(biased) {
 
 	this.sums = function() {
 		return sums;
+	}
+
+	this.Q = function() {
+		return Q;
 	}
 }

@@ -10,7 +10,7 @@ var DiscSampler = function() {
 
 	circleDistances.forEach(function(distance, index) {
 		var count = circleCounts[index];
-			
+
 		var angleInc = (2 * Math.PI) / count;
 		for (var i = 0; i < count; i++) {
 			var point = {
@@ -21,8 +21,6 @@ var DiscSampler = function() {
 		}
 	})
 
-
-	 // {x: 0.75, y: 0.75}, {x: -0.75, y: 0.75}, {x: -0.75, y: -0.75}, {x: 0.75, y: -0.75}];
 	var diagram = voronoi.compute(sites, bbox);
 
 	this.getID = function(x, y) {
@@ -49,6 +47,10 @@ var DiscSampler = function() {
 		return 'index-not-found';
 	}
 
+	this.getSite = function(id) {
+		return sites[id];
+	}
+
 	this.getAllIDs = function() {
 		var that = this;
 		var sorted = sites.slice();
@@ -68,7 +70,7 @@ var DiscSampler = function() {
 	this.getPaths = function() {
 		var that = this;
 		var paths = [];
-		
+
 		diagram.cells.forEach(function(cell) {
 			var path = [];
 			path.push(cell.halfedges[0].getStartpoint());
@@ -89,21 +91,41 @@ var DiscSampler = function() {
 	}
 
 	// get flow data for a certain site
-	this.getFlowData = function() {
+	this.getFlowData = function(Q, sums) {
 		// compute center of mass
 		// return difference vector to site
+		// strength = excentricity...
+		var that = this;
+		return sites.map(function(site, from) {
 
-		return sites.map(function(site) {
+			var tos = Q[from];
+			if (tos) {
+				var sum = {x: 0, y: 0}
+				for (var to in tos)
+					if (tos.hasOwnProperty(to)) {
+						var site = that.getSite(to);
+						// weight...
+						var weight = Q[from][to];
+						sum = mad(sum, site, weight);
+					}
+
+				var center = mul(sum, 1 / sums[from]);
+			} else {
+				var center = site;
+			}
+
 			return {
 				x: site.x,
 				y: site.y,
-				direction: 0,
-				strength: 1
+				centerX: center.x,
+				centerY: center.y
 			};
 		})
 	}
 
-	// utils
+
+
+	// --- utils ---------------------------------------------------------------
 
 	// map x from [a, b] to [r, s]
 	var map = function(a, b, r, s, x) {
@@ -118,5 +140,17 @@ var DiscSampler = function() {
 		}
 
 		return (v.x * v.x) + (v.y * v.y);
+	}
+
+	var add = function(a, b) {
+		return {x: a.x + b.x, y: a.y + b.y};
+	}
+
+	var mul = function(a, s) {
+		return {x: a.x * s, y: a.y * s};
+	}
+
+	var mad = function(a, b, s) {
+		return {x: a.x + b.x * s, y: a.y + b.y * s};
 	}
 }
