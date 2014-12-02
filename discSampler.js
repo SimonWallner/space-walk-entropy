@@ -99,14 +99,14 @@ var DiscSampler = function() {
 		return sites.map(function(site, from) {
 
 			var tos = Q[from];
-			if (tos) {
+			if (tos && sums[from] && sums[from] > 0) {
 				var sum = {x: 0, y: 0}
 				for (var to in tos)
 					if (tos.hasOwnProperty(to)) {
-						var site = that.getSite(to);
+						var toSite = that.getSite(to);
 						// weight...
 						var weight = Q[from][to];
-						sum = mad(sum, site, weight);
+						sum = mad(sum, toSite, weight);
 					}
 
 				var center = mul(sum, 1 / sums[from]);

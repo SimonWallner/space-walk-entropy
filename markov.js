@@ -459,7 +459,7 @@ var setupFlowVis = function() {
 }
 
 var updateFlowVis = function() {
-	var data = discSampler.getFlowData(analogMc[0].Q(), analogMc[0].sums());
+	var data = discSampler.getFlowData(analogMc[2].Q(), analogMc[2].sums());
 
 	var x = d3.scale.linear()
 		.domain([-1, 1])
@@ -474,8 +474,12 @@ var updateFlowVis = function() {
 			y: (d.centerY - d.y) / 2
 		};
 
-		// return 'M' + (x(d.x) - s(dirVector.x * d.strength)) + ',' + (x(d.y) - s(dirVector.y * d.strength))
-		//  + ' L' + (x(d.x) + s(dirVector.x * d.strength)) + ',' + (x(d.y) + s(dirVector.y * d.strength));
+		// var dirVector = {
+		// 	x: 0.1,
+		// 	y: 0.1
+		// };
+
+
 		return 'M' + x(d.x) + ',' + x(d.y)
 			+ ' L' + x(d.x + dirVector.x) + ',' + x(d.y + dirVector.y);
 	};
