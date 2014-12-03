@@ -78,28 +78,38 @@ window.onload = function() {
 	setupAnalog();
 
 	window.setInterval(function() {
-		sample();
-		truncateHistory();
-		updateGraph();
+		if (!libsw.isPaused()) {
+			sample();
+			truncateHistory();
+			updateGraph();
+		}
 	}, samplingF);
 
 	setupFlowVis();
 	window.setInterval(function() {
-		updateFlowVis();
+		if (!libsw.isPaused()) {
+			updateFlowVis();
+		}
 	}, 500);
 
 	setupMatrixPlot();
 	window.setInterval(function() {
-		updateMatrixPlot();
+		if (!libsw.isPaused()) {
+			updateMatrixPlot();
+		}
 	}, 100);
 
 	window.setInterval(function() {
-		updateSumSvg();
+		if (!libsw.isPaused()) {
+			updateSumSvg();
+		}
 	}, 500);
 
 	setupLinearPlot();
 	window.setInterval(function() {
-		updateLinearPlot();
+		if (!libsw.isPaused()) {
+			updateLinearPlot();
+		}
 	}, 500);
 }
 
