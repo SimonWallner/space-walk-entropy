@@ -190,6 +190,8 @@ svg rect.outline {
 svg path.glyph {
   stroke: #3fc0c9;
   marker-end: url(#markerArrow); }
+svg path.quiver {
+  stroke: #c1dfe1; }
 
 svg.matrix {
   margin-right: 1px; }

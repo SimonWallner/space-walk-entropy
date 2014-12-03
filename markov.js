@@ -57,6 +57,18 @@ var linearSvg;
 var linearCurrentID;
 var linearLastID;
 
+// quivers
+var quivers = []
+for (var i = 0; i < 50;) {
+	pos = {
+		x: Math.random() * 2 - 1,
+		y: Math.random() * 2 - 1
+	};
+	if (distance({x: 0, y: 0}, pos) < 1) {
+		quivers.push({pos: pos});
+		i++;
+	}
+}
 
 // shared
 var c = d3.scale.linear()
@@ -474,12 +486,6 @@ var updateFlowVis = function() {
 			y: (d.centerY - d.y) / 2
 		};
 
-		// var dirVector = {
-		// 	x: 0.1,
-		// 	y: 0.1
-		// };
-
-
 		return 'M' + x(d.x) + ',' + x(d.y)
 			+ ' L' + x(d.x + dirVector.x) + ',' + x(d.y + dirVector.y);
 	};
@@ -491,6 +497,57 @@ var updateFlowVis = function() {
 
 	selection // update
 		.attr('d', pathSpec);
+
+
+	// quiver plot
+	var sites = discSampler.getSites();
+	for (var i = 0; i < quivers.length; i++) {
+		pos = quivers[i].pos;
+
+		var pairs = sites.map(function(site, index) {
+			var d = distance(pos, site)
+			return {
+				siteId: index,
+				distance: d
+			}
+		})
+
+		var sorted = pairs.slice();
+		sorted.sort(function(a, b) {
+			return a.distance - b.distance;
+		});
+
+		var sum = {x: 0, y: 0};
+		var weightSum = 0;
+		for (var k = 0; k < 3; k++) {
+			var pair = sorted[k];
+			var siteCenter = {x: data[pair.siteId].centerX, y: data[pair.siteId].centerY}
+			var weight = 1 - (pair.distance / sorted[2].distance);
+			sum = mad(sum, siteCenter, weight);
+			weightSum += weight;
+		}
+		mul(sum, 1 / weightSum);
+
+		quivers[i].center = sum;
+	}
+
+	var quiverPathSpec = function(d) {
+		var dirVector = {
+			x: (d.center.x - d.pos.x) / 4,
+			y: (d.center.y - d.pos.y) / 4
+		};
+
+		return 'M' + x(d.pos.x) + ',' + x(d.pos.y)
+			+ ' L' + x(d.pos.x + dirVector.x) + ',' + x(d.pos.y + dirVector.y);
+	};
+
+	var selection = d3.select('#flowVis svg').selectAll('path.quiver').data(quivers);
+	selection.enter()
+		.append('path')
+		.attr('class', 'quiver');
+
+	selection // update
+		.attr('d', quiverPathSpec);
 }
 
 
@@ -548,4 +605,25 @@ function filter(data, kernel) {
 		}
 		return (sum / weightsSum) || 0;
 	});
+}
+
+function distance(a, b) {
+	var v = {
+		x: b.x - a.x,
+		y: b.y - a.y,
+	}
+
+	return (v.x * v.x) + (v.y * v.y);
+}
+
+var add = function(a, b) {
+	return {x: a.x + b.x, y: a.y + b.y};
+}
+
+var mul = function(a, s) {
+	return {x: a.x * s, y: a.y * s};
+}
+
+var mad = function(a, b, s) {
+	return {x: a.x + b.x * s, y: a.y + b.y * s};
 }

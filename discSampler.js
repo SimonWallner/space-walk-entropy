@@ -1,4 +1,5 @@
 // sampling on a disc
+// domain [-1, 1][-1, 1]
 var DiscSampler = function() {
 
 	var voronoi = new Voronoi();
@@ -122,6 +123,7 @@ var DiscSampler = function() {
 			};
 		})
 	}
+
 
 
 

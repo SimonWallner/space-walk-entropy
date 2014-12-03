@@ -144,7 +144,7 @@ $height: 50px;
 		white-space: nowrap;
 		position: relative;
 		// background-color: $grey;
-		
+
 		.label {
 			position: absolute;
 			top: 0px;
@@ -182,8 +182,8 @@ $height: 50px;
 		margin-right: 2px;
 		transform-origin: bottom left;
 	}
-	
-	
+
+
 	#history, #analog {
 		float: left;
 
@@ -237,7 +237,7 @@ $height: 50px;
 					background-color: $lime;
 					border: solid 1px $lime;
 				}
-			}			
+			}
 
 			&:nth-child(2) {
 				.element {
@@ -299,6 +299,11 @@ svg {
 	path.glyph {
 		stroke: $blue;
 		marker-end: url(#markerArrow);
+	}
+
+	path.quiver {
+		stroke: $lightBlue;
+		// marker-end: url(#markerArrow);
 	}
 }
 
