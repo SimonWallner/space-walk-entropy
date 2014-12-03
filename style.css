@@ -191,7 +191,9 @@ svg path.glyph {
   stroke: #3fc0c9;
   marker-end: url(#markerArrow); }
 svg path.quiver {
-  stroke: #c1dfe1; }
+  stroke: white;
+  stroke-width: 1px;
+  marker-end: url(#quiverArrow); }
 
 svg.matrix {
   margin-right: 1px; }

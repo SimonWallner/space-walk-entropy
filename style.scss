@@ -302,8 +302,9 @@ svg {
 	}
 
 	path.quiver {
-		stroke: $lightBlue;
-		// marker-end: url(#markerArrow);
+		stroke: white;
+		stroke-width: 1px;
+		marker-end: url(#quiverArrow);
 	}
 }
 

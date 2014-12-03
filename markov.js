@@ -58,17 +58,13 @@ var linearCurrentID;
 var linearLastID;
 
 // quivers
-var quivers = []
-for (var i = 0; i < 50;) {
-	pos = {
-		x: Math.random() * 2 - 1,
-		y: Math.random() * 2 - 1
-	};
-	if (distance({x: 0, y: 0}, pos) < 1) {
-		quivers.push({pos: pos});
-		i++;
+var arrows = []
+jitteredGridSamples(15, 0.7).map(function(sample) {
+	if (distance({x: 0, y: 0}, sample) < 1) {
+		arrows.push({pos: sample});
 	}
-}
+})
+
 
 // shared
 var c = d3.scale.linear()
@@ -466,9 +462,22 @@ var setupFlowVis = function() {
 		.append('path')
 			.attr('d', 'M0,0 L0,10 L10,5 L0,0')
 			.attr('fill', '#3fc0c9')
-			// .attr('stroke-width', '0px')
+			.attr('style', 'stroke-width: 0px');
+
+	d3.select('#flowVis svg defs').append('marker')
+		.attr('id', 'quiverArrow')
+		.attr('viewBox', '0 0 10 10')
+		.attr('markerWidth', 5)
+		.attr('markerHeight', 4)
+		.attr('refX', 2)
+		.attr('refY', 5)
+		.attr('orient', 'auto')
+		.append('path')
+			.attr('d', 'M0,0 L0,10 L10,5 L0,0')
+			.attr('fill', 'white')
 			.attr('style', 'stroke-width: 0px')
 }
+
 
 var updateFlowVis = function() {
 	var data = discSampler.getFlowData(analogMc[2].Q(), analogMc[2].sums());
@@ -490,19 +499,19 @@ var updateFlowVis = function() {
 			+ ' L' + x(d.x + dirVector.x) + ',' + x(d.y + dirVector.y);
 	};
 
-	var selection = d3.select('#flowVis svg').selectAll('path.glyph').data(data);
-	selection.enter()
-		.append('path')
-		.attr('class', 'glyph');
-
-	selection // update
-		.attr('d', pathSpec);
+	// var selection = d3.select('#flowVis svg').selectAll('path.glyph').data(data);
+	// selection.enter()
+	// 	.append('path')
+	// 	.attr('class', 'glyph');
+	//
+	// selection // update
+	// 	.attr('d', pathSpec);
 
 
 	// quiver plot
 	var sites = discSampler.getSites();
-	for (var i = 0; i < quivers.length; i++) {
-		pos = quivers[i].pos;
+	for (var i = 0; i < arrows.length; i++) {
+		pos = arrows[i].pos;
 
 		var pairs = sites.map(function(site, index) {
 			var d = distance(pos, site)
@@ -522,26 +531,32 @@ var updateFlowVis = function() {
 		for (var k = 0; k < 3; k++) {
 			var pair = sorted[k];
 			var siteCenter = {x: data[pair.siteId].centerX, y: data[pair.siteId].centerY}
-			var weight = 1 - (pair.distance / sorted[2].distance);
+
+			if (pair.distance === 0) {
+				sum = siteCenter;
+				weightsSum = 1;
+				break;
+			}
+			weight = 1 / Math.pow(pair.distance, 1);
 			sum = mad(sum, siteCenter, weight);
 			weightSum += weight;
 		}
-		mul(sum, 1 / weightSum);
+		sum = mul(sum, 1 / weightSum);
 
-		quivers[i].center = sum;
+		arrows[i].center = sum;
 	}
 
 	var quiverPathSpec = function(d) {
 		var dirVector = {
-			x: (d.center.x - d.pos.x) / 4,
-			y: (d.center.y - d.pos.y) / 4
+			x: (d.center.x - d.pos.x) / 5,
+			y: (d.center.y - d.pos.y) / 5
 		};
 
 		return 'M' + x(d.pos.x) + ',' + x(d.pos.y)
 			+ ' L' + x(d.pos.x + dirVector.x) + ',' + x(d.pos.y + dirVector.y);
 	};
 
-	var selection = d3.select('#flowVis svg').selectAll('path.quiver').data(quivers);
+	var selection = d3.select('#flowVis svg').selectAll('path.quiver').data(arrows);
 	selection.enter()
 		.append('path')
 		.attr('class', 'quiver');
@@ -626,4 +641,20 @@ var mul = function(a, s) {
 
 var mad = function(a, b, s) {
 	return {x: a.x + b.x * s, y: a.y + b.y * s};
+}
+
+function jitteredGridSamples(dimension, jitter) {
+	var result = [];
+	for (var i = 0; i < dimension; i++) {
+		for (var j = 0; j < dimension; j++) {
+			var x = (i / (dimension - 1)) * 2 - 1;
+			var y = (j / (dimension - 1)) * 2 - 1;
+
+			result.push({
+				x: x + (Math.random() * 2 - 1) * (jitter / dimension),
+				y: y + (Math.random() * 2 - 1) * (jitter / dimension)
+			})
+		}
+	}
+	return result;
 }
