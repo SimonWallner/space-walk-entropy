@@ -15,7 +15,7 @@ var knownControllers = [0];
 var windowLengths = [15, 30, 60, 120, 240];
 var mc = [];
 for (var i = 0; i < windowLengths.length; i++) {
-	mc[i] = new MarkovChain(true);
+	mc[i] = new MarkovChain(false);
 }
 
 var samplingF = 100; // ms
@@ -88,27 +88,27 @@ window.onload = function() {
 	setupFlowVis();
 	window.setInterval(function() {
 		if (!libsw.isPaused()) {
-			updateFlowVis();
+			// updateFlowVis();
 		}
 	}, 500);
 
 	setupMatrixPlot();
 	window.setInterval(function() {
 		if (!libsw.isPaused()) {
-			updateMatrixPlot();
+			// updateMatrixPlot();
 		}
 	}, 100);
 
 	window.setInterval(function() {
 		if (!libsw.isPaused()) {
-			updateSumSvg();
+			// updateSumSvg();
 		}
 	}, 500);
 
 	setupLinearPlot();
 	window.setInterval(function() {
 		if (!libsw.isPaused()) {
-			updateLinearPlot();
+			// updateLinearPlot();
 		}
 	}, 500);
 }
