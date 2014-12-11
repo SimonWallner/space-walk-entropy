@@ -6,7 +6,7 @@
 
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-	
+
 	<script type="text/javascript" src="lib/voronoi/rhill-voronoi-core.js"></script>
 	<script type="text/javascript" src="discSampler.js"></script>
 	<script type="text/javascript" src="linearSampler.js"></script>
@@ -17,10 +17,133 @@
 	<link href='style.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
-	<h1>Markov Chain</h1>
-	<div id="controllerSelect"><span>active controller: </span></div>
-	<div class="clear"></div>
-	
+	<div class="box">
+		<div class="group">
+			<h1>Self Information</h1>
+		</div>
+	</div>
+
+	<div class="box">
+		<div class="group">
+			<div class="button large">Open Docs</div>
+		</div>
+	</div>
+
+	<div class="box">
+		<div class="group">
+			<div class="label large">
+				Contrlr Mapping
+			</div>
+			<div class="optionGroup">
+				<div class="option">X360</div>
+				<div class="option">PS3</div>
+				<div class="option">CSTM</div>
+			</div>
+		</div>
+
+		<div class="group">
+			<div class="label wide">
+				I/O
+			</div>
+			<div class="button">Load</div>
+			<div class="button">Str</div>
+		</div>
+
+		<div class="group">
+			<div class="label wide">
+				Contrlr Select
+			</div>
+			<div class="optionGroup">
+				<div class="button">1</div>
+				<div class="button">2</div>
+				<div class="button">3</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="box">
+		<div class="group">
+			<div class="label large">
+				Model Data
+			</div>
+			<div class="label wide">
+				I/O
+			</div>
+			<div class="button">Load</div>
+			<div class="button">Str</div>
+		</div>
+		<div class="group">
+			<div class="label wide">
+				Reset
+			</div>
+			<div class="button danger">RST</div>
+			<div class="button danger">CFRM</div>
+		</div>
+	</div>
+
+
+	<div class="box">
+		<div class="group">
+			<div class="label large">
+				<strong>A</strong>
+			</div>
+			<div class="label large">
+				Markov Model
+			</div>
+			<div class="optionGroup">
+				<div class="option">15</div>
+				<div class="option">30</div>
+				<div class="option">60</div>
+				<div class="option">120</div>
+				<div class="option">240</div>
+				<div class="option">CSTM</div>
+			</div>
+		</div>
+
+		<div class="group">
+			<div class="statusGroup">
+				<div class="label">RDY</div>
+				<div class="indicator"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="box">
+		<div class="group">
+			<div class="label large">
+				<strong>B</strong>
+			</div>
+			<div class="label large">
+				Markov Model
+			</div>
+			<div class="optionGroup">
+				<div class="option">15</div>
+				<div class="option">30</div>
+				<div class="option">60</div>
+				<div class="option">120</div>
+				<div class="option">240</div>
+				<div class="option">CSTM</div>
+			</div>
+		</div>
+
+		<div class="group">
+			<div class="statusGroup">
+				<div class="label">RDY</div>
+				<div class="indicator"></div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
+
+
+
+
+
 	<div id="selfIformation">
 		<div id="history">
 			<div class="group">
@@ -73,7 +196,7 @@
 				</div>
 			</div>
 
-			<div class="group" id="">
+			<div class="group">
 				<div class="labelBox"><span class="label">Filtered</span></div>
 				<div class="data">
 					<div class="element">

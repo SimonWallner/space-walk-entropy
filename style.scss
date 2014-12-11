@@ -28,33 +28,6 @@ $backgroundColor: #eee;
 	height: 0;
 }
 
-body {
-	background-color: #333;
-	font-size: 16px;
-	font-family: 'Dosis';
-	font-weight: 400;
-	color: #E8E8E8;
-}
-
-#container {
-	margin-left: 1em;
-	padding-bottom: 1em;
-}
-
-h1, h2 {
-	font-size: 2em;
-	margin-bottom: 0.2em;
-	color: #E8E8E8;
-	text-transform: uppercase;
-	font-weight: 200;
-}
-
-
-p {
-	color: #E8E8E8;
-	margin-top: 1em;
-}
-
 .button {
 	border-radius: 0.3em;
 	padding-left: 0.5em;
@@ -65,43 +38,10 @@ p {
 	margin-right: 0.5em;
 }
 
-.interactive {
-	cursor: pointer;
-}
-
 .active {
 	background-color: $blue;
 }
 
-#controllerSelect {
-	border: 1px solid $lightGrey;
-	padding: 0.5em;
-	border-radius: 0.3em;
-	display: inline-block;
-	span {
-		margin-right: 0.5em;
-	}
-
-	div {
-		width: 2em;
-		height: 2em;
-		border-radius: 0.2em;
-		padding: 0.3em;
-		background-color: $lighterGrey;
-		display: inline-block;
-		margin-right: 0.5em;
-		cursor: pointer;
-
-		&:last-child {
-			margin-right: 0px;
-		}
-
-		&.active {
-			cursor: default;
-			background-color: $blue;
-		}
-	}
-}
 
 // === input complexity stuff ===
 $height: 50px;

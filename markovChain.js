@@ -4,7 +4,7 @@
 
 // Discrete time, discrete space markov model
 // states are identified as strings
-var MarkovChain = function(biased) {
+var MarkovChain = function(biased, numIndividualStates) {
 
 	var Q = {}; // transition matrix storing transition counts;
 	// this ends up to be a 2D matrix that is addressed as
@@ -14,7 +14,7 @@ var MarkovChain = function(biased) {
 
 	var historyBuffer = [];
 
-	var bias = 20;
+	var bias = 0;
 	var froms = {};
 	var tos = {};
 
@@ -96,6 +96,12 @@ var MarkovChain = function(biased) {
 			return 0;
 		}
 
+		if (biased) {
+			totalStatesCnt = Math.pow(2, numIndividualStates);
+			var b = 2;
+
+			return (Q[from][to] + b) / (sums[from] + (totalStatesCnt * b));
+		}
 		return Q[from][to] / sums[from];
 	}
 
