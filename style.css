@@ -92,14 +92,76 @@ div {
   background-color: #787878;
   border-radius: 3px; }
   .statusGroup .label {
-    margin-top: 0px; }
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px; }
 
 .indicator {
-  background-color: #b6ce4e;
+  background-color: #6c734d;
   margin: 4px;
   margin-top: 2px;
-  width: 40.2px;
+  width: 36.2px;
   height: 32.5px; }
+
+@-webkit-keyframes fadeReady {
+  from {
+    background-color: #6c734d; }
+
+  to {
+    background-color: #b6ce4e; } }
+@-moz-keyframes fadeReady {
+  from {
+    background-color: #6c734d; }
+
+  to {
+    background-color: #b6ce4e; } }
+@keyframes fadeReady {
+  from {
+    background-color: #6c734d; }
+
+  to {
+    background-color: #b6ce4e; } }
+.indicator.ready {
+  -webkit-animation: fadeReady 0.5s linear 1;
+  -moz-animation: fadeReady 0.5s linear 1;
+  animation: fadeReady 0.5s linear 1;
+  -webkit-animation-fill-mode: forwards;
+  -moz-animation-fill-mode: forwards;
+  animation-fill-mode: forwards; }
+
+@-webkit-keyframes flash {
+  from {
+    background-color: #e25454; }
+
+  to {
+    background-color: #b21e1e; } }
+@-moz-keyframes flash {
+  from {
+    background-color: #e25454; }
+
+  to {
+    background-color: #b21e1e; } }
+@keyframes flash {
+  from {
+    background-color: #e25454; }
+
+  to {
+    background-color: #b21e1e; } }
+.button.danger {
+  background-color: #b6ce4e;
+  background-color: #975050; }
+  .button.danger.armed {
+    background-color: #e25454; }
+  .button.danger.flashing {
+    -webkit-animation: flash 0.5s linear infinite;
+    -moz-animation: flash 0.5s linear infinite;
+    animation: flash 0.5s linear infinite; }
+  .button.danger.safety {
+    background-image: url("img/hatchies.svg");
+    background-size: 300%;
+    cursor: default; }
+    .button.danger.safety:hover {
+      border: none; }
 
 .clear {
   clear: both;

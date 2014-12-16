@@ -101,14 +101,12 @@ div {
 	cursor: pointer;
 
 	&:hover {
-		// background-color: mix($blue, $labelColor, 50);
 		border: 1px solid white;
 	}
 
 	&.active {
 		background-color: $blue;
 		&:hover {
-			// background-color: mix($blue, $labelColor, 70);
 		}
 	}
 
@@ -146,17 +144,64 @@ div {
 	border-radius: $innerRadius;
 	.label {
 		margin-top: 0px;
+		margin-left: 0px;
+		margin-right: 0px;
 	}
 }
 
 .indicator {
-	background-color: $lime;
+	background-color: mix($lime, $boxBGColor, 30);
 	margin: $gutter;
 	margin-top: $halfGutter;
-	width: $smallWidth - $gutter;
+	width: $smallWidth - 2 * $gutter;
 	height: $smallHeight - $gutter;
 }
 
+@include keyframes(fadeReady) {
+	from {
+		background-color: mix($lime, $boxBGColor, 30);
+	}
+
+	to {
+		background-color: $lime;
+	}
+}
+
+.indicator.ready {
+	// background-color: $lime;
+	@include animation(fadeReady 0.5s linear 1);
+	@include animation-fill-mode(forwards);
+}
+
+@include keyframes(flash) {
+	from {
+		background-color: $red;
+	}
+
+	to {
+		background-color: darken($red, 20);
+	}
+}
+
+.button.danger {
+	background-color: $lime;
+	background-color: mix($red, $boxBGColor, 50);
+
+	&.armed {
+		background-color: $red;
+	}
+	&.flashing {
+		@include animation(flash 0.5s linear infinite);
+	}
+	&.safety {
+		background-image: url('img/hatchies.svg');
+		background-size: 300%;
+		cursor: default;
+		&:hover {
+			border: none;
+		}
+	}
+}
 
 
 
