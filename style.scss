@@ -2,22 +2,163 @@
  * Markov Chain styel sheet
  */
 
+@import url('http://spacewalk.simonwallner.at/app/css/base.css');
+@import "bourbon/bourbon";
+
 /* some colors */
 $orange: #e89f49;
 $lime: #b6ce4e;
 $turquise: #5dd1a4;
 $blue: #3fc0c9;
-$lightBlue: #C1DFE1;
 $lavender: #8885ed;
 $rose: #c673d8;
 $red: #e25454;
 
-$darkGrey: #333;
-$grey: #555;
-$lighterGrey: #666;
-$lightGrey: #ccc;
 
-$backgroundColor: #eee;
+$bgColor: #333333;
+$boxBGColor: #4d4d4d;
+$labelColor: #787878;
+
+$innerRadius: 3px;
+$outerRadius: 5px;
+$borderWidth: 5px;
+
+$boxHeight: 85px;
+$gutter: 4px;
+
+$halfGutter: $gutter / 2;
+$innerHeight: $boxHeight - 2 * $gutter;
+$innerWidth: $innerHeight * 1.2;
+$smallHeight: ($innerHeight - $gutter) / 2;
+$smallWidth: ($innerWidth - $gutter) / 2;
+
+// --- general rules ----------------------------------------------------------
+body {
+	background-color: $bgColor;
+}
+
+h1 {
+	color: white;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	margin: 0px;
+
+	position: relative;
+	display: block;
+	top: 50%;
+	@include transform(translateY(-50%));
+}
+
+div {
+	box-sizing: border-box;
+}
+
+.box {
+	background-color: $boxBGColor;
+	display: block;
+	float: left;
+	border-radius: $outerRadius;
+	height: $boxHeight;
+
+	margin-left: $gutter;
+	margin-bottom: $gutter;
+
+	padding: $halfGutter;
+
+	color: white;
+	text-transform: uppercase;
+	font-size: 14px;
+}
+
+.group, .label, .optionGroup, .option, .button, .statusGroup {
+	float: left;
+}
+
+.label, .option, .button, .statusGroup {
+	margin: $halfGutter;
+}
+
+
+.button, .label, .option, .indicator {
+	border-radius: $innerRadius;
+	height: $smallHeight;
+	width: $smallWidth;
+	font-weight: 200;
+	letter-spacing: 0.12em;
+	line-height: 1.2em;
+	text-align: center;
+
+	span {
+		position: relative;
+	 	top: 50%;
+		display: block;
+		@include transform(translateY(-50%));
+	}
+}
+
+.button, .option {
+	background-color: mix($blue, $boxBGColor, 30);
+	cursor: pointer;
+
+	&:hover {
+		// background-color: mix($blue, $labelColor, 50);
+		border: 1px solid white;
+	}
+
+	&.active {
+		background-color: $blue;
+		&:hover {
+			// background-color: mix($blue, $labelColor, 70);
+		}
+	}
+
+}
+
+.label {
+	background-color: $labelColor;
+}
+
+.large {
+	font-size: 1.3em;
+}
+
+.button.large, .label.large {
+	height: $innerHeight;
+	width: $innerWidth ;
+
+	strong {
+		font-size: 3.5em;
+		font-weight: 300;
+		display: block;
+	}
+}
+
+.label.large {
+	width: $innerWidth;
+}
+
+.label.wide {
+	width: $innerWidth;
+}
+
+.statusGroup {
+	background-color: $labelColor;
+	border-radius: $innerRadius;
+	.label {
+		margin-top: 0px;
+	}
+}
+
+.indicator {
+	background-color: $lime;
+	margin: $gutter;
+	margin-top: $halfGutter;
+	width: $smallWidth - $gutter;
+	height: $smallHeight - $gutter;
+}
+
+
+
 
 .clear {
 	clear: both;
@@ -28,19 +169,9 @@ $backgroundColor: #eee;
 	height: 0;
 }
 
-.button {
-	border-radius: 0.3em;
-	padding-left: 0.5em;
-	padding-right: 0.5em;
-	padding-top: 0.2em;
-	padding-bottom: 0.2em;
-	background-color: $blue * 0.5;
-	margin-right: 0.5em;
-}
 
-.active {
-	background-color: $blue;
-}
+
+
 
 
 // === input complexity stuff ===
@@ -62,7 +193,7 @@ $height: 50px;
 		}
 
 		float: left;
-		background-color: $grey;
+		// background-color: $grey;
 		border-radius: 0.3em;
 		height: 7em;
 		width: 30px;
@@ -159,7 +290,7 @@ $height: 50px;
 	.divider {
 		height: 270px;
 		// width: 10px;
-		border-left: dashed 2px $grey;
+		// border-left: dashed 2px $grey;
 		margin-left: 2px;
 		float: left;
 	}
@@ -223,13 +354,13 @@ div.inline {
 
 svg {
 	path {
-		stroke: $darkGrey;
+		// stroke: $darkGrey;
 		stroke-width: 3px;
 	}
 
 	.outline {
 		stroke-width: 1px;
-		stroke: $lightGrey;
+		// stroke: $lightGrey;
 		fill: none;
 	}
 	rect.outline {
