@@ -286,20 +286,25 @@ $(document).ready(function() {
 });
 
 var drawControllerSelect = function() {
-	var divs = d3.select('#controllerSelect').selectAll('div').data(knownControllers);
+	var divs = d3.select('#controllerSelectGroup').selectAll('.option').data(knownControllers);
 	divs.enter()
 		.append('div')
-			.text(function(d) { return d; })
 			.attr('id', function(d) { return 'controller' + d; })
+			.attr('class', 'option')
 			.on('click', function(d) {
 				activeController = d;
-				drawControllerSelect();
+				activateOption('#controller' + activeController);
 			})
+			.append('span')
+				.text(function(d) { return d; })
 
-	divs.text(function(d) { return d; })
-		.attr('class', '');
+	activateOption('#controller' + activeController);
 
-	$('#controller' + activeController).addClass('active');
+	// add clearing divs
+	$('#controllerSelectGroup div.clear').remove();
+	var options = $('#controllerSelectGroup .option');
+	var i = Math.floor(options.length / 2);
+	$('<div>', { class: 'clear'}).insertAfter($(options[i-1]));
 }
 
 libsw.onMessage = function(data) {
