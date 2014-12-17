@@ -165,7 +165,7 @@ var loadSettings = function() {
 }
 
 var storeSettings = function() {
-	localStorage.setItem(JSON.stringify(settings))
+	localStorage.setItem(storageKey, JSON.stringify(settings))
 }
 
 var activateOption = function(id) {
@@ -183,9 +183,15 @@ $(document).ready(function() {
 
 	loadSettings();
 	if (settings.currentMapping === 'custom') {
-		currentMapping = settints.customMapping;
+		currentMapping = settings.customMapping;
+		activateOption('#mappingCustom');
 	} else {
 		currentMapping = mappings[settings.currentMapping];
+		if (settings.currentMapping === 'xbox360') {
+			activateOption('#mappingX360');
+		} else if (settings.currentMapping === 'ps3') {
+			activateOption('#mappingPS3');
+		}
 	}
 
 	window.setInterval(function() {
@@ -227,18 +233,21 @@ $(document).ready(function() {
 	$('#mappingX360').click(function() {
 		currentMapping = mappings.xbox360;
 		settings.currentMapping = 'xbox360';
+		storeSettings();
 		activateOption(this);
 	});
 
 	$('#mappingPS3').click(function() {
 		currentMapping = mappings.ps3;
 		settings.currentMapping = 'ps3';
+		storeSettings();
 		activateOption(this);
 	});
 
 	$('#mappingCustom').click(function() {
 		currentMapping = settings.customMapping;
 		settings.currentMapping = 'custom';
+		storeSettings();
 		activateOption(this);
 	});
 
@@ -256,9 +265,9 @@ $(document).ready(function() {
 			reader.onload = function(event) {
 				try {
 					var parsed = JSON.parse(event.target.result);
-					if (parsed.digital && Array.isArray(parsed.digital) && parsed.analog && Array.isArray(parsed.analog)) {
+					if (parsed.digital && parsed.analog) {
 						settings.customMapping = parsed;
-						settigns.currentMapping = 'custom';
+						settings.currentMapping = 'custom';
 						storeSettings();
 						activateOption('#mappingCustom');
 					} else {
