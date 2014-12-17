@@ -15,6 +15,10 @@ var knownControllers = [0];
 
 // Probabilistic Models
 var windowLengths = [15, 30, 60, 120, 240];
+var reverseWindowLookup = {}
+windowLengths.forEach(function(l, i) {
+	reverseWindowLookup[l] = i;
+})
 var samplingF = 100; // ms
 var maxHistoryLength = 120;
 var maxInformation = 1; // bits
@@ -28,6 +32,11 @@ for (var i = 0; i < windowLengths.length; i++) {
 	digitalMCs[i] = new MarkovChain(true, 16);
 	linearMCs[i] = new MarkovChain(false);
 	analogMCs[i] = new MarkovChain(false);
+}
+var custom = {
+	digital: new StaticModel({}),
+	analog: new StaticModel({}),
+	linear: new StaticModel({})
 }
 
 // samplers
@@ -48,6 +57,7 @@ var linearLastID;
 
 // current Models
 var modelA = {
+	id: '15',
 	linear: linearMCs[0],
 	analog: analogMCs[0],
 	digital: digitalMCs[0],
@@ -58,6 +68,7 @@ var modelA = {
 	}
 }
 var modelB = {
+	id: '15',
 	linear: linearMCs[0],
 	analog: analogMCs[0],
 	digital: digitalMCs[0],
@@ -67,7 +78,6 @@ var modelB = {
 		mixed: []
 	}
 }
-var customModel;
 
 // display
 var svgSize = 300;
@@ -314,7 +324,26 @@ $(document).ready(function() {
 			digitalModel: modelA.digital.serialize()
 		}
 		downloadJson(data, 'modelData.json');
-	})
+	});
+
+	$('#modelA15, #modelA30, #modelA60, #modelA120, #modelA240').click(function() {
+		var id = $(this).data().model;
+		modelA.id = 'id';
+		var index = reverseWindowLookup[id];
+
+		modelA.linear = linearMCs[index];
+		modelA.analog = analogMCs[index];
+		modelA.digital = digitalMCs[index];
+
+		modelA.history = {
+			analog: [],
+			digital: [],
+			mixed: []
+		};
+
+		activateOption(this);
+		// settings storage???
+	});
 });
 
 var drawControllerSelect = function() {
