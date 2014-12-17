@@ -53,6 +53,13 @@ div {
 	box-sizing: border-box;
 }
 
+a {
+	&:link { color: inherit; text-decoration: inherit; }
+	&:hover { color: inherit; text-decoration: inherit; }
+	&:active { color: inherit; text-decoration: inherit; }
+	&:visited { color: inherit; text-decoration: inherit; }
+}
+
 .box {
 	background-color: $boxBGColor;
 	display: block;
@@ -100,14 +107,11 @@ div {
 	background-color: mix($blue, $boxBGColor, 30);
 	cursor: pointer;
 
-	&:hover {
-		border: 1px solid white;
-	}
+	&:hover { border: 1px solid white; }
+	&:active { background-color: $blue; }
 
 	&.active {
 		background-color: $blue;
-		&:hover {
-		}
 	}
 
 }

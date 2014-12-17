@@ -23,6 +23,19 @@ h1 {
 div {
   box-sizing: border-box; }
 
+a:link {
+  color: inherit;
+  text-decoration: inherit; }
+a:hover {
+  color: inherit;
+  text-decoration: inherit; }
+a:active {
+  color: inherit;
+  text-decoration: inherit; }
+a:visited {
+  color: inherit;
+  text-decoration: inherit; }
+
 .box {
   background-color: #4d4d4d;
   display: block;
@@ -65,6 +78,8 @@ div {
   cursor: pointer; }
   .button:hover, .option:hover {
     border: 1px solid white; }
+  .button:active, .option:active {
+    background-color: #3fc0c9; }
   .button.active, .option.active {
     background-color: #3fc0c9; }
 

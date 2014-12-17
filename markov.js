@@ -72,10 +72,121 @@ var c = d3.scale.linear()
 	.range(['#444', '#e25454']);
 
 
-window.onload = function() {
-	drawControllerSelect();
+var mappings = {
+	xbox360: {
+		digital: {
+			'button-0': 'cross',
+			'button-1': 'circle',
+			'button-2': 'square',
+			'button-3': 'triangle',
 
+			'button-4': 'L1',
+			'button-5': 'R1',
+			'button-6': 'L3',
+			'button-7': 'R3',
+
+			'button-11': 'Dpad-up',
+			'button-12': 'Dpad-down',
+			'button-13': 'Dpad-left',
+			'button-14': 'Dpad-right',
+
+			'button-8': 'start',
+			'button-9': 'select',
+			'button-10': 'special'
+		},
+		analog: {
+			'axis-0': {id: 'LS', property: 'x'},
+			'axis-1': {id: 'LS', property: 'y'},
+
+			'axis-3': {id: 'RS', property: 'x'},
+			'axis-4': {id: 'RS', property: 'y'},
+
+			'axis-2': {id: 'L2'},
+			'axis-5': {id: 'R2'}
+		}
+	},
+	ps3: {
+		digital: {
+			'button-14': 'cross',
+			'button-13': 'circle',
+			'button-15': 'square',
+			'button-12': 'triangle',
+
+			'button-10': 'L1',
+			'button-11': 'R1',
+			'button-8': 'L2',
+			'button-9': 'R2',
+			'button-1': 'L3',
+			'button-2': 'R3',
+
+			'button-4': 'Dpad-up',
+			'button-6': 'Dpad-down',
+			'button-7': 'Dpad-left',
+			'button-5': 'Dpad-right',
+
+			'button-3': 'start',
+			'button-0': 'select',
+			'button-16': 'special'
+		},
+		analog: {
+			'axis-0': {id: 'LS', property: 'x'},
+			'axis-1': {id: 'LS', property: 'y'},
+
+			'axis-2': {id: 'RS', property: 'x'},
+			'axis-3': {id: 'RS', property: 'y'},
+		}
+	}
+}
+
+var currentMapping = mappings.xbox360;
+
+
+// various plugins might reside on the same origin, hence we are using
+// a pseudo random storage key.
+var storageKey = '71710660-85cd-11e4-b4a9-0800200c9a66';
+var settings = {
+	currentMapping: 'xbox360',
+	customMapping: mappings.xbox360
+};
+
+var loadSettings = function() {
+	var result = localStorage.getItem(storageKey);
+	if (result) {
+		parsedSettings = JSON.parse(result);
+
+		// update settings one by one so that we can retain default values
+		// if there is no key in the stored settings.
+		for (var key in parsedSettings) {
+			if (parsedSettings.hasOwnProperty(key)) {
+				settings[key] = parsedSettings[key];
+			}
+		}
+	}
+}
+
+var storeSettings = function() {
+	localStorage.setItem(JSON.stringify(settings))
+}
+
+var activateOption = function(id) {
+	var option = $(id);
+	if (option) {
+		option.siblings().toggleClass('active', false);
+		option.toggleClass('active', true);
+	}
+}
+
+
+$(document).ready(function() {
+	drawControllerSelect();
 	setupAnalog();
+
+	loadSettings();
+	if (settings.currentMapping === 'custom') {
+		currentMapping = settints.customMapping;
+	} else {
+		currentMapping = mappings[settings.currentMapping];
+	}
 
 	window.setInterval(function() {
 		if (!libsw.isPaused()) {
@@ -111,7 +222,58 @@ window.onload = function() {
 			updateLinearPlot();
 		}
 	}, 500);
-}
+
+	// buttons hooks
+	$('#mappingX360').click(function() {
+		currentMapping = mappings.xbox360;
+		settings.currentMapping = 'xbox360';
+		activateOption(this);
+	});
+
+	$('#mappingPS3').click(function() {
+		currentMapping = mappings.ps3;
+		settings.currentMapping = 'ps3';
+		activateOption(this);
+	});
+
+	$('#mappingCustom').click(function() {
+		currentMapping = settings.customMapping;
+		settings.currentMapping = 'custom';
+		activateOption(this);
+	});
+
+	$('#mappingStore').click(function() {
+		var string = JSON.stringify(currentMapping, undefined, 2);
+		var aTag = $('<a>', { href: 'data:aplication/json;charset=utf-8,' + encodeURI(string), download: 'mapping.json'})
+		aTag[0].click();
+	});
+
+	$('#mappingLoad').click(function() {
+		var input = $('<input>', { type: 'file' })
+		input.change(function(event) {
+			var files = event.target.files;
+			var reader = new FileReader();
+			reader.onload = function(event) {
+				try {
+					var parsed = JSON.parse(event.target.result);
+					if (parsed.digital && Array.isArray(parsed.digital) && parsed.analog && Array.isArray(parsed.analog)) {
+						settings.customMapping = parsed;
+						settigns.currentMapping = 'custom';
+						storeSettings();
+						activateOption('#mappingCustom');
+					} else {
+						alert('Error: The mappings file you provided is illformated.')
+					}
+
+				} catch (e) {
+					alert('Error: Failed to parse mappings JSON file (' + e + ')');
+				}
+			}
+			reader.readAsText(files[0]);
+		})
+		input.trigger('click');
+	});
+});
 
 var drawControllerSelect = function() {
 	var divs = d3.select('#controllerSelect').selectAll('div').data(knownControllers);
