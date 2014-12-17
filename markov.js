@@ -9,70 +9,76 @@ Math.log2 = Math.log2 || function(a) { return Math.log(a) / Math.LN2; };
 
 var libsw = new LibSpaceWalk();
 
+// controllers
 var activeController = 0;
 var knownControllers = [0];
 
+// Probabilistic Models
 var windowLengths = [15, 30, 60, 120, 240];
-var mc = [];
-for (var i = 0; i < windowLengths.length; i++) {
-	mc[i] = new MarkovChain(true, 16);
-}
-
 var samplingF = 100; // ms
-
-var historyData = [];
-for (var i = 0; i < windowLengths.length; i++) {
-	historyData[i] = [];
-}
 var maxHistoryLength = 120;
 var maxInformation = 1; // bits
 
-// reserving space for up to 16 buttons
+
+// Marcov Chains
+var digitalMCs = [];
+var linearMCs = [];
+var analogMCs = [];
+for (var i = 0; i < windowLengths.length; i++) {
+	digitalMCs[i] = new MarkovChain(true, 16);
+	linearMCs[i] = new MarkovChain(false);
+	analogMCs[i] = new MarkovChain(false);
+}
+
+// samplers
+var discSampler = new DiscSampler();
+var linearSampler = new LinearSampler();
+
+// digital
 var currentSample = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var lastSample = currentSample;
 
 // analog fun
-var analogWindowLengths = [150, 300, 600];
-var analogMc = [];
-var analogHistoryData = []
-for (var i = 0; i < analogWindowLengths.length; i++) {
-	analogMc[i] = new MarkovChain(false);
-	analogHistoryData[i] = [];
-}
-var discSampler = new DiscSampler();
 var currentAnalogSample = {x: 0, y: 0};
 var lastAnalogID = discSampler.getID(currentAnalogSample);
-var maxAnalogInformation = 1;
-
-var svgSize = 300;
-
-var MatrixRoundRobin = 0;
-var matrixIDs;
 
 // linear stuff
-var linearMc = new MarkovChain(false);
-var linearSampler = new LinearSampler();
-var linearSVGSize = {w: 300, h: 50};
-var linearSvg;
 var linearCurrentID;
 var linearLastID;
 
 // current Models
 var modelA = {
-	linear: linearMc,
-	analog: analogMc[0],
-	digital: mc[0]
+	linear: linearMCs[0],
+	analog: analogMCs[0],
+	digital: digitalMCs[0],
+	history: {
+		analog: [],
+		digital: [],
+		mixed: []
+	}
 }
 var modelB = {
-	linear: linearMc,
-	analog: analogMc[0],
-	digital: mc[0],
+	linear: linearMCs[0],
+	analog: analogMCs[0],
+	digital: digitalMCs[0],
+	history: {
+		analog: [],
+		digital: [],
+		mixed: []
+	}
 }
 var customModel;
 
+// display
+var svgSize = 300;
+var MatrixRoundRobin = 0;
+var matrixIDs;
+var linearSVGSize = {w: 300, h: 50};
+var linearSvg;
+
 
 // quivers
-var arrows = []
+var arrows = [];
 jitteredGridSamples(15, 0.7).map(function(sample) {
 	if (distance({x: 0, y: 0}, sample) < 1) {
 		arrows.push({pos: sample});
@@ -370,34 +376,45 @@ var sample = function() {
 	var currentStateID = generateId(currentSample);
 	var lastStateID = generateId(lastSample);
 
-	for (var i = 0; i < windowLengths.length; i++) {
-		mc[i].learn(lastStateID, currentStateID);
-		var p = mc[i].p(lastStateID, currentStateID);
-		var info = selfInformation(p);
+	digitalMCs.forEach(function(mc, i) {
+		mc.learn(lastStateID, currentStateID);
+		mc.truncate(windowLengths[i]);
+	});
 
-		historyData[i].push(info);
-		maxInformation = Math.max(maxInformation, info);
+	var pA = modelA.digital.p(lastStateID, currentStateID);
+	var pB = modelB.digital.p(lastStateID, currentStateID);
+	var infoA = selfInformation(pA);
+	var infoB = selfInformation(pB);
 
-		mc[i].truncate(windowLengths[i]);
-	}
+	modelA.history.digital.push(infoA);
+	modelB.history.digital.push(infoB);
+
+	maxInformation = Math.max(maxInformation, infoA);
+	maxInformation = Math.max(maxInformation, infoB);
 
 	lastSample = currentSample.slice(0); // force copy
 
 	// analog
 	var currentAnalogId = discSampler.getID(currentAnalogSample);
 
-	for (var i = 0; i < analogWindowLengths.length; i++) {
-		analogMc[i].learn(lastAnalogID, currentAnalogId);
-		var p = analogMc[i].p(lastAnalogID, currentAnalogId);
-		var info = selfInformation(p);
+	analogMCs.forEach(function(mc, i) {
+		mc.learn(lastAnalogID, currentAnalogId);
+		mc.truncate(windowLengths[i]);
+	});
 
-		analogHistoryData[i].push(info);
-		maxAnalogInformation = Math.max(maxAnalogInformation, info);
+	pA = modelA.analog.p(lastAnalogID, currentAnalogId);
+	pB = modelA.analog.p(lastAnalogID, currentAnalogId);
+	infoA = selfInformation(pA);
+	infoB = selfInformation(pB);
 
-		analogMc[i].truncate(analogWindowLengths[i]);
-	}
+	modelA.history.analog.push(infoA);
+	modelB.history.analog.push(infoB);
 
-	var probs = analogMc[2].transitionP(currentAnalogId);
+	maxInformation = Math.max(maxInformation, infoA);
+	maxInformation = Math.max(maxInformation, infoB);
+
+
+	var probs = modelA.analog.transitionP(currentAnalogId);
 	probs.forEach(function(element) {
 		d3.select('#graph-cell-' + element.id).attr('fill', c(element.pLog));
 	});
@@ -405,66 +422,39 @@ var sample = function() {
 	lastAnalogID = currentAnalogId;
 
 	// linear
-	linearMc.learn(linearLastID, linearCurrentID);
+	linearMCs.forEach(function(mc, i) {
+		mc.learn(linearLastID, linearCurrentID);
+		mc.truncate(windowLengths[i]);
+	});
 	linearLastID = linearCurrentID;
 }
 
 
 var updateGraph = function() {
-	for (var i = 0; i < mc.length; i++) {
-		var bits = d3.select('#info' + windowLengths[i]).selectAll('.bit').data(historyData[i]);
+	for (var i = 0; i < linearMCs.length; i++) {
+		var bits = d3.select('#info' + windowLengths[i]).selectAll('.bit').data(modelA.history.digital);
 		bits.enter()
 			.append('div')
 				.attr('class', 'bit')
 		bits
 			.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
-
 
 		// $('#markov-value').text(historyData[historyData.length-1].toFixed(2));
 		// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));
 		$('#maxInformation').text(maxInformation.toFixed(2));
 	}
-
-	// gaussian
-	var kernel = gaussian(9)
-
-	for (var i = 0; i < 3; i++)	{
-		var gaussianFiltered = filter(historyData[i], kernel);
-		bits = d3.select('#filtered' + windowLengths[i]).selectAll('.bit').data(gaussianFiltered);
-		bits.enter()
-			.append('div')
-				.attr('class', 'bit')
-		bits
-			.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
-	}
-
-	// analog
-	for (var i = 0; i < analogMc.length; i++) {
-		var bits = d3.select('#analogInfo' + analogWindowLengths[i]).selectAll('.bit').data(analogHistoryData[i]);
-		bits.enter()
-			.append('div')
-				.attr('class', 'bit')
-		bits
-			.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxAnalogInformation) + ')';});
-
-
-		// $('#markov-value').text(historyData[historyData.length-1].toFixed(2));
-		// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));
-		$('#maxAnalogInformation').text(maxAnalogInformation.toFixed(2));
-	}
 }
 
 
 var truncateHistory = function() {
-	for (var i = 0; i < historyData.length; i++)
-	if (historyData[i].length > maxHistoryLength) {
-		historyData[i] = historyData[i].splice(historyData[i].length - maxHistoryLength);
-	}
+	var collection = [modelA.history.analog, modelA.history.digital, modelA.history.mixed,
+					modelB.history.analog, modelB.history.digital, modelB.history.mixed];
 
-	for (var i = 0; i < analogHistoryData.length; i++)
-	if (analogHistoryData[i].length > maxHistoryLength) {
-		analogHistoryData[i] = analogHistoryData[i].splice(analogHistoryData[i].length - maxHistoryLength);
-	}
+	collection.forEach(function (list) {
+		if (list.length > maxHistoryLength) {
+			list = list.splice(list.length - maxHistoryLength);
+		}
+	});
 }
 
 
@@ -584,7 +574,7 @@ var setupMatrixPlot = function() {
 var updateMatrixPlot = function() {
 	var id = matrixIDs[MatrixRoundRobin]
 
-	var probs = analogMc[2].transitionP(id);
+	var probs = modelA.analog.transitionP(id);
 	probs.forEach(function(element) {
 		d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.pLog));
 	});
@@ -593,7 +583,7 @@ var updateMatrixPlot = function() {
 }
 
 var updateSumSvg = function() {
-	var sums = analogMc[2].sums();
+	var sums = modelA.analog.sums();
 	var total = 0;
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
@@ -648,11 +638,11 @@ var setupLinearPlot = function() {
 }
 
 var updateLinearPlot = function() {
-	linearMc.transitionP(linearCurrentID).forEach(function(p) {
+	modelA.linear.transitionP(linearCurrentID).forEach(function(p) {
 		d3.select('#linearPlot-cell-' + p.id).attr('fill', c(p.p));
 	})
 
-	var sums = linearMc.sums();
+	var sums = modelA.linear.sums();
 	var total = 0;
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
@@ -697,7 +687,7 @@ var setupFlowVis = function() {
 
 
 var updateFlowVis = function() {
-	var data = discSampler.getFlowData(analogMc[2].Q(), analogMc[2].sums());
+	var data = discSampler.getFlowData(modelA.analog.Q(), modelA.analog.sums());
 
 	var x = d3.scale.linear()
 		.domain([-1, 1])
