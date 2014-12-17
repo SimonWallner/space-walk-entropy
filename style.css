@@ -74,14 +74,21 @@ a:visited {
     transform: translateY(-50%); }
 
 .button, .option {
-  background-color: #486f72;
   cursor: pointer; }
   .button:hover, .option:hover {
     border: 1px solid white; }
-  .button:active, .option:active {
+
+.option {
+  background-color: #486f72; }
+  .option:active {
     background-color: #3fc0c9; }
-  .button.active, .option.active {
+  .option.active {
     background-color: #3fc0c9; }
+
+.button {
+  background-color: #5dd1a4; }
+  .button:active {
+    background-color: #38c38d; }
 
 .label {
   background-color: #787878; }
@@ -165,6 +172,8 @@ a:visited {
 .button.danger {
   background-color: #b6ce4e;
   background-color: #975050; }
+  .button.danger:active {
+    background-color: #b55151; }
   .button.danger.armed {
     background-color: #e25454; }
   .button.danger.flashing {

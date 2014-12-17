@@ -8,7 +8,7 @@
 /* some colors */
 $orange: #e89f49;
 $lime: #b6ce4e;
-$turquise: #5dd1a4;
+$turquoise: #5dd1a4;
 $blue: #3fc0c9;
 $lavender: #8885ed;
 $rose: #c673d8;
@@ -104,16 +104,22 @@ a {
 }
 
 .button, .option {
-	background-color: mix($blue, $boxBGColor, 30);
 	cursor: pointer;
-
 	&:hover { border: 1px solid white; }
+}
+
+.option {
+	background-color: mix($blue, $boxBGColor, 30);
 	&:active { background-color: $blue; }
 
 	&.active {
 		background-color: $blue;
 	}
+}
 
+.button {
+	background-color: $turquoise;
+	&:active { background-color: darken($turquoise, 10); }
 }
 
 .label {
@@ -190,6 +196,8 @@ a {
 .button.danger {
 	background-color: $lime;
 	background-color: mix($red, $boxBGColor, 50);
+
+	&:active { background-color: mix($red, $boxBGColor, 70); }
 
 	&.armed {
 		background-color: $red;

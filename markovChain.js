@@ -138,4 +138,52 @@ var MarkovChain = function(biased, numIndividualStates) {
 	this.Q = function() {
 		return Q;
 	}
+
+	this.serialize = function() {
+		var q = {};
+		for (var f in froms) {
+			q[f] = {};
+			for (var t in tos) {
+				q[f][t] = this.p(f, t)
+			}
+		}
+		return q;
+	}
+}
+
+
+// static probability model, i.e. it has no learning capabilities and can be of
+// any form.
+StaticModel = function(q) {
+	var Q = q;
+
+	this.p = function(from, to) {
+		if (Q[from] === undefined || Q[from][to] === undefined) {
+			return 0;
+		}
+
+		return Q[from][to];
+	}
+
+	this.pLog = function(from, to) {
+		var p = this.p(form, to);
+
+		return Math.max(0, Math.log(p));
+	}
+
+	// return a list of transitions probs starting at 'from'
+	this.transitionP = function(from) {
+		var transition = [];
+		if (Q[from]) {
+			for (var to in Q[from]) {
+				if (Q[from].hasOwnProperty(to)) {
+					transition.push({
+						id: to,
+						p: this.p(from, to),
+						pLog: this.pLog(from, to)})
+				}
+			}
+		}
+		return transition;
+	}
 }

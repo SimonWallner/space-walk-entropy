@@ -57,6 +57,20 @@ var linearSvg;
 var linearCurrentID;
 var linearLastID;
 
+// current Models
+var modelA = {
+	linear: linearMc,
+	analog: analogMc[0],
+	digital: mc[0]
+}
+var modelB = {
+	linear: linearMc,
+	analog: analogMc[0],
+	digital: mc[0],
+}
+var customModel;
+
+
 // quivers
 var arrows = []
 jitteredGridSamples(15, 0.7).map(function(sample) {
@@ -176,6 +190,11 @@ var activateOption = function(id) {
 	}
 }
 
+var downloadJson = function(obj, filename) {
+	var json = JSON.stringify(obj, undefined, 2);
+	var aTag = $('<a>', { href: 'data:aplication/json;charset=utf-8,' + encodeURI(json), download: filename})
+	aTag[0].click();
+}
 
 $(document).ready(function() {
 	drawControllerSelect();
@@ -252,9 +271,7 @@ $(document).ready(function() {
 	});
 
 	$('#mappingStore').click(function() {
-		var string = JSON.stringify(currentMapping, undefined, 2);
-		var aTag = $('<a>', { href: 'data:aplication/json;charset=utf-8,' + encodeURI(string), download: 'mapping.json'})
-		aTag[0].click();
+		downloadJson(currentMapping, 'mapping.json');
 	});
 
 	$('#mappingLoad').click(function() {
@@ -283,6 +300,15 @@ $(document).ready(function() {
 		})
 		input.trigger('click');
 	});
+
+	$('#modelStore').click(function() {
+		var data = {
+			linearModel: modelA.linear.serialize(),
+			analogModel: modelA.analog.serialize(),
+			digitalModel: modelA.digital.serialize()
+		}
+		downloadJson(data, 'modelData.json');
+	})
 });
 
 var drawControllerSelect = function() {
