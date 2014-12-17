@@ -269,6 +269,7 @@ $(document).ready(function() {
 						settings.customMapping = parsed;
 						settings.currentMapping = 'custom';
 						storeSettings();
+						currentMapping = parsed;
 						activateOption('#mappingCustom');
 					} else {
 						alert('Error: The mappings file you provided is illformated.')
@@ -306,17 +307,21 @@ libsw.onMessage = function(data) {
 
 		if (data.payload.controllerNumber === activeController) {
 			if (data.payload.type === 'digital') {
-				currentSample[data.payload.buttonNumber] = data.payload.value;
-			} else if(data.payload.type === 'analog') {
-
-				if (data.payload.name === 'axis-0') {
-					currentAnalogSample.x = data.payload.value;
-				} else if (data.payload.name === 'axis-1') {
-					currentAnalogSample.y = data.payload.value;
+				if (currentMapping.digital[data.payload.name]) {
+					currentSample[data.payload.buttonNumber] = data.payload.value;
 				}
+			} else if(data.payload.type === 'analog') {
+				var mapping = currentMapping.analog[data.payload.name];
+				if (mapping) {
+					if (mapping.id === 'LS' && mapping.property === 'x') {
+						currentAnalogSample.x = data.payload.value;
+					} else if (mapping.id === 'LS' && mapping.property === 'y') {
+						currentAnalogSample.y = data.payload.value;
+					}
 
-				if (data.payload.name === 'axis-5') { // right trigger (XB360)
-					linearCurrentID = linearSampler.getID(data.payload.value);
+					if (data.payload.name === 'axis-5') { // right trigger (XB360)
+						linearCurrentID = linearSampler.getID(data.payload.value);
+					}
 				}
 			}
 		} else {
