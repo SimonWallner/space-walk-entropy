@@ -18,6 +18,8 @@ $red: #e25454;
 $bgColor: #333333;
 $boxBGColor: #4d4d4d;
 $labelColor: #787878;
+$buttonColor: $blue;
+$optionColor: $turquoise;
 
 $innerRadius: 3px;
 $outerRadius: 5px;
@@ -109,17 +111,17 @@ a {
 }
 
 .option {
-	background-color: mix($blue, $boxBGColor, 30);
-	&:active { background-color: $blue; }
+	background-color: mix($optionColor, $boxBGColor, 30);
+	&:active { background-color: $optionColor; }
 
 	&.active {
-		background-color: $blue;
+		background-color: $optionColor;
 	}
 }
 
 .button {
-	background-color: $turquoise;
-	&:active { background-color: darken($turquoise, 10); }
+	background-color: $buttonColor;
+	&:active { background-color: darken($buttonColor, 10); }
 }
 
 .label {
