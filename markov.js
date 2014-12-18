@@ -558,30 +558,112 @@ var sample = function() {
 
 
 var updateGraph = function() {
-	for (var i = 0; i < linearMCs.length; i++) {
-		var bits = d3.select('#info' + windowLengths[i]).selectAll('.bit').data(modelA.history.digital);
-		bits.enter()
-			.append('div')
-				.attr('class', 'bit')
-		bits
-			.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
 
-		// $('#markov-value').text(historyData[historyData.length-1].toFixed(2));
-		// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));
-		$('#maxInformation').text(maxInformation.toFixed(2));
-	}
+	var x = d3.scale.linear()
+		.domain([0, 120])
+		.range([400, 0]);
+	var yA = d3.scale.linear()
+		.domain([0, maxInformation])
+		.range([0, 50]);
+
+	var barsA = d3.select('#digitalA').selectAll('.barA').data(modelA.history.digital);
+	barsA.enter()
+		.append('rect')
+			.attr('width', 2)
+			.attr('class', 'barA');
+	barsA
+		.attr('x', function(d, i) { return (120 - modelA.history.digital.length + i) * 3; })
+		.attr('y', function(d) { return 50 -yA(d); })
+		.attr('height', function(d, i) { return yA(d) });
+
+	barsA.exit()
+		.remove();
+
+
+	var barsB = d3.select('#digitalB').selectAll('.barB').data(modelB.history.digital);
+	barsB.enter()
+		.append('rect')
+			.attr('width', 2)
+			.attr('class', 'barB');
+	barsB
+		.attr('x', function(d, i) { return (120 - modelB.history.digital.length + i) * 3; })
+		.attr('y', 55)
+		.attr('height', function(d, i) { return yA(d) });
+
+	barsB.exit()
+		.remove();
+
+
+
+	var diffDigital = modelA.history.digital.map(function(d, i) {
+		return d - modelB.history.digital[i];
+	})
+
+	var barsDiff = d3.select('#digitalDiff').selectAll('.diffPos, .diffNeg').data(diffDigital);
+	barsDiff.enter()
+		.append('rect')
+			.attr('width', 2)
+	barsDiff
+		.attr('x', function(d, i) { return (120 - modelB.history.digital.length + i) * 3; })
+		.attr('y', function(d) {
+			if (d > 0) {
+				return 50 - yA(d);
+			} else {
+				return 55;
+			}
+		})
+		.attr('height', function(d) { return yA(Math.abs(d)) })
+		.attr('class', function(d) { return (d > 0) ? 'diffPos' : 'diffNeg'});
+
+	barsB.exit()
+		.remove();
+
+
+
+	// for (var i = 0; i < linearMCs.length; i++) {
+	// 	var bits = d3.select('#info' + windowLengths[i]).selectAll('.bit').data(modelA.history.digital);
+	// 	bits.enter()
+	// 		.append('div')
+	// 			.attr('class', 'bit')
+	// 	bits
+	// 		.style('transform', function(d) {return 'scale(1, ' + Math.max(0.05, d / maxInformation) + ')';});
+	//
+	// 	// $('#markov-value').text(historyData[historyData.length-1].toFixed(2));
+	// 	// // $('#markov-bar').width(200 * (historyData[historyData.length-1] / maxInformation));
+	// 	$('#maxInformation').text(maxInformation.toFixed(2));
+	// }
 }
 
 
 var truncateHistory = function() {
-	var collection = [modelA.history.analog, modelA.history.digital, modelA.history.mixed,
-					modelB.history.analog, modelB.history.digital, modelB.history.mixed];
+	// FIXME
+	// code duplication as fuck. My first approach in beeing smart did not work :(
+	if (modelA.history.digital.length > maxHistoryLength) {
+		modelA.history.digital = modelA.history.digital.splice(modelA.history.digital.length - maxHistoryLength);
+	}
 
-	collection.forEach(function (list) {
-		if (list.length > maxHistoryLength) {
-			list = list.splice(list.length - maxHistoryLength);
-		}
-	});
+	if (modelA.history.analog.length > maxHistoryLength) {
+		modelA.history.analog = modelA.history.analog.splice(modelA.history.analog.length - maxHistoryLength);
+	}
+
+	if (modelA.history.mixed.length > maxHistoryLength) {
+		modelA.history.mixed = modelA.history.mixed.splice(modelA.history.mixed.length - maxHistoryLength);
+	}
+
+	if (modelB.history.digital.length > maxHistoryLength) {
+		modelB.history.digital = modelB.history.digital.splice(modelB.history.digital.length - maxHistoryLength);
+	}
+
+	if (modelB.history.analog.length > maxHistoryLength) {
+		modelB.history.analog = modelB.history.analog.splice(modelB.history.analog.length - maxHistoryLength);
+	}
+
+	if (modelB.history.mixed.length > maxHistoryLength) {
+		modelB.history.mixed = modelB.history.mixed.splice(modelB.history.mixed.length - maxHistoryLength);
+	}
+
+
+
 }
 
 

@@ -21,6 +21,8 @@ $labelColor: #787878;
 $buttonColor: $blue;
 $optionColor: $turquoise;
 
+$barColor: #5b5b5b;
+
 $innerRadius: 3px;
 $outerRadius: 5px;
 $borderWidth: 5px;
@@ -265,184 +267,7 @@ div.plotArea {
 
 
 
-// === input complexity stuff ===
-$height: 50px;
-
-#selfIformation, #analog {
-	margin-top: 1em;
-	padding-bottom: 1em;
-
-	font-family: 'Dosis';
-	font-weight: 200;
-	.labelBox {
-		.label {
-			transform: rotate(90deg);
-			transform-origin: left top 0;
-			display: inline-block;
-			margin: 0.5em;
-			margin-left: 1.6em;
-		}
-
-		float: left;
-		// background-color: $grey;
-		border-radius: 0.3em;
-		height: 7em;
-		width: 30px;
-	}
-	.data {
-		margin-left: 35px;
-	}
-
-	.element {
-		width: 600px;
-		height: $height;
-		font-weight: 400;
-		padding-top: 0.1em;
-		border: solid 1px $lime;
-		border-radius: 0.3em;
-		margin-bottom: 3px;
-		margin-right: 3px;
-		overflow: hidden;
-		white-space: nowrap;
-		position: relative;
-		// background-color: $grey;
-
-		.label {
-			position: absolute;
-			top: 0px;
-			left: 0px;
-			width: 300px;
-			padding: 0.5em;
-			padding-top: 0.2em;
-			background: linear-gradient(to right, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
-			z-index: 1;
-		}
-
-		.background {
-			z-index: -1;
-		}
-
-		.highValue {
-			position: absolute;
-			right: 0px;
-			top: 0px;
-			padding: 0.5em;
-			padding-top: 0.2em;
-			z-index: 1;
-			background-color: rgba(0, 0, 0, 0.5);
-		}
-	}
-
-	.bits-wrapper {
-		float: right;
-	}
-
-	.bit {
-		width: 3px;
-		height: $height - 2;
-		display: inline-block;
-		margin-right: 2px;
-		transform-origin: bottom left;
-	}
-
-
-	#history, #analog {
-		float: left;
-
-		.group {
-			&:nth-child(1) {
-				.element {
-					border: solid 1px $lavender;
-				}
-				.bit {
-					background-color: $lavender;
-				}
-			}
-
-			&:nth-child(2) {
-				.element {
-					border: solid 1px $blue;
-				}
-				.bit {
-					background-color: $blue;
-				}
-			}
-			&:nth-child(3) {
-				.element {
-					border: solid 1px $lavender;
-				}
-				.bit {
-					background-color: $lavender;
-				}
-			}
-		}
-	}
-
-	.divider {
-		height: 270px;
-		// width: 10px;
-		// border-left: dashed 2px $grey;
-		margin-left: 2px;
-		float: left;
-	}
-
-	#live {
-		.element {
-			width: 200px;
-			overflow: visible;
-		}
-		margin-left: 613px;
-
-		.group {
-			&:nth-child(1) {
-				.element {
-					background-color: $lime;
-					border: solid 1px $lime;
-				}
-			}
-
-			&:nth-child(2) {
-				.element {
-					background-color: $orange;
-					border: solid 1px $orange;
-				}
-			}
-			&:nth-child(3) {
-				.element {
-					background-color: $lavender;
-					border: solid 1px $lavender;
-				}
-			}
-		}
-		.label {
-			background: none;
-		}
-	}
-
-}
-
-.pReturn {
-	.pReturnWrapper, #markovInformation {
-		white-space: nowrap;
-		padding-left: 2px;
-
-		.bar {
-			width: 2px;
-			height: $height - 2;
-			border-right: 2px solid #333;
-			background-color: $lavender;
-			box-sizing: border-box;
-			// float: left;
-			transform-origin: bottom left;
-			display: inline-block;
-		}
-	}
-}
-
-div.inline {
-	display: inline-block;
-}
-
+// --- SVG stuff ---------------------------------------------------------------
 svg {
 	path {
 		// stroke: $darkGrey;
@@ -468,6 +293,19 @@ svg {
 		stroke-width: 1px;
 		marker-end: url(#quiverArrow);
 	}
+
+	.barA, .barB {
+		fill: $barColor;
+	}
+
+	.diffPos {
+		fill: $lime;
+	}
+
+	.diffNeg {
+		fill: $red;
+	}
+
 }
 
 svg.matrix {
