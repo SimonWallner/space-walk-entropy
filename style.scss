@@ -34,6 +34,8 @@ $innerWidth: $innerHeight * 1.2;
 $smallHeight: ($innerHeight - $gutter) / 2;
 $smallWidth: ($innerWidth - $gutter) / 2;
 
+$plotHeight: 150px;
+
 // --- general rules ----------------------------------------------------------
 body {
 	background-color: $bgColor;
@@ -217,6 +219,36 @@ a {
 	}
 }
 
+#plotBox {
+	height: 3 * $plotHeight + 4 * $gutter;
+}
+
+div.plotLabel {
+	background-color: $labelColor;
+	border-radius: $innerRadius;
+	font-size: 1.2em;
+	letter-spacing: 0.12em;
+	width: 1.5em;
+	height: $plotHeight;
+	float: left;
+	margin: $halfGutter;
+
+	span {
+		transform-origin: 0% 0%;
+		transform: rotate(90deg) translateY(-1.4em) translateX(0.4em);
+		display: inline-block;
+		white-space: nowrap;
+	}
+}
+div.plotArea {
+	width: 500px;
+	height: $plotHeight;
+	float: left;
+	background-color: $bgColor;
+	margin: $halfGutter;
+	border-radius: $innerRadius;
+	overflow: hidden;
+}
 
 
 .clear {
