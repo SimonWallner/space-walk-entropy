@@ -226,9 +226,9 @@ var setActiveModel = function(model, id) {
 		model.digital = digitalMCs[index];
 
 		model.history = {
-			analog: [],
-			digital: [],
-			mixed: []
+			analog: Array.apply(null, new Array(maxHistoryLength)).map(Number.prototype.valueOf,0),
+			digital: Array.apply(null, new Array(maxHistoryLength)).map(Number.prototype.valueOf,0),
+			mixed: Array.apply(null, new Array(maxHistoryLength)).map(Number.prototype.valueOf,0)
 		};
 	} else if (id === 'custom') {
 		model.id = 'custom';
