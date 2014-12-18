@@ -176,7 +176,9 @@ var currentMapping = mappings.xbox360;
 var storageKey = '71710660-85cd-11e4-b4a9-0800200c9a66';
 var settings = {
 	currentMapping: 'xbox360',
-	customMapping: mappings.xbox360
+	customMapping: mappings.xbox360,
+	modelAId: '15',
+	modelBId: '15',
 };
 
 var loadSettings = function() {
@@ -212,10 +214,38 @@ var downloadJson = function(obj, filename) {
 	aTag[0].click();
 }
 
+var setActiveModel = function(model, id) {
+	var index = reverseWindowLookup[id];
+	if (typeof index != 'undefined') {
+		model.id = id;
+		model.linear = linearMCs[index];
+		model.analog = analogMCs[index];
+		model.digital = digitalMCs[index];
+
+		model.history = {
+			analog: [],
+			digital: [],
+			mixed: []
+		};
+	} else if (id === 'custom') {
+		model.id = 'custom';
+		model.linear = custom.linear;
+		model.analog = custom.analog;
+		model.digital = custom.digital;
+
+		model.history = {
+			analog: [],
+			digital: [],
+			mixed: []
+		};
+	}
+}
+
 $(document).ready(function() {
 	drawControllerSelect();
 	setupAnalog();
 
+	// load settings
 	loadSettings();
 	if (settings.currentMapping === 'custom') {
 		currentMapping = settings.customMapping;
@@ -229,6 +259,13 @@ $(document).ready(function() {
 		}
 	}
 
+	setActiveModel(modelA, settings.modelAId);
+	activateOption('#modelA' + settings.modelAId);
+	setActiveModel(modelB, settings.modelBId);
+	activateOption('#modelB' + settings.modelBId);
+
+
+	// intervall callbacks
 	window.setInterval(function() {
 		if (!libsw.isPaused()) {
 			sample();
@@ -326,23 +363,55 @@ $(document).ready(function() {
 		downloadJson(data, 'modelData.json');
 	});
 
+	$('#modelLaod').click(function() {
+		var input = $('<input>', { type: 'file' })
+		input.change(function(event) {
+			var files = event.target.files;
+			var reader = new FileReader();
+			reader.onload = function(event) {
+				try {
+					var parsed = JSON.parse(event.target.result);
+					if (parsed.linearModel && parsed.analogModel && parsed.digitalModel) {
+						custom.linearModel = parsed.linearModel;
+						custom.analogModel = parsed.analogModel;
+						custom.digitalModel = parsed.digitalModel;
+
+						setActiveModel(modelB, 'custom');
+						settings.modelBId = 'custom';
+						storeSettings();
+
+						activateOption('#modelBcustom');
+					} else {
+						alert('Error: The model data file you provided is illformated.')
+					}
+
+				} catch (e) {
+					alert('Error: Failed to parse model data JSON file (' + e + ')');
+				}
+			}
+			reader.readAsText(files[0]);
+		})
+		input.trigger('click');
+	});
+
 	$('#modelA15, #modelA30, #modelA60, #modelA120, #modelA240').click(function() {
 		var id = $(this).data().model;
-		modelA.id = 'id';
-		var index = reverseWindowLookup[id];
+		setActiveModel(modelA, id)
 
-		modelA.linear = linearMCs[index];
-		modelA.analog = analogMCs[index];
-		modelA.digital = digitalMCs[index];
-
-		modelA.history = {
-			analog: [],
-			digital: [],
-			mixed: []
-		};
+		settings.modelAId = modelA.id;
+		storeSettings();
 
 		activateOption(this);
-		// settings storage???
+	});
+
+	$('#modelB15, #modelB30, #modelB60, #modelB120, #modelB240, #modelBcustom').click(function() {
+		var id = $(this).data().model;
+		setActiveModel(modelB, id)
+
+		settings.modelBId = modelB.id;
+		storeSettings();
+
+		activateOption(this);
 	});
 });
 
@@ -456,6 +525,10 @@ var sample = function() {
 		mc.truncate(windowLengths[i]);
 	});
 	linearLastID = linearCurrentID;
+
+	// ready indicator check;
+	$('#modelAReady').toggleClass('ready', modelA.analog.ready());
+	$('#modelBReady').toggleClass('ready', modelB.analog.ready());
 }
 
 

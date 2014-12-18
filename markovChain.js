@@ -149,6 +149,11 @@ var MarkovChain = function(biased, numIndividualStates) {
 		}
 		return q;
 	}
+
+	this.ready = function() {
+		// TODO check if we are ready
+		return false;
+	}
 }
 
 
@@ -185,5 +190,24 @@ StaticModel = function(q) {
 			}
 		}
 		return transition;
+	}
+
+	this.Q = function() {
+		return Q;
+	}
+
+	this.sums = function() {
+		// Q is already the transition p, hence sums is set to a constant 1
+		var sums = [];
+		for (var from in Q) {
+			if (Q.hasOwnProperty(from)) {
+				sums[from] = 1;
+			}
+		}
+		return sums;
+	}
+
+	this.ready = function() {
+		return true;
 	}
 }
