@@ -23,6 +23,14 @@ var MarkovChain = function(biased, numIndividualStates) {
 		return performance.now() / 1000;
 	}
 
+	this.reset = function() {
+		Q = {};
+		sums = {};
+		historyBuffer = [];
+		froms = {};
+		tos = {};
+	}
+
 	this.learn = function(from, to) {
 		if (biased) {
 			// fully expended setup

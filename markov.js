@@ -79,6 +79,9 @@ var modelB = {
 	}
 }
 
+// reset model
+resetModelArmed = false;
+
 // display
 var svgSize = 300;
 var MatrixRoundRobin = 0;
@@ -412,6 +415,28 @@ $(document).ready(function() {
 		storeSettings();
 
 		activateOption(this);
+	});
+
+	$('#modelReset').click(function() {
+		resetModelArmed = !resetModelArmed;
+		$(this).toggleClass('armed', resetModelArmed);
+		$('#modelResetConfirm').toggleClass('safety', !resetModelArmed);
+		$('#modelResetConfirm').toggleClass('flashing', resetModelArmed);
+	});
+
+	$('#modelResetConfirm').click(function() {
+		if (resetModelArmed) {
+			for (var i = 0; i < windowLengths; i++) {
+				linearMCs[i].reset();
+				analogMCs[i].reset();
+				digitalMCs[i].reset();
+			}
+
+			resetModelArmed = false;
+			$('#modelReset').toggleClass('armed', resetModelArmed);
+			$(this).toggleClass('safety', !resetModelArmed);
+			$('#modelResetConfirm').toggleClass('flashing', resetModelArmed);
+		}
 	});
 });
 
