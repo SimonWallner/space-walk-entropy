@@ -83,11 +83,15 @@ var modelB = {
 resetModelArmed = false;
 
 // display
-var svgSize = 300;
+var svgSize = {};
+var svgPadding = 5;
 var MatrixRoundRobin = 0;
 var matrixIDs;
 var linearSVGSize = {w: 300, h: 50};
 var linearSvg;
+var svgScales = {};
+
+analogSize = 300;
 
 
 // quivers
@@ -246,6 +250,7 @@ var setActiveModel = function(model, id) {
 
 $(document).ready(function() {
 	drawControllerSelect();
+	setupGraph();
 	setupAnalog();
 
 	// load settings
@@ -556,15 +561,28 @@ var sample = function() {
 	$('#modelBReady').toggleClass('ready', modelB.analog.ready());
 }
 
+var setupGraph = function() {
+	svgSize = {
+		w: $('#svgDigital').width(),
+		h: $('#svgDigital').height()
+	};
+
+	svgSize.innerWidth = svgSize.w - 2 * svgPadding;
+	svgSize.innerHeight = svgSize.h - 2 * svgPadding;
+	svgSize.plotHeight = (svgSize.innerHeight - svgPadding) / 2;
+
+	svgScales.x = d3.scale.linear()
+		.domain([0, maxHistoryLength])
+		.range([svgPadding, svgSize.innerWidth + svgPadding]);
+
+}
 
 var updateGraph = function() {
 
-	var x = d3.scale.linear()
-		.domain([0, 120])
-		.range([400, 0]);
-	var yA = d3.scale.linear()
+	svgScales.y = d3.scale.linear()
 		.domain([0, maxInformation])
-		.range([0, 50]);
+		.range([0, svgSize.plotHeight]);
+
 
 	var barsA = d3.select('#digitalA').selectAll('.barA').data(modelA.history.digital);
 	barsA.enter()
@@ -572,9 +590,9 @@ var updateGraph = function() {
 			.attr('width', 2)
 			.attr('class', 'barA');
 	barsA
-		.attr('x', function(d, i) { return (120 - modelA.history.digital.length + i) * 3; })
-		.attr('y', function(d) { return 50 -yA(d); })
-		.attr('height', function(d, i) { return yA(d) });
+		.attr('x', function(d, i) { return svgScales.x(maxHistoryLength - modelB.history.digital.length + i); })
+		.attr('y', function(d) { return (svgPadding + svgSize.plotHeight) - svgScales.y(d); })
+		.attr('height', function(d, i) { return svgScales.y(d) });
 
 	barsA.exit()
 		.remove();
@@ -586,9 +604,9 @@ var updateGraph = function() {
 			.attr('width', 2)
 			.attr('class', 'barB');
 	barsB
-		.attr('x', function(d, i) { return (120 - modelB.history.digital.length + i) * 3; })
-		.attr('y', 55)
-		.attr('height', function(d, i) { return yA(d) });
+		.attr('x', function(d, i) { return svgScales.x(maxHistoryLength - modelB.history.digital.length + i); })
+		.attr('y', svgPadding + svgSize.plotHeight + svgPadding)
+		.attr('height', function(d, i) { return svgScales.y(d) });
 
 	barsB.exit()
 		.remove();
@@ -604,15 +622,15 @@ var updateGraph = function() {
 		.append('rect')
 			.attr('width', 2)
 	barsDiff
-		.attr('x', function(d, i) { return (120 - modelB.history.digital.length + i) * 3; })
+		.attr('x', function(d, i) { return svgScales.x(maxHistoryLength - modelB.history.digital.length + i); })
 		.attr('y', function(d) {
 			if (d > 0) {
-				return 50 - yA(d);
+				return (svgPadding + svgSize.plotHeight) - svgScales.y(d);
 			} else {
-				return 55;
+				return (svgPadding + svgSize.plotHeight + svgPadding);
 			}
 		})
-		.attr('height', function(d) { return yA(Math.abs(d)) })
+		.attr('height', function(d) { return svgScales.y(Math.abs(d)) })
 		.attr('class', function(d) { return (d > 0) ? 'diffPos' : 'diffNeg'});
 
 	barsB.exit()
@@ -685,24 +703,24 @@ var generateId = function(arr) {
 var setupAnalog = function() {
 		var x = d3.scale.linear()
 			.domain([-1, 1])
-			.range([3, svgSize - 3]);
+			.range([3, analogSize - 3]);
 
 	['graph', 'sumSvg', 'flowVis'].forEach(function(id) {
 		var svg = d3.select('#' + id).append('svg')
-			.attr('width', svgSize + 'px')
-			.attr('height', svgSize + 'px');
+			.attr('width', analogSize + 'px')
+			.attr('height', analogSize + 'px');
 
 		svg.append('defs').append('clipPath')
 			.attr('id', 'clip-' + id)
 			.append('circle')
 				.attr('cx', x(0))
 				.attr('cy', x(0))
-				.attr('r', svgSize / 2 - 6);
+				.attr('r', analogSize / 2 - 6);
 
 		svg.append('circle')
 			.attr('cx', x(0))
 			.attr('cy', x(0))
-			.attr('r', svgSize / 2 - 2)
+			.attr('r', analogSize / 2 - 2)
 			.attr('class', 'outline');
 
 		discSampler.getPaths().forEach(function(path) {
