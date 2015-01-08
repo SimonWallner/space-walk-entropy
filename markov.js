@@ -575,6 +575,9 @@ var setupGraph = function() {
 		.domain([0, maxHistoryLength])
 		.range([svgPadding, svgSize.innerWidth + svgPadding]);
 
+	d3.select('#grid')
+		.attr('transform', 'translate(5, 5)');
+
 }
 
 var updateGraph = function() {
@@ -582,6 +585,13 @@ var updateGraph = function() {
 	svgScales.y = d3.scale.linear()
 		.domain([0, maxInformation])
 		.range([0, svgSize.plotHeight]);
+
+	svgScales.yAxis = d3.svg.axis()
+		.scale(svgScales.y)
+		.orient("left")
+		.ticks(3)
+		.innerTickSize(-svgSize.innerWidth)
+		.outerTickSize(0)
 
 
 	var barsA = d3.select('#digitalA').selectAll('.barA').data(modelA.history.digital);
@@ -637,6 +647,9 @@ var updateGraph = function() {
 		.remove();
 
 
+	d3.select('#grid')
+		.attr("class", "grid")
+		.call(svgScales.yAxis)
 
 	// for (var i = 0; i < linearMCs.length; i++) {
 	// 	var bits = d3.select('#info' + windowLengths[i]).selectAll('.bit').data(modelA.history.digital);
