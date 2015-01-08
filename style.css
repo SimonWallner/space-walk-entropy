@@ -242,17 +242,17 @@ svg .diffPos {
   fill: #b6ce4e; }
 svg .diffNeg {
   fill: #e25454; }
-svg #grid text {
+svg .grid .tick line {
+  stroke: #5b5b5b;
+  stroke-width: 2px;
+  opacity: 0.3; }
+svg .grid g.tick text {
+  opacity: 0; }
+svg .labels text {
   font-family: 'Dosis';
   font-size: 16px;
   fill: #5b5b5b;
   text-anchor: end; }
-svg #grid .tick line {
-  stroke: #5b5b5b;
-  stroke-width: 2px;
-  opacity: 0.5; }
-svg #grid g.tick text {
-  opacity: 0; }
 
 svg.matrix {
   margin-right: 1px; }

@@ -306,17 +306,11 @@ svg {
 		fill: $red;
 	}
 
-	#grid {
-		text {
-			font-family: 'Dosis';
-			font-size: 16px;
-			fill: $barColor;
-			text-anchor: end;
-		}
+	.grid {
 		.tick line {
 			stroke: $barColor;
 			stroke-width: 2px;
-			opacity: 0.5;
+			opacity: 0.3;
 		}
 
 		g.tick text {
@@ -324,6 +318,14 @@ svg {
 		}
 	}
 
+	.labels {
+		text {
+			font-family: 'Dosis';
+			font-size: 16px;
+			fill: $barColor;
+			text-anchor: end;
+		}
+	}
 }
 
 svg.matrix {

@@ -575,8 +575,12 @@ var setupGraph = function() {
 		.domain([0, maxHistoryLength])
 		.range([svgPadding, svgSize.innerWidth + svgPadding]);
 
-	d3.select('#grid')
-		.attr('transform', 'translate(5, 5)');
+	d3.selectAll('#digitalA g.grid, #digitalB g.grid')
+		.attr('transform', 'translate(5, 0)');
+	d3.select('#digitalA')
+		.attr('transform', 'translate(0, ' + (svgSize.plotHeight + 1 * svgPadding) +') scale(1, -1)');
+	d3.select('#digitalB')
+		.attr('transform', 'translate(0, ' + (svgSize.plotHeight + 2 * svgPadding) +')');
 
 }
 
@@ -600,8 +604,8 @@ var updateGraph = function() {
 			.attr('width', 2)
 			.attr('class', 'barA');
 	barsA
-		.attr('x', function(d, i) { return svgScales.x(maxHistoryLength - modelB.history.digital.length + i); })
-		.attr('y', function(d) { return (svgPadding + svgSize.plotHeight) - svgScales.y(d); })
+		.attr('x', function(d, i) { return svgScales.x(i); })
+		.attr('y', 0)
 		.attr('height', function(d, i) { return svgScales.y(d) });
 
 	barsA.exit()
@@ -614,8 +618,8 @@ var updateGraph = function() {
 			.attr('width', 2)
 			.attr('class', 'barB');
 	barsB
-		.attr('x', function(d, i) { return svgScales.x(maxHistoryLength - modelB.history.digital.length + i); })
-		.attr('y', svgPadding + svgSize.plotHeight + svgPadding)
+		.attr('x', function(d, i) { return svgScales.x(i); })
+		.attr('y', 0)
 		.attr('height', function(d, i) { return svgScales.y(d) });
 
 	barsB.exit()
@@ -647,7 +651,7 @@ var updateGraph = function() {
 		.remove();
 
 
-	d3.select('#grid')
+	d3.selectAll('#digitalA .grid, #digitalB .grid')
 		.attr("class", "grid")
 		.call(svgScales.yAxis)
 
