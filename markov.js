@@ -87,11 +87,12 @@ var svgSize = {};
 var svgPadding = 5;
 var MatrixRoundRobin = 0;
 var matrixIDs;
-var linearSVGSize = {w: 300, h: 50};
+var linearSVGSize = {w: 280, h: 40};
 var linearSvg;
 var svgScales = {};
 
-analogSize = 300;
+analogSize = 193;
+matrixSize = 63;
 
 
 // quivers
@@ -634,7 +635,7 @@ var updateGraph = function() {
 		var barsA = svg.select('.dataA').selectAll('.barA').data(plot.dataA);
 		barsA.enter()
 			.append('rect')
-				.attr('width', 2)
+				.attr('width', 4)
 				.attr('class', 'barA');
 		barsA
 			.attr('x', function(d, i) { return svgScales.x(i); })
@@ -648,7 +649,7 @@ var updateGraph = function() {
 		var barsB = svg.select('.dataB').selectAll('.barB').data(plot.dataB);
 		barsB.enter()
 			.append('rect')
-				.attr('width', 2)
+				.attr('width', 4)
 				.attr('class', 'barB');
 		barsB
 			.attr('x', function(d, i) { return svgScales.x(i); })
@@ -667,7 +668,7 @@ var updateGraph = function() {
 		var barsDiff = svg.select('.diff').selectAll('.diffPos, .diffNeg').data(diffDigital);
 		barsDiff.enter()
 			.append('rect')
-				.attr('width', 2)
+				.attr('width', 4)
 		barsDiff
 			.attr('x', function(d, i) { return svgScales.x(maxHistoryLength - plot.dataB.length + i); })
 			.attr('y', function(d) {
@@ -745,12 +746,13 @@ var setupAnalog = function() {
 			.domain([-1, 1])
 			.range([3, analogSize - 3]);
 
-	['graph', 'sumSvg', 'flowVis'].forEach(function(id) {
+	['sumsA', 'sumsB', 'flowA', 'flowB'].forEach(function(id) {
 		var svg = d3.select('#' + id).append('svg')
 			.attr('width', analogSize + 'px')
 			.attr('height', analogSize + 'px');
 
-		svg.append('defs').append('clipPath')
+		var defs = svg.append('defs');
+		defs.append('clipPath')
 			.attr('id', 'clip-' + id)
 			.append('circle')
 				.attr('cx', x(0))
@@ -763,7 +765,8 @@ var setupAnalog = function() {
 			.attr('r', analogSize / 2 - 2)
 			.attr('class', 'outline');
 
-		discSampler.getPaths().forEach(function(path) {
+		var centers = discSampler.getCenters();
+		discSampler.getPaths().forEach(function(path, index) {
 			var lineFunc = d3.svg.line()
 				.x(function(d) { return x(d.x); })
 	 			.y(function(d) { return x(d.y); })
@@ -774,6 +777,25 @@ var setupAnalog = function() {
 				.attr('fill', '#444')
 				.attr('id', id + '-cell-' + path.id)
 				.attr('clip-path', 'url(#clip-' + id +')');
+
+
+			// diff viewer
+			var centerX = centers[index].x;
+			var clipId = id + '-cell-' + path.id + '-clip';
+			defs.append('clipPath')
+				.attr('id', clipId)
+				.append('rect')
+					.attr('x', x(centerX))
+					.attr('y', 0)
+					.attr('width', x(1))
+					.attr('height', x(1))
+					.attr('clip-path', 'url(#clip-' + id +')');
+
+			svg.append('path')
+				.attr('d', lineFunc(path.path))
+				.attr('fill', '#ccffee')
+				.attr('id', id + '-cell-' + path.id)
+				.attr('clip-path', 'url(#' + clipId +')');
 		});
 	})
 }
@@ -781,7 +803,7 @@ var setupAnalog = function() {
 
 var setupMatrixPlot = function() {
 	matrixIDs = discSampler.getAllIDs();
-	var size = 100;
+	var size = matrixSize;
 
 	d3.select('#matrixPlot').selectAll('svg').data(matrixIDs)
 		.enter()
@@ -860,7 +882,7 @@ var updateSumSvg = function() {
 
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
-			d3.select('#sumSvg-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));
+			d3.select('#sumsA-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));
 		}
 	}
 }
@@ -871,16 +893,16 @@ var setupLinearPlot = function() {
 		d.attr('width', linearSVGSize.w)
 		.attr('height', linearSVGSize.h);
 	}
-	linearSvg = d3.select('#linearPlot').append('svg').call(dimension);
-	linearSumsSvg = d3.select('#linearSums').append('svg').call(dimension);
+	linearSvg = d3.select('#linearPlotLeft').append('svg').call(dimension);
+	linearSumsSvg = d3.select('#linearPlotRight').append('svg').call(dimension);
 
 	var x = d3.scale.linear()
 		.domain([0, 1])
-		.range([4, linearSVGSize.w - 4]);
+		.range([3, linearSVGSize.w - 3]);
 
 	var y = d3.scale.linear()
 		.domain([0, 1])
-		.range([4, linearSVGSize.h - 4]);
+		.range([3, linearSVGSize.h - 3]);
 
 	[linearSvg, linearSumsSvg].forEach(function(svg) {
 		linearSampler.getPaths().forEach(function(path) {
@@ -894,14 +916,11 @@ var setupLinearPlot = function() {
 				.attr('fill', '#444')
 				.attr('id', svg[0][0].parentElement.id + '-cell-' + path.id)
 		});
-
-		svg.append('rect')
-			.attr('x', 1)
-			.attr('y', 1)
-			.attr('width', linearSVGSize.w - 2)
-			.attr('height', linearSVGSize.h - 2)
-			.attr('class', 'outline');
 	});
+
+	d3.selectAll('.linearP').append('svg')
+		.attr("width", 110)
+		.attr("height", 15)
 }
 
 var updateLinearPlot = function() {
@@ -925,7 +944,7 @@ var updateLinearPlot = function() {
 }
 
 var setupFlowVis = function() {
-	d3.select('#flowVis svg defs').append('marker')
+	d3.select('#flowA svg defs, #flowB svg defs').append('marker')
 		.attr('id', 'markerArrow')
 		.attr('viewBox', '0 0 10 10')
 		.attr('markerWidth', 5)
@@ -938,7 +957,7 @@ var setupFlowVis = function() {
 			.attr('fill', '#3fc0c9')
 			.attr('style', 'stroke-width: 0px');
 
-	d3.select('#flowVis svg defs').append('marker')
+	d3.selectAll('#flowA svg defs, #flowB svg defs').append('marker')
 		.attr('id', 'quiverArrow')
 		.attr('viewBox', '0 0 10 10')
 		.attr('markerWidth', 5)
@@ -958,7 +977,7 @@ var updateFlowVis = function() {
 
 	var x = d3.scale.linear()
 		.domain([-1, 1])
-		.range([3, svgSize - 3]);
+		.range([3, analogSize - 3]);
 	var s = d3.scale.linear()
 		.domain([0, 1])
 		.range([0, 10]);
@@ -1030,7 +1049,7 @@ var updateFlowVis = function() {
 			+ ' L' + x(d.pos.x + dirVector.x) + ',' + x(d.pos.y + dirVector.y);
 	};
 
-	var selection = d3.select('#flowVis svg').selectAll('path.quiver').data(arrows);
+	var selection = d3.select('#flowA svg').selectAll('path.quiver').data(arrows);
 	selection.enter()
 		.append('path')
 		.attr('class', 'quiver');

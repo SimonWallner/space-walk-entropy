@@ -154,6 +154,9 @@ a {
 .label.wide {
 	width: $innerWidth;
 }
+.label.extraWide {
+	width: $innerWidth + $smallWidth + $gutter;
+}
 
 .statusGroup {
 	background-color: $labelColor;
@@ -225,7 +228,7 @@ a {
 	height: 3 * $plotHeight + 4 * $gutter;
 }
 
-div.plotLabel {
+div.verticalGroupLabel{
 	background-color: $labelColor;
 	border-radius: $innerRadius;
 	font-size: 1.2em;
@@ -242,9 +245,16 @@ div.plotLabel {
 		white-space: nowrap;
 	}
 }
-div.plotArea {
-	width: 500px;
-	height: $plotHeight;
+
+div.circularLabel {
+	height: 400px;
+}
+
+#circularAnalog {
+	height: 400px + 2 * $gutter;
+}
+
+div.plotArea, div.circularArea, div.linearArea {
 	float: left;
 	background-color: $bgColor;
 	margin: $halfGutter;
@@ -252,6 +262,27 @@ div.plotArea {
 	overflow: hidden;
 }
 
+div.plotArea {
+	width: 800px;
+	height: $plotHeight;
+}
+
+
+div.circularArea {
+	width: 800px;
+	height: 400px;
+	padding: $gutter;
+}
+
+div.linearArea {
+	width: 800px;
+	height: 150px;
+	padding: 2 * $gutter;
+}
+
+.inline {
+	display: inline-block;
+}
 
 .clear {
 	clear: both;
@@ -262,6 +293,46 @@ div.plotArea {
 	height: 0;
 }
 
+#linearBox {
+	height: 150px + 2 * $gutter;
+}
+
+div.linearLabel {
+	padding-left: 1em;
+	padding-right: 1em;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	margin-top: 0.5em;
+	background-color: $boxBGColor;
+	display: inline-block;
+	float: left;
+	border-radius: $innerRadius;
+	font-weight: 200;
+	letter-spacing: 0.12em;
+	line-height: 1.2em;
+	text-align: center;
+	width: 70px;
+}
+
+div.linearPlot {
+	border: 1px solid white;
+	border-radius: $innerRadius;
+	display: inline-block;
+	margin-bottom: 2 * $gutter;
+}
+
+div.linearP {
+	display: inline-block;
+	border: 1px solid white;
+	border-radius: $innerRadius;
+	margin: $halfGutter;
+}
+
+#rightLinear, #leftLinear {
+	width: 392px;
+	float: left;
+}
+
 
 
 
@@ -270,13 +341,13 @@ div.plotArea {
 // --- SVG stuff ---------------------------------------------------------------
 svg {
 	path {
-		// stroke: $darkGrey;
+		stroke: $bgColor;
 		stroke-width: 3px;
 	}
 
 	.outline {
 		stroke-width: 1px;
-		// stroke: $lightGrey;
+		stroke: white;
 		fill: none;
 	}
 	rect.outline {

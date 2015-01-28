@@ -147,11 +147,11 @@
 
 	<div class="box" id="plotBox">
 		<div class="group">
-			<div class="plotLabel">
+			<div class="plotLabel verticalGroupLabel">
 				<span>Digital</span>
 			</div>
 			<div class="plotArea">
-				<svg width="500" height="150" id="svgDigital">
+				<svg width="800" height="150" id="svgDigital">
 					<g class="dataA">
 						<g class="grid">
 						</g>
@@ -163,8 +163,8 @@
 					<g class="diff"></g>
 
 					<g class="labels">
-						<text class="maxInformation" x="490" y="20">--</text>
-						<text class="maxInformation" x="490" y="140">--</text>
+						<text class="maxInformation" x="790" y="20">--</text>
+						<text class="maxInformation" x="790" y="140">--</text>
 					</g>
 				</svg>
 			</div>
@@ -172,11 +172,11 @@
 		<div class="clear"></div>
 
 		<div class="group">
-			<div class="plotLabel">
+			<div class="plotLabel verticalGroupLabel">
 				<span>Analog</span>
 			</div>
 			<div class="plotArea">
-				<svg width="500" height="150" id="svgAnalog">
+				<svg width="800" height="150" id="svgAnalog">
 					<g class="dataA">
 						<g class="grid">
 						</g>
@@ -188,8 +188,8 @@
 					<g class="diff"></g>
 
 					<g class="labels">
-						<text class="maxInformation" x="490" y="20">--</text>
-						<text class="maxInformation" x="490" y="140">--</text>
+						<text class="maxInformation" x="790" y="20">--</text>
+						<text class="maxInformation" x="790" y="140">--</text>
 					</g>
 				</svg>
 			</div>
@@ -197,11 +197,11 @@
 		<div class="clear"></div>
 
 		<div class="group">
-			<div class="plotLabel">
+			<div class="plotLabel verticalGroupLabel">
 				<span>Mixed</span>
 			</div>
-			<div  class="plotArea">
-				<svg width="500" height="150" id="svgMixed">
+			<div class="plotArea">
+				<svg width="800" height="150" id="svgMixed">
 					<g class="dataA">
 						<g class="grid">
 						</g>
@@ -213,8 +213,8 @@
 					<g class="diff"></g>
 
 					<g class="labels">
-						<text class="maxInformation" x="490" y="20">--</text>
-						<text class="maxInformation" x="490" y="140">--</text>
+						<text class="maxInformation" x="790" y="20">--</text>
+						<text class="maxInformation" x="790" y="140">--</text>
 					</g>
 				</svg>
 			</div>
@@ -222,140 +222,142 @@
 		<div class="clear"></div>
 	</div>
 
+	<div class="clear"></div>
 
 
-
-
-	<!-- <div class="clear"></div>
-	<div id="selfIformation">
-		<div id="history">
-			<div class="group">
-				<div class="labelBox"><span class="label">Self&nbsp;Information</span></div>
-
-				<div class="data">
-					<div class="element">
-						<span class="label">15s</span>
-						<div class="bits-wrapper">
-							<span class="highValue" id="maxInformation">--</span>
-							<div class="bits" id="info15"></div>
-						</div>
-					</div>
-				</div>
-
-				<div class="data">
-					<div class="element">
-						<span class="label">30s</span>
-						<div class="bits-wrapper">
-							<div class="bits" id="info30"></div>
-						</div>
-					</div>
-				</div>
-
-				<div class="data">
-					<div class="element">
-						<span class="label">60</span>
-						<div class="bits-wrapper">
-							<div class="bits" id="info60"></div>
-						</div>
-					</div>
-				</div>
-
-				<div class="data">
-					<div class="element">
-						<span class="label">120</span>
-						<div class="bits-wrapper">
-							<div class="bits" id="info120"></div>
-						</div>
-					</div>
-				</div>
-
-				<div class="data">
-					<div class="element">
-						<span class="label">240</span>
-						<div class="bits-wrapper">
-							<div class="bits" id="info240"></div>
-						</div>
-					</div>
-				</div>
+	<div class="box">
+		<div class="group">
+			<div class="label large">
+				<span>Prop Mapping</span>
 			</div>
-
-			<div class="group">
-				<div class="labelBox"><span class="label">Filtered</span></div>
-				<div class="data">
-					<div class="element">
-						<span class="label">15s</span>
-						<div class="bits-wrapper">
-							<div class="bits" id="filtered15"></div>
-						</div>
-					</div>
-				</div>
-
-				<div class="data">
-					<div class="element">
-						<span class="label">30s</span>
-						<div class="bits-wrapper">
-							<div class="bits" id="filtered30"></div>
-						</div>
-					</div>
-				</div>
-				<div class="data">
-					<div class="element">
-						<span class="label">60s</span>
-						<div class="bits-wrapper">
-							<div class="bits" id="filtered60"></div>
-						</div>
-					</div>
-				</div>
+		</div>
+		<div class="group">
+			<div class="label wide">
+				<span>Scale</span>
 			</div>
-		</div> -->
-		<div class="clear"></div>
-
-		<!-- analog stuff -->
-		<!-- <div id="analog">
-			<div class="group">
-				<div class="labelBox"><span class="label">Analog&nbsp;Self&nbsp;Information</span></div>
-
-				<div class="data">
-					<div class="element">
-						<span class="label">15s</span>
-						<div class="bits-wrapper">
-							<span class="highValue" id="maxAnalogInformation">--</span>
-							<div class="bits" id="analogInfo15"></div>
-						</div>
-					</div>
-				</div>
-
-				<div class="data">
-					<div class="element">
-						<span class="label">30s</span>
-						<div class="bits-wrapper">
-							<div class="bits" id="analogInfo30"></div>
-						</div>
-					</div>
-				</div>
-
-				<div class="data">
-					<div class="element">
-						<span class="label">60</span>
-						<div class="bits-wrapper">
-							<div class="bits" id="analogInfo60"></div>
-						</div>
-					</div>
-				</div>
+			<div class="clear"></div>
+			<div class="optionGroup">
+				<div id="modelLaod" class="button"><span>Load</span></div>
+				<div id="modelStore" class="button"><span>Str</span></div>
 			</div>
-		</div> -->
+		</div>
+		<div class="group">
+			<div class="label wide">
+				<span>Color</span>
+			</div>
+			<div class="clear"></div>
+			<div class="optionGroup">
+				<div id="modelLaod" class="button"><span>Heat</span></div>
+				<div id="modelStore" class="button"><span>Mono</span></div>
+			</div>
+		</div>
+		<div class="group">
+			<div class="label extraWide">
+				<span>Diff Enc</span>
+			</div>
+			<div class="clear"></div>
+			<div class="optionGroup">
+				<div id="modelLaod" class="button"><span>Off</span></div>
+				<div id="modelStore" class="button"><span>Split</span></div>
+				<div id="modelStore" class="button"><span>Diff</span></div>
+			</div>
+		</div>
+		</div>
+	</div>
 
-		<div class="clear"></div>
-		<div id="graph" class="inline"></div>
-		<div id="sumSvg" class="inline"></div>
-		<div id="flowVis" class="inline"></div>
+	<div class="box">
+		<div class="group">
+			<div class="label large">
+				<span>Vector Field</span>
+			</div>
+		</div>
+		<div class="group">
+			<div class="label wide">
+				<span>Display</span>
+			</div>
+			<div class="clear"></div>
+			<div class="optionGroup">
+				<div id="modelLaod" class="button"><span>QVR</span></div>
+				<div id="modelStore" class="button"><span>ARR</span></div>
+			</div>
+		</div>
+		<div class="group">
+			<div class="label extraWide">
+				<span>Diff Enc</span>
+			</div>
+			<div class="clear"></div>
+			<div class="optionGroup">
+				<div id="modelLaod" class="button"><span>Qvr</span></div>
+				<div id="modelStore" class="button"><span>Arr</span></div>
+				<div id="modelStore" class="button"><span>Area</span></div>
+			</div>
+		</div>
+		</div>
+	</div>
 
-		<div class="clear"></div>
-		<div id="matrixPlot"></div>
+	<div class="clear"></div>
 
+	<div class="box" id="circularAnalog">
+		<div class="group">
+			<div class="verticalGroupLabel circularLabel">
+				<span>Circular Analog</span>
+			</div>
+			<div class="circularArea">
+				<div id="sumsA" class="inline"></div>
+				<div id="sumsB" class="inline"></div>
+				<div id="flowA" class="inline"></div>
+				<div id="flowB" class="inline"></div>
+
+				<div class="clear"></div>
+				<div id="matrixPlot"></div>
+				<div class="clear"></div>
+			</div>
+			<div class="clear"></div>
+		</div>
 		<div class="clear"></div>
-		<div id="linearPlot"></div>
-		<div id="linearSums"></div>
+	</div>
+
+	<div class="clear"></div>
+
+	<div class="box" id="linearBox">
+		<div class="group">
+			<div class="verticalGroupLabel">
+				<span>Linear</span>
+			</div>
+			<div class="linearArea">
+				<div id="leftLinear">
+					<div class="linearLabel">Left</div>
+					<div id="linearPlotLeft" class="linearPlot"></div>
+					<div class="clear"></div>
+
+					<div id="linearPLeft1" class="linearP"></div>
+					<div id="linearPLeft2" class="linearP"></div>
+					<div id="linearPLeft3" class="linearP"></div>
+					<div id="linearPLeft4" class="linearP"></div>
+					<div id="linearPLeft5" class="linearP"></div>
+					<div id="linearPLeft6" class="linearP"></div>
+					<div id="linearPLeft7" class="linearP"></div>
+					<div id="linearPLeft8" class="linearP"></div>
+					<div id="linearPLeft9" class="linearP"></div>
+				</div>
+				<div id="rightLinear">
+					<div class="linearLabel">Right</div>
+					<div id="linearPlotRight" class="linearPlot"></div>
+					<div class="clear"></div>
+
+					<div id="linearPLeft1" class="linearP"></div>
+					<div id="linearPLeft2" class="linearP"></div>
+					<div id="linearPLeft3" class="linearP"></div>
+					<div id="linearPLeft4" class="linearP"></div>
+					<div id="linearPLeft5" class="linearP"></div>
+					<div id="linearPLeft6" class="linearP"></div>
+					<div id="linearPLeft7" class="linearP"></div>
+					<div id="linearPLeft8" class="linearP"></div>
+					<div id="linearPLeft9" class="linearP"></div>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</div>
 	</div>
 </body>
 </html>

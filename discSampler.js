@@ -5,7 +5,7 @@ var DiscSampler = function() {
 	var voronoi = new Voronoi();
 	var bbox = {xl: -1, xr: 1, yt: -1, yb: 1};
 
-	var circleDistances = [0.3, 0.6, 0.95];
+	var circleDistances = [0.3, 0.6, 0.86];
 	var circleCounts = [5, 10, 20];
 	var sites = [{x: 0, y: 0}]
 
@@ -89,6 +89,17 @@ var DiscSampler = function() {
 
 	this.getSites = function() {
 		return sites;
+	}
+
+	this.getCenters = function() {
+		var that = this;
+		var centers = [];
+
+		diagram.cells.forEach(function(cell) {
+			centers.push(cell.site);
+		})
+
+		return centers;
 	}
 
 	// get flow data for a certain site

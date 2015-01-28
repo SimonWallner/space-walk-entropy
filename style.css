@@ -110,6 +110,9 @@ a:visited {
 .label.wide {
   width: 92.4px; }
 
+.label.extraWide {
+  width: 140.6px; }
+
 .statusGroup {
   background-color: #787878;
   border-radius: 3px; }
@@ -190,7 +193,7 @@ a:visited {
 #plotBox {
   height: 466px; }
 
-div.plotLabel {
+div.verticalGroupLabel {
   background-color: #787878;
   border-radius: 3px;
   font-size: 1.2em;
@@ -199,20 +202,41 @@ div.plotLabel {
   height: 150px;
   float: left;
   margin: 2px; }
-  div.plotLabel span {
+  div.verticalGroupLabel span {
     transform-origin: 0% 0%;
     transform: rotate(90deg) translateY(-1.4em) translateX(0.4em);
     display: inline-block;
     white-space: nowrap; }
 
-div.plotArea {
-  width: 500px;
-  height: 150px;
+div.circularLabel {
+  height: 400px; }
+
+#circularAnalog {
+  height: 408px; }
+
+div.plotArea, div.circularArea, div.linearArea {
   float: left;
   background-color: #333333;
   margin: 2px;
   border-radius: 3px;
   overflow: hidden; }
+
+div.plotArea {
+  width: 800px;
+  height: 150px; }
+
+div.circularArea {
+  width: 800px;
+  height: 400px;
+  padding: 4px; }
+
+div.linearArea {
+  width: 800px;
+  height: 150px;
+  padding: 8px; }
+
+.inline {
+  display: inline-block; }
 
 .clear {
   clear: both;
@@ -222,10 +246,47 @@ div.plotArea {
   width: 0;
   height: 0; }
 
+#linearBox {
+  height: 158px; }
+
+div.linearLabel {
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  margin-top: 0.5em;
+  background-color: #4d4d4d;
+  display: inline-block;
+  float: left;
+  border-radius: 3px;
+  font-weight: 200;
+  letter-spacing: 0.12em;
+  line-height: 1.2em;
+  text-align: center;
+  width: 70px; }
+
+div.linearPlot {
+  border: 1px solid white;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 8px; }
+
+div.linearP {
+  display: inline-block;
+  border: 1px solid white;
+  border-radius: 3px;
+  margin: 2px; }
+
+#rightLinear, #leftLinear {
+  width: 392px;
+  float: left; }
+
 svg path {
+  stroke: #333333;
   stroke-width: 3px; }
 svg .outline {
   stroke-width: 1px;
+  stroke: white;
   fill: none; }
 svg rect.outline {
   shape-rendering: crispEdges; }
