@@ -113,6 +113,9 @@ a:visited {
 .label.extraWide {
   width: 140.6px; }
 
+.label.fourWide {
+  width: 188.8px; }
+
 .statusGroup {
   background-color: #787878;
   border-radius: 3px; }

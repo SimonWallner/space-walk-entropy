@@ -157,6 +157,10 @@ a {
 .label.extraWide {
 	width: $innerWidth + $smallWidth + $gutter;
 }
+.label.fourWide {
+	width: $innerWidth + 2 * $smallWidth + 2 * $gutter;
+}
+
 
 .statusGroup {
 	background-color: $labelColor;

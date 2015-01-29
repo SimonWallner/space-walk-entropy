@@ -493,16 +493,29 @@ $(document).ready(function() {
 	})
 	$('#diffSplit').click(function() {
 		settings.diff = 'split';
-		// ...
 		$('.analogDiff').attr('class', 'analogDiff');
 		storeSettings();
 		activateOption(this);
 	})
 	$('#diffDiff').click(function() {
 		settings.diff = 'diff';
-		// ...
 		$('.analogDiff').attr('class', 'analogDiff hidden');
 		storeSettings();
+		activateOption(this);
+	})
+
+	$('#vectorDisplayQuiver').click(function() {
+		settings.vectorDisplay = 'quiver';
+		storeSettings();
+		$('.quiver').attr('class', 'quiver');
+		$('.glyph').attr('class', 'glyph hidden');
+		activateOption(this);
+	})
+	$('#vectorDisplayArrow').click(function() {
+		settings.vectorDisplay = 'arrow';
+		storeSettings();
+		$('.quiver').attr('class', 'quiver hidden');
+		$('.glyph').attr('class', 'glyph');
 		activateOption(this);
 	})
 
@@ -540,6 +553,12 @@ $(document).ready(function() {
 		$('#diffSplit').click();
 	} else {
 		$('#diffDiff').click();
+	}
+
+	if (settings.vectorDisplay === 'quiver') {
+		$('#vectorDisplayQuiver').click();
+	} else {
+		$('#vectorDisplayArrow').click();
 	}
 
 	setActiveModel(modelA, settings.modelAId);
@@ -1125,7 +1144,7 @@ var updateLinearPlot = function() {
 }
 
 var setupFlowVis = function() {
-	d3.select('#flowA svg defs, #flowB svg defs').append('marker')
+	d3.select('#flowL svg defs, #flowR svg defs').append('marker')
 		.attr('id', 'markerArrow')
 		.attr('viewBox', '0 0 10 10')
 		.attr('markerWidth', 5)
@@ -1138,7 +1157,7 @@ var setupFlowVis = function() {
 			.attr('fill', '#3fc0c9')
 			.attr('style', 'stroke-width: 0px');
 
-	d3.selectAll('#flowA svg defs, #flowB svg defs').append('marker')
+	d3.selectAll('#flowL svg defs, #flowR svg defs').append('marker')
 		.attr('id', 'quiverArrow')
 		.attr('viewBox', '0 0 10 10')
 		.attr('markerWidth', 5)
@@ -1173,13 +1192,13 @@ var updateFlowVis = function() {
 			+ ' L' + x(d.x + dirVector.x) + ',' + x(d.y + dirVector.y);
 	};
 
-	// var selection = d3.select('#flowVis svg').selectAll('path.glyph').data(data);
-	// selection.enter()
-	// 	.append('path')
-	// 	.attr('class', 'glyph');
-	//
-	// selection // update
-	// 	.attr('d', pathSpec);
+	var selection = d3.select('#flowL svg').selectAll('path.glyph').data(data);
+	selection.enter()
+		.append('path')
+		.attr('class', 'glyph ' + ((settings.vectorDisplay === 'arrow') ? '' : 'hidden'));
+
+	selection // update
+		.attr('d', pathSpec);
 
 
 	// quiver plot
@@ -1230,10 +1249,10 @@ var updateFlowVis = function() {
 			+ ' L' + x(d.pos.x + dirVector.x) + ',' + x(d.pos.y + dirVector.y);
 	};
 
-	var selection = d3.select('#flowA svg').selectAll('path.quiver').data(arrows);
+	var selection = d3.select('#flowL svg').selectAll('path.quiver').data(arrows);
 	selection.enter()
 		.append('path')
-		.attr('class', 'quiver');
+		.attr('class', 'quiver ' + ((settings.vectorDisplay === 'quiver') ? '' : 'hidden'));
 
 	selection // update
 		.attr('d', quiverPathSpec);
