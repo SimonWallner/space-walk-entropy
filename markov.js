@@ -106,14 +106,24 @@ jitteredGridSamples(15, 0.7).map(function(sample) {
 
 
 // shared
-var c = d3.scale.linear()
+var cSolid = d3.scale.linear()
 	.domain([0, 1])
 	.range(['#444', '#e25454']);
 
-var cDiff = d3.scale.linear()
+var cSolidDiff = d3.scale.linear()
 	.domain([0, 1])
 	.range(['#444', '#55C3E0']);
 
+var cHeat = d3.scale.linear()
+	.domain([0, 0.5, 0.8, 1])
+	.range(['#444', '#DCE055', '#e25454', '#FF0000']);
+
+var cHeatDiff = d3.scale.linear()
+	.domain([0, 0.5, 0.8, 1])
+	.range(['#444', '#55E091', '#55D3E0', '#008CFF']);
+
+var c = cHeat;
+var cDiff = cHeatDiff;
 
 var mappings = {
 	xbox360: {
