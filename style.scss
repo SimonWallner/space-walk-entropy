@@ -405,7 +405,8 @@ svg.matrix {
 	path {
 		stroke-width: 1.5px;
 		&.anchor {
-			stroke: $blue;
+				stroke: $blue;
+				stroke-location: inside;
 		}
 	}
 

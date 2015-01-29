@@ -3,11 +3,11 @@ var LinearSampler = function() {
 	var domain = {min: 0, max: 1};
 	var numSamples = 4;
 
-	var upperLimits = [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
-	var lowerLimits = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875];
+	var upperLimits = [0.1111111, 0.2222222, 0.333333, 0.444444, 0.555555, 0.666666, 0.777777, 0.888888, 1];
+	var lowerLimits = [0, 0.1111111, 0.2222222, 0.333333, 0.444444, 0.555555, 0.666666, 0.777777, 0.888888];
 
 	this.getID = function(x) {
-		
+
 		for (var i = 0; i < upperLimits.length; i++) {
 			if (x <= upperLimits[i]) {
 				return i.toString();

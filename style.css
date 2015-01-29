@@ -320,6 +320,7 @@ svg.matrix {
   svg.matrix path {
     stroke-width: 1.5px; }
     svg.matrix path.anchor {
-      stroke: #3fc0c9; }
+      stroke: #3fc0c9;
+      stroke-location: inside; }
   svg.matrix circle.outline {
     stroke-width: 0.5px; }

@@ -88,6 +88,7 @@ var svgPadding = 5;
 var MatrixRoundRobin = 0;
 var matrixIDs;
 var linearSVGSize = {w: 280, h: 40};
+var linearMatrixSVGSize = {w: 110, h: 15}
 var linearSvg;
 var svgScales = {};
 
@@ -793,7 +794,7 @@ var setupAnalog = function() {
 
 			svg.append('path')
 				.attr('d', lineFunc(path.path))
-				.attr('fill', '#ccffee')
+				.attr('fill', '#444')
 				.attr('id', id + '-cell-' + path.id)
 				.attr('clip-path', 'url(#' + clipId +')');
 		});
@@ -918,9 +919,37 @@ var setupLinearPlot = function() {
 		});
 	});
 
-	d3.selectAll('.linearP').append('svg')
-		.attr("width", 110)
-		.attr("height", 15)
+	// lienar matrix plot
+	['leftLinear', 'rightLinear'].forEach(function(id) {
+
+		var svgs = d3.selectAll('#' + id + ' .linearP').append('svg');
+		svgs.attr("width", linearMatrixSVGSize.w)
+			.attr("height", linearMatrixSVGSize.h)
+			.attr('id', function(d, i) { return 'matrix-' + i})
+			.attr('class', 'matrix');
+
+		var mX = d3.scale.linear()
+			.domain([0, 1])
+			.range([1, linearMatrixSVGSize.w - 1]);
+
+		var mY = d3.scale.linear()
+			.domain([0, 1])
+			.range([1, linearMatrixSVGSize.h - 1]);
+
+		var lineFunc = d3.svg.line()
+			.x(function(d) { return mX(d.x); })
+			.y(function(d) { return mY(d.y); })
+			.interpolate("linear");
+
+		linearSampler.getPaths().forEach(function(path) {
+			svgs.append('path')
+				.attr('d', lineFunc(path.path))
+				.attr('fill', '#444')
+				.attr('id', function(d, i) { return id + '-matrix-' + i + '-cell-' + path.id; })
+				.attr('class', function(d, i) { return (i === path.id) ? 'anchor' : ''})
+		});
+	});
+
 }
 
 var updateLinearPlot = function() {
