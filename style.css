@@ -314,6 +314,8 @@ svg .labels text {
   font-size: 16px;
   fill: #5b5b5b;
   text-anchor: end; }
+svg .hidden {
+  opacity: 0; }
 
 svg.matrix {
   margin-right: 1px; }

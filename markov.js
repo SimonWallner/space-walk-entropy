@@ -106,11 +106,11 @@ jitteredGridSamples(15, 0.7).map(function(sample) {
 
 
 // shared
-var cSolid = d3.scale.linear()
+var cMono = d3.scale.linear()
 	.domain([0, 1])
 	.range(['#444', '#e25454']);
 
-var cSolidDiff = d3.scale.linear()
+var cMonoDiff = d3.scale.linear()
 	.domain([0, 1])
 	.range(['#444', '#55C3E0']);
 
@@ -124,6 +124,14 @@ var cHeatDiff = d3.scale.linear()
 
 var c = cHeat;
 var cDiff = cHeatDiff;
+
+var pScaleLinear = function(sum, total) {
+	return sum / total;
+}
+var pScaleLog = function(sum, total) {
+	return Math.max(0, Math.log(sum)) / Math.log(total);
+}
+var pScale = pScaleLog;
 
 var mappings = {
 	xbox360: {
@@ -268,25 +276,6 @@ $(document).ready(function() {
 	drawControllerSelect();
 	setupGraph();
 	setupAnalog();
-
-	// load settings
-	loadSettings();
-	if (settings.currentMapping === 'custom') {
-		currentMapping = settings.customMapping;
-		activateOption('#mappingCustom');
-	} else {
-		currentMapping = mappings[settings.currentMapping];
-		if (settings.currentMapping === 'xbox360') {
-			activateOption('#mappingX360');
-		} else if (settings.currentMapping === 'ps3') {
-			activateOption('#mappingPS3');
-		}
-	}
-
-	setActiveModel(modelA, settings.modelAId);
-	activateOption('#modelA' + settings.modelAId);
-	setActiveModel(modelB, settings.modelBId);
-	activateOption('#modelB' + settings.modelBId);
 
 
 	// intervall callbacks
@@ -459,6 +448,98 @@ $(document).ready(function() {
 			$('#modelResetConfirm').toggleClass('flashing', resetModelArmed);
 		}
 	});
+
+	$('#scale1').click(function() {
+		pScale = pScaleLinear;
+		activateOption(this);
+		settings.pScale = 'linear';
+		storeSettings();
+	})
+
+	$('#scaleLog').click(function() {
+		pScale = pScaleLog;
+		activateOption(this);
+		settings.pScale = 'log';
+		storeSettings();
+	})
+
+	$('#colorHeat').click(function() {
+		c = cHeat;
+		cDiff = cHeatDiff;
+		activateOption(this);
+		settings.color = 'heat';
+		storeSettings();
+	})
+	$('#colorMono').click(function() {
+		c = cMono;
+		cDiff = cMonoDiff;
+		activateOption(this);
+		settings.color = 'mono';
+		storeSettings();
+	})
+
+	$('#diffOff').click(function() {
+		settings.diff = 'off';
+
+		$('.analogDiff').attr('class', 'analogDiff hidden');
+		storeSettings();
+		activateOption(this);
+	})
+	$('#diffSplit').click(function() {
+		settings.diff = 'split';
+		// ...
+		$('.analogDiff').attr('class', 'analogDiff');
+		storeSettings();
+		activateOption(this);
+	})
+	$('#diffDiff').click(function() {
+		settings.diff = 'diff';
+		// ...
+		$('.analogDiff').attr('class', 'analogDiff hidden');
+		storeSettings();
+		activateOption(this);
+	})
+
+
+
+	// load settings
+	loadSettings();
+	if (settings.currentMapping === 'custom') {
+		currentMapping = settings.customMapping;
+		activateOption('#mappingCustom');
+	} else {
+		currentMapping = mappings[settings.currentMapping];
+		if (settings.currentMapping === 'xbox360') {
+			activateOption('#mappingX360');
+		} else if (settings.currentMapping === 'ps3') {
+			activateOption('#mappingPS3');
+		}
+	}
+
+	if (settings.color === 'heat') {
+		$('#colorHeat').click();
+	} else {
+		$('#colorMono').click();
+	}
+
+	if (settings.pScale === 'linear') {
+		$('#scale1').click();
+	} else {
+		$('#scaleLog').click();
+	}
+
+	if (settings.diff === 'off') {
+		$('#diffOff').click();
+	} else if (settings.diff === 'split') {
+		$('#diffSplit').click();
+	} else {
+		$('#diffDiff').click();
+	}
+
+	setActiveModel(modelA, settings.modelAId);
+	activateOption('#modelA' + settings.modelAId);
+	setActiveModel(modelB, settings.modelBId);
+	activateOption('#modelB' + settings.modelBId);
 });
 
 var drawControllerSelect = function() {
@@ -761,7 +842,8 @@ var setupAnalog = function() {
 			.domain([-1, 1])
 			.range([3, analogSize - 3]);
 
-	['sumsL', 'sumsR', 'flowL', 'flowR'].forEach(function(id) {
+	var labels = ['L', 'R', 'L', 'R'];
+	['sumsL', 'sumsR', 'flowL', 'flowR'].forEach(function(id, i) {
 		var svg = d3.select('#' + id).append('svg')
 			.attr('width', analogSize + 'px')
 			.attr('height', analogSize + 'px');
@@ -781,7 +863,7 @@ var setupAnalog = function() {
 			.attr('class', 'outline');
 
 		svg.append('text')
-			.text('TODO')
+			.text(labels[i])
 			.attr('x', 5)
 			.attr('y', 20)
 			.attr('class', 'label')
@@ -816,6 +898,7 @@ var setupAnalog = function() {
 			.attr('d', lineFunc(path.path))
 			.attr('fill', '#444')
 			.attr('id', id + '-cell-' + path.id + '-diff')
+			.attr('class', 'analogDiff')
 			.attr('clip-path', 'url(#' + clipId +')');
 		});
 	})
@@ -886,7 +969,12 @@ var updateMatrixPlot = function() {
 
 	var probs = modelA.analog.transitionP(id);
 	probs.forEach(function(element) {
-		d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.pLog));
+		// TODO: fixme somehow it is the other way round...
+		if (settings.pScale === 'linear') {
+			d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.p));
+		} else {
+			d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.pLog));
+		}
 	});
 
 	MatrixRoundRobin = (MatrixRoundRobin + 1) % matrixIDs.length;
@@ -903,7 +991,7 @@ var updateSumSvg = function() {
 
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
-			d3.select('#sumsL-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));
+			d3.select('#sumsL-cell-' + from).attr('fill', c(pScale(sums[from], total)));
 		}
 	}
 
@@ -918,7 +1006,7 @@ var updateSumSvg = function() {
 
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
-			d3.select('#sumsL-cell-' + from + '-diff').attr('fill', cDiff(Math.max(0, Math.log(sums[from])) / Math.log(total)));
+			d3.select('#sumsL-cell-' + from + '-diff').attr('fill', cDiff(pScale(sums[from], total)));
 		}
 	}
 }

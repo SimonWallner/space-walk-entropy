@@ -397,6 +397,10 @@ svg {
 			text-anchor: end;
 		}
 	}
+
+	.hidden {
+		opacity: 0;
+	}
 }
 
 svg.matrix {
