@@ -125,6 +125,12 @@ var cHeatDiff = d3.scale.linear()
 var c = cHeat;
 var cDiff = cHeatDiff;
 
+var cDiffEncoding = d3.scale.linear()
+	// .domain([-1, 0, 1])
+	// .range(['#E25454', '#444', '#B6CE4E']);
+	.domain([-1, -0.01, 0, 0.01, 1])
+	.range(['#E25454', '#674848', '#444', '#5D6346', '#B6CE4E']);
+
 var pScaleLinear = function(sum, total) {
 	return sum / total;
 }
@@ -981,32 +987,55 @@ var updateMatrixPlot = function() {
 }
 
 var updateSumSvg = function() {
-	var sums = modelA.analog.sums();
-	var total = 0;
-	for (var from in sums) {
-		if (sums.hasOwnProperty(from)) {
-			total += sums[from];
+	if (settings.diff !== 'diff') {
+		var sums = modelA.analog.sums();
+		var total = 0;
+		for (var from in sums) {
+			if (sums.hasOwnProperty(from)) {
+				total += sums[from];
+			}
 		}
-	}
 
-	for (var from in sums) {
-		if (sums.hasOwnProperty(from)) {
-			d3.select('#sumsL-cell-' + from).attr('fill', c(pScale(sums[from], total)));
+		for (var from in sums) {
+			if (sums.hasOwnProperty(from)) {
+				d3.select('#sumsL-cell-' + from).attr('fill', c(pScale(sums[from], total)));
+			}
 		}
-	}
 
-	// model B
-	var sums = modelB.analog.sums();
-	var total = 0;
-	for (var from in sums) {
-		if (sums.hasOwnProperty(from)) {
-			total += sums[from];
+		// model B
+		var sums = modelB.analog.sums();
+		var total = 0;
+		for (var from in sums) {
+			if (sums.hasOwnProperty(from)) {
+				total += sums[from];
+			}
 		}
-	}
 
-	for (var from in sums) {
-		if (sums.hasOwnProperty(from)) {
-			d3.select('#sumsL-cell-' + from + '-diff').attr('fill', cDiff(pScale(sums[from], total)));
+		for (var from in sums) {
+			if (sums.hasOwnProperty(from)) {
+				d3.select('#sumsL-cell-' + from + '-diff').attr('fill', cDiff(pScale(sums[from], total)));
+			}
+		}
+	} else {
+		var sumsA = modelA.analog.sums();
+		var sumsB = modelB.analog.sums();
+		var totalA = 0;
+		var totalB = 0;
+		for (var from in sumsA) {
+			if (sumsA.hasOwnProperty(from)) {
+				totalA += sumsA[from];
+			}
+		}
+		for (var from in sumsB) {
+			if (sumsB.hasOwnProperty(from)) {
+				totalB += sumsB[from];
+			}
+		}
+
+		for (var from in sumsA) {
+			if (sumsA.hasOwnProperty(from) && sumsB.hasOwnProperty(from)) {
+				d3.select('#sumsL-cell-' + from).attr('fill', cDiffEncoding(pScale(sumsA[from], totalA) - pScale(sumsB[from], totalB)));
+			}
 		}
 	}
 }
