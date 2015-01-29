@@ -110,6 +110,10 @@ var c = d3.scale.linear()
 	.domain([0, 1])
 	.range(['#444', '#e25454']);
 
+var cDiff = d3.scale.linear()
+	.domain([0, 1])
+	.range(['#444', '#55C3E0']);
+
 
 var mappings = {
 	xbox360: {
@@ -747,7 +751,7 @@ var setupAnalog = function() {
 			.domain([-1, 1])
 			.range([3, analogSize - 3]);
 
-	['sumsA', 'sumsB', 'flowA', 'flowB'].forEach(function(id) {
+	['sumsL', 'sumsR', 'flowL', 'flowR'].forEach(function(id) {
 		var svg = d3.select('#' + id).append('svg')
 			.attr('width', analogSize + 'px')
 			.attr('height', analogSize + 'px');
@@ -766,6 +770,12 @@ var setupAnalog = function() {
 			.attr('r', analogSize / 2 - 2)
 			.attr('class', 'outline');
 
+		svg.append('text')
+			.text('TODO')
+			.attr('x', 5)
+			.attr('y', 20)
+			.attr('class', 'label')
+
 		var centers = discSampler.getCenters();
 		discSampler.getPaths().forEach(function(path, index) {
 			var lineFunc = d3.svg.line()
@@ -780,23 +790,23 @@ var setupAnalog = function() {
 				.attr('clip-path', 'url(#clip-' + id +')');
 
 
-			// diff viewer
-			var centerX = centers[index].x;
-			var clipId = id + '-cell-' + path.id + '-clip';
-			defs.append('clipPath')
-				.attr('id', clipId)
-				.append('rect')
-					.attr('x', x(centerX))
-					.attr('y', 0)
-					.attr('width', x(1))
-					.attr('height', x(1))
-					.attr('clip-path', 'url(#clip-' + id +')');
+		// diff viewer
+		var centerX = centers[index].x;
+		var clipId = id + '-cell-' + path.id + '-clip';
+		defs.append('clipPath')
+			.attr('id', clipId)
+			.append('rect')
+				.attr('x', x(centerX))
+				.attr('y', 0)
+				.attr('width', x(1))
+				.attr('height', x(1))
+				.attr('clip-path', 'url(#clip-' + id +')');
 
-			svg.append('path')
-				.attr('d', lineFunc(path.path))
-				.attr('fill', '#444')
-				.attr('id', id + '-cell-' + path.id)
-				.attr('clip-path', 'url(#' + clipId +')');
+		svg.append('path')
+			.attr('d', lineFunc(path.path))
+			.attr('fill', '#444')
+			.attr('id', id + '-cell-' + path.id + '-diff')
+			.attr('clip-path', 'url(#' + clipId +')');
 		});
 	})
 }
@@ -883,7 +893,22 @@ var updateSumSvg = function() {
 
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
-			d3.select('#sumsA-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));
+			d3.select('#sumsL-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));
+		}
+	}
+
+	// model B
+	var sums = modelB.analog.sums();
+	var total = 0;
+	for (var from in sums) {
+		if (sums.hasOwnProperty(from)) {
+			total += sums[from];
+		}
+	}
+
+	for (var from in sums) {
+		if (sums.hasOwnProperty(from)) {
+			d3.select('#sumsL-cell-' + from + '-diff').attr('fill', cDiff(Math.max(0, Math.log(sums[from])) / Math.log(total)));
 		}
 	}
 }
