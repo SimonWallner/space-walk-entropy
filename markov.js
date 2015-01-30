@@ -279,6 +279,9 @@ var setActiveModel = function(model, id) {
 }
 
 $(document).ready(function() {
+
+	loadSettings();
+
 	drawControllerSelect();
 	setupGraph();
 	setupAnalog();
@@ -504,19 +507,46 @@ $(document).ready(function() {
 		activateOption(this);
 	})
 
-	$('#vectorDisplayQuiver').click(function() {
-		settings.vectorDisplay = 'quiver';
+	$('#vectorADisplayQuiver').click(function() {
+		settings.vectorADisplay = 'quiver';
 		storeSettings();
 		$('.quiver').attr('class', 'quiver');
 		$('.glyph').attr('class', 'glyph hidden');
 		activateOption(this);
 	})
-	$('#vectorDisplayArrow').click(function() {
-		settings.vectorDisplay = 'arrow';
+	$('#vectorADisplayArrow').click(function() {
+		settings.vectorADisplay = 'arrow';
 		storeSettings();
 		$('.quiver').attr('class', 'quiver hidden');
 		$('.glyph').attr('class', 'glyph');
 		activateOption(this);
+	})
+
+	$('#vectorBDisplayOff').click(function() {
+		activateOption(this);
+		settings.vectorBDisplay = 'off';
+		storeSettings();
+	})
+	$('#vectorBDisplayQuiver').click(function() {
+		activateOption(this);
+		settings.vectorBDisplay = 'quiver';
+		storeSettings();
+	})
+	$('#vectorBDisplayArrow').click(function() {
+		activateOption(this);
+		settings.vectorBDisplay = 'arrow';
+		storeSettings();
+	})
+
+	$('#vectorErrorOff').click(function() {
+		activateOption(this);
+		settings.vectorError = 'off';
+		storeSettings();
+	})
+	$('#vectorErrorArea').click(function() {
+		activateOption(this);
+		settings.vectorError = 'area';
+		storeSettings();
 	})
 
 
@@ -555,10 +585,24 @@ $(document).ready(function() {
 		$('#diffDiff').click();
 	}
 
-	if (settings.vectorDisplay === 'quiver') {
-		$('#vectorDisplayQuiver').click();
+	if (settings.vectorADisplay === 'quiver') {
+		$('#vectorADisplayQuiver').click();
 	} else {
-		$('#vectorDisplayArrow').click();
+		$('#vectorADisplayArrow').click();
+	}
+
+	if (settings.vectorBDisplay === 'off') {
+		$('#vectorBDisplayOff').click();
+	} else if (settings.vectorBDisplay === 'quiver') {
+		$('#vectorBDisplayQuiver').click();
+	} else {
+		$('#vectorBDisplayArrow').click();
+	}
+
+	if (settings.vectorError === 'off') {
+		$('#vectorErrorOff').click();
+	} else {
+		$('#vectorErrorArea').click();
 	}
 
 	setActiveModel(modelA, settings.modelAId);
@@ -1173,6 +1217,7 @@ var setupFlowVis = function() {
 
 
 var updateFlowVis = function() {
+	// arrows/glyphs
 	var data = discSampler.getFlowData(modelA.analog.Q(), modelA.analog.sums());
 
 	var x = d3.scale.linear()
@@ -1195,7 +1240,7 @@ var updateFlowVis = function() {
 	var selection = d3.select('#flowL svg').selectAll('path.glyph').data(data);
 	selection.enter()
 		.append('path')
-		.attr('class', 'glyph ' + ((settings.vectorDisplay === 'arrow') ? '' : 'hidden'));
+		.attr('class', 'glyph ' + ((settings.vectorADisplay === 'arrow') ? '' : 'hidden'));
 
 	selection // update
 		.attr('d', pathSpec);
@@ -1252,10 +1297,28 @@ var updateFlowVis = function() {
 	var selection = d3.select('#flowL svg').selectAll('path.quiver').data(arrows);
 	selection.enter()
 		.append('path')
-		.attr('class', 'quiver ' + ((settings.vectorDisplay === 'quiver') ? '' : 'hidden'));
+		.attr('class', 'quiver ' + ((settings.vectorADisplay === 'quiver') ? '' : 'hidden'));
 
 	selection // update
 		.attr('d', quiverPathSpec);
+
+
+	// error plot
+	var dataA = discSampler.getFlowData(modelA.analog.Q(), modelA.analog.sums());
+	var dataB = discSampler.getFlowData(modelB.analog.Q(), modelB.analog.sums());
+
+	var area = dataA.map(function(d, i) {
+		return area2D({x: d.dirX, y: d.dirY}, {x: dataB[i].dirX, y: dataB[i].dirY});
+	})
+
+	var c = d3.scale.linear()
+		.domain([0, 0.2])
+		.range(['#444', '#55C3E0']);
+
+	area.forEach(function(d, i) {
+		d3.select('#flowR-cell-' + i)
+			.attr('fill', c(d))
+	})
 }
 
 
@@ -1322,6 +1385,10 @@ function distance(a, b) {
 	}
 
 	return (v.x * v.x) + (v.y * v.y);
+}
+
+function area2D(a, b) {
+	return Math.abs(a.x * b.y - a.y * b.x);
 }
 
 var add = function(a, b) {

@@ -130,7 +130,9 @@ var DiscSampler = function() {
 				x: site.x,
 				y: site.y,
 				centerX: center.x,
-				centerY: center.y
+				centerY: center.y,
+				dirX: (center.x - site.x) / 2,
+				dirY: (center.y - site.y) / 2,
 			};
 		})
 	}
