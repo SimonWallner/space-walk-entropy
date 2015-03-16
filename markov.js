@@ -1375,16 +1375,14 @@ var updateFlowVis = function() {
 
 
 	// error plot
-	var area = data.a.map(function(d, i) {
-		return area2D({x: d.dirX, y: d.dirY}, {x: data.b[i].dirX, y: data.b[i].dirY});
+	var error = data.a.map(function(d, i) {
+		var diff = sub({x: (d.dirX || 0), y: (d.dirY || 0)},
+			{x: (data.b[i].dirX || 0), y: (data.b[i].dirY || 0)})
+			return norm2(diff) * 3; // FIXME: arbitrary value!!!
 	})
 
-	var c = d3.scale.linear()
-		.domain([0, 0.2])
-		.range(['#444', '#55C3E0']);
-
-	area.forEach(function(d, i) {
-		d3.select('#flowR-cell-' + i)
+	error.forEach(function(d, i) {
+		d3.select('#flowL-cell-' + i)
 			.attr('fill', c(d))
 	})
 }
@@ -1463,12 +1461,20 @@ var add = function(a, b) {
 	return {x: a.x + b.x, y: a.y + b.y};
 }
 
+var sub = function(a, b) {
+	return {x: a.x - b.x, y: a.y - b.y};
+}
+
 var mul = function(a, s) {
 	return {x: a.x * s, y: a.y * s};
 }
 
 var mad = function(a, b, s) {
 	return {x: a.x + b.x * s, y: a.y + b.y * s};
+}
+
+var norm2 = function(a) {
+	return a.x * a.x + a.y * a.y;
 }
 
 function jitteredGridSamples(dimension, jitter) {
