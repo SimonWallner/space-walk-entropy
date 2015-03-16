@@ -295,11 +295,20 @@ svg rect.outline {
   shape-rendering: crispEdges; }
 svg path.glyph {
   stroke: #3fc0c9;
-  marker-end: url(#markerArrow); }
+  marker-end: url(#markerArrowA);
+  stroke-width: 2px; }
+svg path.glyphB {
+  stroke: #e89f49;
+  marker-end: url(#markerArrowB);
+  stroke-width: 2px; }
 svg path.quiver {
   stroke: white;
   stroke-width: 1px;
   marker-end: url(#quiverArrow); }
+svg path.quiverB {
+  stroke: #e89f49;
+  stroke-width: 1px;
+  marker-end: url(#quiverArrowB); }
 svg .barA, svg .barB {
   fill: #5b5b5b; }
 svg .diffPos {

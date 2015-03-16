@@ -98,9 +98,11 @@ matrixSize = 63;
 
 // quivers
 var arrows = [];
+var arrowsB = [];
 jitteredGridSamples(15, 0.7).map(function(sample) {
 	if (distance({x: 0, y: 0}, sample) < 1) {
 		arrows.push({pos: sample});
+		arrowsB.push({pos: sample});
 	}
 })
 
@@ -526,16 +528,22 @@ $(document).ready(function() {
 		activateOption(this);
 		settings.vectorBDisplay = 'off';
 		storeSettings();
+		$('.quiverB').attr('class', 'quiverB hidden');
+		$('.glyphB').attr('class', 'glyphB hidden');
 	})
 	$('#vectorBDisplayQuiver').click(function() {
 		activateOption(this);
 		settings.vectorBDisplay = 'quiver';
 		storeSettings();
+		$('.quiverB').attr('class', 'quiverB');
+		$('.glyphB').attr('class', 'glyphB hidden');
 	})
 	$('#vectorBDisplayArrow').click(function() {
 		activateOption(this);
 		settings.vectorBDisplay = 'arrow';
 		storeSettings();
+		$('.quiverB').attr('class', 'quiverB hidden');
+		$('.glyphB').attr('class', 'glyphB');
 	})
 
 	$('#vectorErrorOff').click(function() {
@@ -1189,7 +1197,7 @@ var updateLinearPlot = function() {
 
 var setupFlowVis = function() {
 	d3.select('#flowL svg defs, #flowR svg defs').append('marker')
-		.attr('id', 'markerArrow')
+		.attr('id', 'markerArrowA')
 		.attr('viewBox', '0 0 10 10')
 		.attr('markerWidth', 5)
 		.attr('markerHeight', 4)
@@ -1199,6 +1207,19 @@ var setupFlowVis = function() {
 		.append('path')
 			.attr('d', 'M0,0 L0,10 L10,5 L0,0')
 			.attr('fill', '#3fc0c9')
+			.attr('style', 'stroke-width: 0px');
+
+	d3.select('#flowL svg defs, #flowR svg defs').append('marker')
+		.attr('id', 'markerArrowB')
+		.attr('viewBox', '0 0 10 10')
+		.attr('markerWidth', 5)
+		.attr('markerHeight', 4)
+		.attr('refX', 2)
+		.attr('refY', 5)
+		.attr('orient', 'auto')
+		.append('path')
+			.attr('d', 'M0,0 L0,10 L10,5 L0,0')
+			.attr('fill', '#e89f49')
 			.attr('style', 'stroke-width: 0px');
 
 	d3.selectAll('#flowL svg defs, #flowR svg defs').append('marker')
@@ -1213,12 +1234,37 @@ var setupFlowVis = function() {
 			.attr('d', 'M0,0 L0,10 L10,5 L0,0')
 			.attr('fill', 'white')
 			.attr('style', 'stroke-width: 0px')
+
+	d3.selectAll('#flowL svg defs, #flowR svg defs').append('marker')
+		.attr('id', 'quiverArrowB')
+		.attr('viewBox', '0 0 10 10')
+		.attr('markerWidth', 5)
+		.attr('markerHeight', 4)
+		.attr('refX', 2)
+		.attr('refY', 5)
+		.attr('orient', 'auto')
+		.append('path')
+			.attr('d', 'M0,0 L0,10 L10,5 L0,0')
+			.attr('fill', '#e89f49')
+			.attr('style', 'stroke-width: 0px')
+
+	d3.select('#flowL svg, #flowR svg').append('g')
+		.attr('class', 'arrowB');
+	d3.select('#flowL svg, #flowR svg').append('g')
+		.attr('class', 'quiverB');
+	d3.select('#flowL svg, #flowR svg').append('g')
+		.attr('class', 'arrowA');
+	d3.select('#flowL svg, #flowR svg').append('g')
+		.attr('class', 'quiverA');
 }
 
 
 var updateFlowVis = function() {
 	// arrows/glyphs
-	var data = discSampler.getFlowData(modelA.analog.Q(), modelA.analog.sums());
+	var data = {
+		a: discSampler.getFlowData(modelA.analog.Q(), modelA.analog.sums()),
+		b: discSampler.getFlowData(modelB.analog.Q(), modelB.analog.sums())
+	}
 
 	var x = d3.scale.linear()
 		.domain([-1, 1])
@@ -1237,10 +1283,20 @@ var updateFlowVis = function() {
 			+ ' L' + x(d.x + dirVector.x) + ',' + x(d.y + dirVector.y);
 	};
 
-	var selection = d3.select('#flowL svg').selectAll('path.glyph').data(data);
+	// glyph A
+	var selection = d3.select('#flowL svg g.arrowA').selectAll('path.glyph').data(data.a);
 	selection.enter()
 		.append('path')
 		.attr('class', 'glyph ' + ((settings.vectorADisplay === 'arrow') ? '' : 'hidden'));
+
+	selection // update
+		.attr('d', pathSpec);
+
+	// glyph B
+	var selection = d3.select('#flowL svg g.arrowB').selectAll('path.glyphB').data(data.b);
+	selection.enter()
+		.append('path')
+		.attr('class', 'glyphB ' + ((settings.vectorADisplay === 'arrow') ? '' : 'hidden'));
 
 	selection // update
 		.attr('d', pathSpec);
@@ -1264,24 +1320,31 @@ var updateFlowVis = function() {
 			return a.distance - b.distance;
 		});
 
-		var sum = {x: 0, y: 0};
+		var sumA = {x: 0, y: 0};
+		var sumB = {x: 0, y: 0};
 		var weightSum = 0;
 		for (var k = 0; k < 3; k++) {
 			var pair = sorted[k];
-			var siteCenter = {x: data[pair.siteId].centerX, y: data[pair.siteId].centerY}
+			var siteCenterA = {x: data.a[pair.siteId].centerX, y: data.a[pair.siteId].centerY}
+			var siteCenterB = {x: data.b[pair.siteId].centerX, y: data.b[pair.siteId].centerY}
 
 			if (pair.distance === 0) {
-				sum = siteCenter;
+				sumA = siteCenterA;
+				sumB = siteCenterB;
 				weightsSum = 1;
 				break;
 			}
+
 			weight = 1 / Math.pow(pair.distance, 1);
-			sum = mad(sum, siteCenter, weight);
+			sumA = mad(sumA, siteCenterA, weight);
+			sumB = mad(sumB, siteCenterB, weight);
 			weightSum += weight;
 		}
-		sum = mul(sum, 1 / weightSum);
+		sumA = mul(sumA, 1 / weightSum);
+		sumB = mul(sumB, 1 / weightSum);
 
-		arrows[i].center = sum;
+		arrows[i].center = sumA;
+		arrowsB[i].center = sumB;
 	}
 
 	var quiverPathSpec = function(d) {
@@ -1294,21 +1357,26 @@ var updateFlowVis = function() {
 			+ ' L' + x(d.pos.x + dirVector.x) + ',' + x(d.pos.y + dirVector.y);
 	};
 
-	var selection = d3.select('#flowL svg').selectAll('path.quiver').data(arrows);
+	// data A
+	var selection = d3.select('#flowL svg g.quiverA').selectAll('path.quiver').data(arrows);
 	selection.enter()
 		.append('path')
 		.attr('class', 'quiver ' + ((settings.vectorADisplay === 'quiver') ? '' : 'hidden'));
+	selection // update
+		.attr('d', quiverPathSpec);
 
+	// data B
+	var selection = d3.select('#flowL svg g.quiverB').selectAll('path.quiverB').data(arrowsB);
+	selection.enter()
+		.append('path')
+		.attr('class', 'quiverB ' + ((settings.vectorBDisplay === 'quiver') ? '' : 'hidden'));
 	selection // update
 		.attr('d', quiverPathSpec);
 
 
 	// error plot
-	var dataA = discSampler.getFlowData(modelA.analog.Q(), modelA.analog.sums());
-	var dataB = discSampler.getFlowData(modelB.analog.Q(), modelB.analog.sums());
-
-	var area = dataA.map(function(d, i) {
-		return area2D({x: d.dirX, y: d.dirY}, {x: dataB[i].dirX, y: dataB[i].dirY});
+	var area = data.a.map(function(d, i) {
+		return area2D({x: d.dirX, y: d.dirY}, {x: data.b[i].dirX, y: data.b[i].dirY});
 	})
 
 	var c = d3.scale.linear()

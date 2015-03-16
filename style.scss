@@ -360,13 +360,25 @@ svg {
 
 	path.glyph {
 		stroke: $blue;
-		marker-end: url(#markerArrow);
+		marker-end: url(#markerArrowA);
+		stroke-width: 2px;
+	}
+	path.glyphB {
+		stroke: $orange;
+		marker-end: url(#markerArrowB);
+		stroke-width: 2px;
 	}
 
 	path.quiver {
 		stroke: white;
 		stroke-width: 1px;
 		marker-end: url(#quiverArrow);
+	}
+
+	path.quiverB {
+		stroke: $orange;
+		stroke-width: 1px;
+		marker-end: url(#quiverArrowB);
 	}
 
 	.barA, .barB {
