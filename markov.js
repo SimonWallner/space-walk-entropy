@@ -27,11 +27,11 @@ var maxInformation = 1; // bits
 // Marcov Chains
 var digitalMCs = [];
 var linearMCs = [];
-var analogMCs = [];
+var analogMCs = {l: [], r: []};
 for (var i = 0; i < windowLengths.length; i++) {
 	digitalMCs[i] = new MarkovChain(true, 16);
 	linearMCs[i] = new MarkovChain(false);
-	analogMCs[i] = new MarkovChain(false);
+	analogMCs.l[i] = new MarkovChain(false);
 }
 var custom = {
 	digital: new StaticModel({}),
@@ -59,7 +59,7 @@ var linearLastID;
 var modelA = {
 	id: '15',
 	linear: linearMCs[0],
-	analog: analogMCs[0],
+	analog: analogMCs.l[0],
 	digital: digitalMCs[0],
 	history: {
 		analog: [],
@@ -70,7 +70,7 @@ var modelA = {
 var modelB = {
 	id: '15',
 	linear: linearMCs[0],
-	analog: analogMCs[0],
+	analog: analogMCs.l[0],
 	digital: digitalMCs[0],
 	history: {
 		analog: [],
@@ -258,7 +258,7 @@ var setActiveModel = function(model, id) {
 	if (typeof index != 'undefined') {
 		model.id = id;
 		model.linear = linearMCs[index];
-		model.analog = analogMCs[index];
+		model.analog = analogMCs.l[index];
 		model.digital = digitalMCs[index];
 
 		model.history = {
@@ -449,7 +449,7 @@ $(document).ready(function() {
 		if (resetModelArmed) {
 			for (var i = 0; i < windowLengths; i++) {
 				linearMCs[i].reset();
-				analogMCs[i].reset();
+				analogMCs.l[i].reset();
 				digitalMCs[i].reset();
 			}
 
@@ -700,7 +700,7 @@ var sample = function() {
 	// analog
 	var currentAnalogId = discSampler.getID(currentAnalogSample);
 
-	analogMCs.forEach(function(mc, i) {
+	analogMCs.l.forEach(function(mc, i) {
 		mc.learn(lastAnalogID, currentAnalogId);
 		mc.truncate(windowLengths[i]);
 	});
@@ -755,9 +755,6 @@ var setupGraph = function() {
 	svgScales.x = d3.scale.linear()
 		.domain([0, maxHistoryLength])
 		.range([svgPadding, svgSize.innerWidth + svgPadding]);
-
-
-
 }
 
 var updateGraph = function() {
