@@ -28,6 +28,8 @@ var maxInformation = 1; // bits
 var digitalMCs = [];
 var linearMCs = [];
 var analogMCs = {l: [], r: []};
+analogMCs.r = analogMCs.l; // for now...
+
 for (var i = 0; i < windowLengths.length; i++) {
 	digitalMCs[i] = new MarkovChain(true, 16);
 	linearMCs[i] = new MarkovChain(false);
@@ -59,7 +61,8 @@ var linearLastID;
 var modelA = {
 	id: '15',
 	linear: linearMCs[0],
-	analog: analogMCs.l[0],
+	analogLeft: analogMCs.l[0],
+	analogRight: analogMCs.r[0],
 	digital: digitalMCs[0],
 	history: {
 		analog: [],
@@ -70,7 +73,8 @@ var modelA = {
 var modelB = {
 	id: '15',
 	linear: linearMCs[0],
-	analog: analogMCs.l[0],
+	analogLeft: analogMCs.l[0],
+	analogRight: analogMCs.r[0],
 	digital: digitalMCs[0],
 	history: {
 		analog: [],
@@ -258,7 +262,8 @@ var setActiveModel = function(model, id) {
 	if (typeof index != 'undefined') {
 		model.id = id;
 		model.linear = linearMCs[index];
-		model.analog = analogMCs.l[index];
+		model.analogLeft = analogMCs.l[index],
+		model.analogRight = analogMCs.r[index],
 		model.digital = digitalMCs[index];
 
 		model.history = {
@@ -269,7 +274,8 @@ var setActiveModel = function(model, id) {
 	} else if (id === 'custom') {
 		model.id = 'custom';
 		model.linear = custom.linear;
-		model.analog = custom.analog;
+		model.analogLeft = custom.analogLeft;
+		model.analogRight = custom.analogRight;
 		model.digital = custom.digital;
 
 		model.history = {
@@ -381,7 +387,7 @@ $(document).ready(function() {
 	$('#modelStore').click(function() {
 		var data = {
 			linearModel: modelA.linear.serialize(),
-			analogModel: modelA.analog.serialize(),
+			analogModel: modelA.analogLeft.serialize(),
 			digitalModel: modelA.digital.serialize()
 		}
 		downloadJson(data, 'modelData.json');
@@ -706,8 +712,8 @@ var sample = function() {
 	});
 
 	var analog = {};
-	analog.pA = modelA.analog.p(lastAnalogID, currentAnalogId);
-	analog.pB = modelB.analog.p(lastAnalogID, currentAnalogId);
+	analog.pA = modelA.analogLeft.p(lastAnalogID, currentAnalogId);
+	analog.pB = modelB.analogLeft.p(lastAnalogID, currentAnalogId);
 	analog.infoA = selfInformation(analog.pA);
 	analog.infoB = selfInformation(analog.pB);
 
@@ -718,7 +724,7 @@ var sample = function() {
 	maxInformation = Math.max(maxInformation, analog.infoB);
 
 
-	var probs = modelA.analog.transitionP(currentAnalogId);
+	var probs = modelA.analogLeft.transitionP(currentAnalogId);
 	probs.forEach(function(element) {
 		d3.select('#graph-cell-' + element.id).attr('fill', c(element.pLog));
 	});
@@ -738,8 +744,8 @@ var sample = function() {
 	linearLastID = linearCurrentID;
 
 	// ready indicator check;
-	$('#modelAReady').toggleClass('ready', modelA.analog.ready());
-	$('#modelBReady').toggleClass('ready', modelB.analog.ready());
+	$('#modelAReady').toggleClass('ready', modelA.analogLeft.ready());
+	$('#modelBReady').toggleClass('ready', modelB.analogLeft.ready());
 }
 
 var setupGraph = function() {
@@ -1041,7 +1047,7 @@ var setupMatrixPlot = function() {
 var updateMatrixPlot = function() {
 	var id = matrixIDs[MatrixRoundRobin]
 
-	var probs = modelA.analog.transitionP(id);
+	var probs = modelA.analogLeft.transitionP(id);
 	probs.forEach(function(element) {
 		// TODO: fixme somehow it is the other way round...
 		if (settings.pScale === 'linear') {
@@ -1056,7 +1062,7 @@ var updateMatrixPlot = function() {
 
 var updateSumSvg = function() {
 	if (settings.diff !== 'diff') {
-		var sums = modelA.analog.sums();
+		var sums = modelA.analogLeft.sums();
 		var total = 0;
 		for (var from in sums) {
 			if (sums.hasOwnProperty(from)) {
@@ -1071,7 +1077,7 @@ var updateSumSvg = function() {
 		}
 
 		// model B
-		var sums = modelB.analog.sums();
+		var sums = modelB.analogLeft.sums();
 		var total = 0;
 		for (var from in sums) {
 			if (sums.hasOwnProperty(from)) {
@@ -1085,8 +1091,8 @@ var updateSumSvg = function() {
 			}
 		}
 	} else {
-		var sumsA = modelA.analog.sums();
-		var sumsB = modelB.analog.sums();
+		var sumsA = modelA.analogLeft.sums();
+		var sumsB = modelB.analogLeft.sums();
 		var totalA = 0;
 		var totalB = 0;
 		for (var from in sumsA) {
@@ -1259,8 +1265,8 @@ var setupFlowVis = function() {
 var updateFlowVis = function() {
 	// arrows/glyphs
 	var data = {
-		a: discSampler.getFlowData(modelA.analog.Q(), modelA.analog.sums()),
-		b: discSampler.getFlowData(modelB.analog.Q(), modelB.analog.sums())
+		a: discSampler.getFlowData(modelA.analogLeft.Q(), modelA.analogLeft.sums()),
+		b: discSampler.getFlowData(modelB.analogLeft.Q(), modelB.analogLeft.sums())
 	}
 
 	var x = d3.scale.linear()
