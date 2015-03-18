@@ -50,8 +50,10 @@ var currentSample = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var lastSample = currentSample;
 
 // analog fun
-var currentAnalogSample = {x: 0, y: 0};
-var lastAnalogID = discSampler.getID(currentAnalogSample);
+var currentAnalogLeftSample = {x: 0, y: 0};
+var currentAnalogRightSample = {x: 0, y: 0};
+var lastAnalogLeftID = discSampler.getID(currentAnalogLeftSample);
+var lastAnalogRightID = discSampler.getID(currentAnalogRightSample);
 
 // linear stuff
 var linearCurrentID;
@@ -659,9 +661,9 @@ libsw.onMessage = function(data) {
 				var mapping = currentMapping.analog[data.payload.name];
 				if (mapping) {
 					if (mapping.id === 'LS' && mapping.property === 'x') {
-						currentAnalogSample.x = data.payload.value;
+						currentAnalogLeftSample.x = data.payload.value;
 					} else if (mapping.id === 'LS' && mapping.property === 'y') {
-						currentAnalogSample.y = data.payload.value;
+						currentAnalogLeftSample.y = data.payload.value;
 					}
 
 					if (data.payload.name === 'axis-5') { // right trigger (XB360)
@@ -703,17 +705,19 @@ var sample = function() {
 
 	lastSample = currentSample.slice(0); // force copy
 
+
 	// analog
-	var currentAnalogId = discSampler.getID(currentAnalogSample);
+	var currentAnalogLeftId = discSampler.getID(currentAnalogLeftSample);
+	// var currentAnalogRightId = discSampler.getID(currentAnalogRightSample);
 
 	analogMCs.l.forEach(function(mc, i) {
-		mc.learn(lastAnalogID, currentAnalogId);
+		mc.learn(lastAnalogLeftID, currentAnalogLeftId);
 		mc.truncate(windowLengths[i]);
 	});
 
 	var analog = {};
-	analog.pA = modelA.analogLeft.p(lastAnalogID, currentAnalogId);
-	analog.pB = modelB.analogLeft.p(lastAnalogID, currentAnalogId);
+	analog.pA = modelA.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
+	analog.pB = modelB.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
 	analog.infoA = selfInformation(analog.pA);
 	analog.infoB = selfInformation(analog.pB);
 
@@ -724,12 +728,13 @@ var sample = function() {
 	maxInformation = Math.max(maxInformation, analog.infoB);
 
 
-	var probs = modelA.analogLeft.transitionP(currentAnalogId);
+	var probs = modelA.analogLeft.transitionP(currentAnalogLeftId);
 	probs.forEach(function(element) {
 		d3.select('#graph-cell-' + element.id).attr('fill', c(element.pLog));
 	});
 
-	lastAnalogID = currentAnalogId;
+	lastAnalogLeftID = currentAnalogLeftId;
+
 
 	// mixed
 	modelA.history.mixed.push(digital.infoA + analog.infoA);
@@ -1062,6 +1067,7 @@ var updateMatrixPlot = function() {
 
 var updateSumSvg = function() {
 	if (settings.diff !== 'diff') {
+		// model A Left
 		var sums = modelA.analogLeft.sums();
 		var total = 0;
 		for (var from in sums) {
@@ -1076,7 +1082,7 @@ var updateSumSvg = function() {
 			}
 		}
 
-		// model B
+		// model B Left
 		var sums = modelB.analogLeft.sums();
 		var total = 0;
 		for (var from in sums) {
@@ -1090,7 +1096,38 @@ var updateSumSvg = function() {
 				d3.select('#sumsL-cell-' + from + '-diff').attr('fill', cDiff(pScale(sums[from], total)));
 			}
 		}
+
+		// model A Right
+		var sums = modelA.analogRight.sums();
+		var total = 0;
+		for (var from in sums) {
+			if (sums.hasOwnProperty(from)) {
+				total += sums[from];
+			}
+		}
+
+		for (var from in sums) {
+			if (sums.hasOwnProperty(from)) {
+				d3.select('#sumsR-cell-' + from).attr('fill', c(pScale(sums[from], total)));
+			}
+		}
+
+		// model B Right
+		var sums = modelB.analogRight.sums();
+		var total = 0;
+		for (var from in sums) {
+			if (sums.hasOwnProperty(from)) {
+				total += sums[from];
+			}
+		}
+
+		for (var from in sums) {
+			if (sums.hasOwnProperty(from)) {
+				d3.select('#sumsR-cell-' + from + '-diff').attr('fill', cDiff(pScale(sums[from], total)));
+			}
+		}
 	} else {
+		// Left
 		var sumsA = modelA.analogLeft.sums();
 		var sumsB = modelB.analogLeft.sums();
 		var totalA = 0;
@@ -1109,6 +1146,28 @@ var updateSumSvg = function() {
 		for (var from in sumsA) {
 			if (sumsA.hasOwnProperty(from) && sumsB.hasOwnProperty(from)) {
 				d3.select('#sumsL-cell-' + from).attr('fill', cDiffEncoding(pScale(sumsA[from], totalA) - pScale(sumsB[from], totalB)));
+			}
+		}
+
+		// Right
+		var sumsA = modelA.analogRight.sums();
+		var sumsB = modelB.analogRight.sums();
+		var totalA = 0;
+		var totalB = 0;
+		for (var from in sumsA) {
+			if (sumsA.hasOwnProperty(from)) {
+				totalA += sumsA[from];
+			}
+		}
+		for (var from in sumsB) {
+			if (sumsB.hasOwnProperty(from)) {
+				totalB += sumsB[from];
+			}
+		}
+
+		for (var from in sumsA) {
+			if (sumsA.hasOwnProperty(from) && sumsB.hasOwnProperty(from)) {
+				d3.select('#sumsR-cell-' + from).attr('fill', cDiffEncoding(pScale(sumsA[from], totalA) - pScale(sumsB[from], totalB)));
 			}
 		}
 	}
