@@ -28,16 +28,17 @@ var maxInformation = 1; // bits
 var digitalMCs = [];
 var linearMCs = [];
 var analogMCs = {l: [], r: []};
-analogMCs.r = analogMCs.l; // for now...
 
 for (var i = 0; i < windowLengths.length; i++) {
 	digitalMCs[i] = new MarkovChain(true, 16);
 	linearMCs[i] = new MarkovChain(false);
 	analogMCs.l[i] = new MarkovChain(false);
+	analogMCs.r[i] = new MarkovChain(false);
 }
 var custom = {
 	digital: new StaticModel({}),
-	analog: new StaticModel({}),
+	analogLeft: new StaticModel({}),
+	analogRight: new StaticModel({}),
 	linear: new StaticModel({})
 }
 
@@ -79,7 +80,7 @@ var modelB = {
 	analogRight: analogMCs.r[0],
 	digital: digitalMCs[0],
 	history: {
-		analog: [],
+		analogLeft: [],
 		digital: [],
 		mixed: []
 	}
@@ -664,6 +665,10 @@ libsw.onMessage = function(data) {
 						currentAnalogLeftSample.x = data.payload.value;
 					} else if (mapping.id === 'LS' && mapping.property === 'y') {
 						currentAnalogLeftSample.y = data.payload.value;
+					} else if (mapping.id === 'RS' && mapping.property === 'x') {
+						currentAnalogRightSample.x = data.payload.value;
+					} else if (mapping.id === 'RS' && mapping.property === 'y') {
+						currentAnalogRightSample.y = data.payload.value;
 					}
 
 					if (data.payload.name === 'axis-5') { // right trigger (XB360)
@@ -708,24 +713,35 @@ var sample = function() {
 
 	// analog
 	var currentAnalogLeftId = discSampler.getID(currentAnalogLeftSample);
-	// var currentAnalogRightId = discSampler.getID(currentAnalogRightSample);
+	var currentAnalogRightId = discSampler.getID(currentAnalogRightSample);
 
 	analogMCs.l.forEach(function(mc, i) {
 		mc.learn(lastAnalogLeftID, currentAnalogLeftId);
 		mc.truncate(windowLengths[i]);
 	});
+	analogMCs.r.forEach(function(mc, i) {
+		mc.learn(lastAnalogRightID, currentAnalogRightId);
+		mc.truncate(windowLengths[i]);
+	});
 
-	var analog = {};
-	analog.pA = modelA.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
-	analog.pB = modelB.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
-	analog.infoA = selfInformation(analog.pA);
-	analog.infoB = selfInformation(analog.pB);
+	var analogLeft = {};
+	analogLeft.pA = modelA.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
+	analogLeft.pB = modelB.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
+	analogLeft.infoA = selfInformation(analogLeft.pA);
+	analogLeft.infoB = selfInformation(analogLeft.pB);
 
-	modelA.history.analog.push(analog.infoA);
-	modelB.history.analog.push(analog.infoB);
+	var analogRight = {};
+	analogRight.pA = modelA.analogRight.p(lastAnalogRightID, currentAnalogRightId);
+	analogRight.pB = modelB.analogRight.p(lastAnalogRightID, currentAnalogRightId);
+	analogRight.infoA = selfInformation(analogRight.pA);
+	analogRight.infoB = selfInformation(analogRight.pB);
 
-	maxInformation = Math.max(maxInformation, analog.infoA);
-	maxInformation = Math.max(maxInformation, analog.infoB);
+	modelA.history.analog.push(analogLeft.infoA + analogRight.infoA);
+	modelB.history.analog.push(analogLeft.infoB + analogRight.infoB);
+
+	maxInformation = Math.max(maxInformation, analogLeft.infoA + analogRight.infoA);
+	maxInformation = Math.max(maxInformation, analogLeft.infoB + analogRight.infoB);
+
 
 
 	var probs = modelA.analogLeft.transitionP(currentAnalogLeftId);
@@ -734,11 +750,12 @@ var sample = function() {
 	});
 
 	lastAnalogLeftID = currentAnalogLeftId;
+	lastAnalogRightID = currentAnalogRightId;
 
 
 	// mixed
-	modelA.history.mixed.push(digital.infoA + analog.infoA);
-	modelB.history.mixed.push(digital.infoB + analog.infoB);
+	modelA.history.mixed.push(digital.infoA + analogLeft.infoA + analogRight.infoA);
+	modelB.history.mixed.push(digital.infoB + analogLeft.infoB + analogRight.infoB);
 
 
 	// linear
