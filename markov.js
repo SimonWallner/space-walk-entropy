@@ -104,12 +104,16 @@ matrixSize = 63;
 
 
 // quivers
-var arrows = [];
-var arrowsB = [];
+var arrowsLeftA = [];
+var arrowsLeftB = [];
+var arrowsRightA = [];
+var arrowsRightB = [];
 jitteredGridSamples(15, 0.7).map(function(sample) {
 	if (distance({x: 0, y: 0}, sample) < 1) {
-		arrows.push({pos: sample});
-		arrowsB.push({pos: sample});
+		arrowsLeftA.push({pos: sample});
+		arrowsLeftB.push({pos: sample});
+		arrowsRightA.push({pos: sample});
+		arrowsRightB.push({pos: sample});
 	}
 })
 
@@ -1401,8 +1405,8 @@ var updateFlowVis = function() {
 
 	// quiver plot
 	var sites = discSampler.getSites();
-	for (var i = 0; i < arrows.length; i++) {
-		pos = arrows[i].pos;
+	for (var i = 0; i < arrowsLeftA.length; i++) {
+		pos = arrowsLeftA[i].pos;
 
 		var pairs = sites.map(function(site, index) {
 			var d = distance(pos, site)
@@ -1417,31 +1421,43 @@ var updateFlowVis = function() {
 			return a.distance - b.distance;
 		});
 
-		var sumA = {x: 0, y: 0};
-		var sumB = {x: 0, y: 0};
+		var sumLeftA = {x: 0, y: 0};
+		var sumLeftB = {x: 0, y: 0};
+		var sumRightA = {x: 0, y: 0};
+		var sumRightB = {x: 0, y: 0};
 		var weightSum = 0;
 		for (var k = 0; k < 3; k++) {
 			var pair = sorted[k];
-			var siteCenterA = {x: data.left.a[pair.siteId].centerX, y: data.left.a[pair.siteId].centerY}
-			var siteCenterB = {x: data.left.b[pair.siteId].centerX, y: data.left.b[pair.siteId].centerY}
+			var siteCenterLeftA = {x: data.left.a[pair.siteId].centerX, y: data.left.a[pair.siteId].centerY}
+			var siteCenterLeftB = {x: data.left.b[pair.siteId].centerX, y: data.left.b[pair.siteId].centerY}
+			var siteCenterRightA = {x: data.right.a[pair.siteId].centerX, y: data.right.a[pair.siteId].centerY}
+			var siteCenterRightB = {x: data.right.b[pair.siteId].centerX, y: data.right.b[pair.siteId].centerY}
 
 			if (pair.distance === 0) {
-				sumA = siteCenterA;
-				sumB = siteCenterB;
+				sumLeftA = siteCenterLeftA;
+				sumLeftB = siteCenterLeftB;
+				sumRightA = siteCenterRightA;
+				sumRightB = siteCenterrightB;
 				weightsSum = 1;
 				break;
 			}
 
 			weight = 1 / Math.pow(pair.distance, 1);
-			sumA = mad(sumA, siteCenterA, weight);
-			sumB = mad(sumB, siteCenterB, weight);
+			sumLeftA = mad(sumLeftA, siteCenterLeftA, weight);
+			sumLeftB = mad(sumLeftB, siteCenterLeftB, weight);
+			sumRightA = mad(sumRightA, siteCenterRightA, weight);
+			sumRightB = mad(sumRightB, siteCenterRightB, weight);
 			weightSum += weight;
 		}
-		sumA = mul(sumA, 1 / weightSum);
-		sumB = mul(sumB, 1 / weightSum);
+		sumLeftA = mul(sumLeftA, 1 / weightSum);
+		sumLeftB = mul(sumLeftB, 1 / weightSum);
+		sumRightA = mul(sumRightA, 1 / weightSum);
+		sumRightB = mul(sumRightB, 1 / weightSum);
 
-		arrows[i].center = sumA;
-		arrowsB[i].center = sumB;
+		arrowsLeftA[i].center = sumLeftA;
+		arrowsLeftB[i].center = sumLeftB;
+		arrowsRightA[i].center = sumRightA;
+		arrowsRightB[i].center = sumRightB;
 	}
 
 	var quiverPathSpec = function(d) {
@@ -1455,7 +1471,14 @@ var updateFlowVis = function() {
 	};
 
 	// data A
-	var selection = d3.select('#flowL svg g.quiverA').selectAll('path.quiver').data(arrows);
+	var selection = d3.select('#flowL svg g.quiverA').selectAll('path.quiver').data(arrowsLeftA);
+	selection.enter()
+		.append('path')
+		.attr('class', 'quiver ' + ((settings.vectorADisplay === 'quiver') ? '' : 'hidden'));
+	selection // update
+		.attr('d', quiverPathSpec);
+
+	var selection = d3.select('#flowR svg g.quiverA').selectAll('path.quiver').data(arrowsRightA);
 	selection.enter()
 		.append('path')
 		.attr('class', 'quiver ' + ((settings.vectorADisplay === 'quiver') ? '' : 'hidden'));
@@ -1463,25 +1486,39 @@ var updateFlowVis = function() {
 		.attr('d', quiverPathSpec);
 
 	// data B
-	var selection = d3.select('#flowL svg g.quiverB').selectAll('path.quiverB').data(arrowsB);
+	var selection = d3.select('#flowL svg g.quiverB').selectAll('path.quiverB').data(arrowsLeftB);
 	selection.enter()
 		.append('path')
 		.attr('class', 'quiverB ' + ((settings.vectorBDisplay === 'quiver') ? '' : 'hidden'));
 	selection // update
 		.attr('d', quiverPathSpec);
 
+	var selection = d3.select('#flowR svg g.quiverB').selectAll('path.quiverB').data(arrowsRightB);
+	selection.enter()
+		.append('path')
+		.attr('class', 'quiverB ' + ((settings.vectorBDisplay === 'quiver') ? '' : 'hidden'));
+	selection // update
+		.attr('d', quiverPathSpec);
 
 	// error plot
-	var error = data.left.a.map(function(d, i) {
-		var diff = sub({x: (d.dirX || 0), y: (d.dirY || 0)},
-			{x: (data.left.b[i].dirX || 0), y: (data.left.b[i].dirY || 0)})
-			return norm2(diff) * 3; // FIXME: arbitrary value!!!
-	})
+	var mapErr = function(data) {
+		return function(d, i) {
+			var diff = sub({x: (d.dirX || 0), y: (d.dirY || 0)},
+				{x: (data.b[i].dirX || 0), y: (data.b[i].dirY || 0)});
+			return norm2(diff) * 3; // FIXME: arbitrary scaling value!!!
+		}
+	}
+	var errorLeft = data.left.a.map(mapErr(data.left));
+	var errorRight = data.right.a.map(mapErr(data.right));
 
-	error.forEach(function(d, i) {
+	errorLeft.forEach(function(d, i) {
 		d3.select('#flowL-cell-' + i)
 			.attr('fill', c(d))
-	})
+	});
+	errorRight.forEach(function(d, i) {
+		d3.select('#flowR-cell-' + i)
+			.attr('fill', c(d))
+	});
 }
 
 
