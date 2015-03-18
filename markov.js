@@ -1275,7 +1275,7 @@ var updateLinearPlot = function() {
 }
 
 var setupFlowVis = function() {
-	d3.select('#flowL svg defs, #flowR svg defs').append('marker')
+	d3.selectAll('#flowL svg defs, #flowR svg defs').append('marker')
 		.attr('id', 'markerArrowA')
 		.attr('viewBox', '0 0 10 10')
 		.attr('markerWidth', 5)
@@ -1288,7 +1288,7 @@ var setupFlowVis = function() {
 			.attr('fill', '#3fc0c9')
 			.attr('style', 'stroke-width: 0px');
 
-	d3.select('#flowL svg defs, #flowR svg defs').append('marker')
+	d3.selectAll('#flowL svg defs, #flowR svg defs').append('marker')
 		.attr('id', 'markerArrowB')
 		.attr('viewBox', '0 0 10 10')
 		.attr('markerWidth', 5)
@@ -1327,13 +1327,13 @@ var setupFlowVis = function() {
 			.attr('fill', '#e89f49')
 			.attr('style', 'stroke-width: 0px')
 
-	d3.select('#flowL svg, #flowR svg').append('g')
+	d3.selectAll('#flowL svg, #flowR svg').append('g')
 		.attr('class', 'arrowB');
-	d3.select('#flowL svg, #flowR svg').append('g')
+	d3.selectAll('#flowL svg, #flowR svg').append('g')
 		.attr('class', 'quiverB');
-	d3.select('#flowL svg, #flowR svg').append('g')
+	d3.selectAll('#flowL svg, #flowR svg').append('g')
 		.attr('class', 'arrowA');
-	d3.select('#flowL svg, #flowR svg').append('g')
+	d3.selectAll('#flowL svg, #flowR svg').append('g')
 		.attr('class', 'quiverA');
 }
 
@@ -1341,8 +1341,14 @@ var setupFlowVis = function() {
 var updateFlowVis = function() {
 	// arrows/glyphs
 	var data = {
-		a: discSampler.getFlowData(modelA.analogLeft.Q(), modelA.analogLeft.sums()),
-		b: discSampler.getFlowData(modelB.analogLeft.Q(), modelB.analogLeft.sums())
+		left: {
+			a: discSampler.getFlowData(modelA.analogLeft.Q(), modelA.analogLeft.sums()),
+			b: discSampler.getFlowData(modelB.analogLeft.Q(), modelB.analogLeft.sums())
+		},
+		right: {
+			a: discSampler.getFlowData(modelA.analogRight.Q(), modelA.analogRight.sums()),
+			b: discSampler.getFlowData(modelB.analogRight.Q(), modelB.analogRight.sums())
+		}
 	}
 
 	var x = d3.scale.linear()
@@ -1363,20 +1369,32 @@ var updateFlowVis = function() {
 	};
 
 	// glyph A
-	var selection = d3.select('#flowL svg g.arrowA').selectAll('path.glyph').data(data.a);
+	var selection = d3.select('#flowL svg g.arrowA').selectAll('path.glyph').data(data.left.a);
 	selection.enter()
 		.append('path')
 		.attr('class', 'glyph ' + ((settings.vectorADisplay === 'arrow') ? '' : 'hidden'));
+	selection // update
+		.attr('d', pathSpec);
 
+	var selection = d3.select('#flowR svg g.arrowA').selectAll('path.glyph').data(data.right.a);
+	selection.enter()
+		.append('path')
+		.attr('class', 'glyph ' + ((settings.vectorADisplay === 'arrow') ? '' : 'hidden'));
 	selection // update
 		.attr('d', pathSpec);
 
 	// glyph B
-	var selection = d3.select('#flowL svg g.arrowB').selectAll('path.glyphB').data(data.b);
+	var selection = d3.select('#flowL svg g.arrowB').selectAll('path.glyphB').data(data.left.b);
 	selection.enter()
 		.append('path')
 		.attr('class', 'glyphB ' + ((settings.vectorADisplay === 'arrow') ? '' : 'hidden'));
+	selection // update
+		.attr('d', pathSpec);
 
+	var selection = d3.select('#flowR svg g.arrowB').selectAll('path.glyphB').data(data.right.b);
+	selection.enter()
+		.append('path')
+		.attr('class', 'glyphB ' + ((settings.vectorADisplay === 'arrow') ? '' : 'hidden'));
 	selection // update
 		.attr('d', pathSpec);
 
@@ -1404,8 +1422,8 @@ var updateFlowVis = function() {
 		var weightSum = 0;
 		for (var k = 0; k < 3; k++) {
 			var pair = sorted[k];
-			var siteCenterA = {x: data.a[pair.siteId].centerX, y: data.a[pair.siteId].centerY}
-			var siteCenterB = {x: data.b[pair.siteId].centerX, y: data.b[pair.siteId].centerY}
+			var siteCenterA = {x: data.left.a[pair.siteId].centerX, y: data.left.a[pair.siteId].centerY}
+			var siteCenterB = {x: data.left.b[pair.siteId].centerX, y: data.left.b[pair.siteId].centerY}
 
 			if (pair.distance === 0) {
 				sumA = siteCenterA;
@@ -1454,9 +1472,9 @@ var updateFlowVis = function() {
 
 
 	// error plot
-	var error = data.a.map(function(d, i) {
+	var error = data.left.a.map(function(d, i) {
 		var diff = sub({x: (d.dirX || 0), y: (d.dirY || 0)},
-			{x: (data.b[i].dirX || 0), y: (data.b[i].dirY || 0)})
+			{x: (data.left.b[i].dirX || 0), y: (data.left.b[i].dirY || 0)})
 			return norm2(diff) * 3; // FIXME: arbitrary value!!!
 	})
 
