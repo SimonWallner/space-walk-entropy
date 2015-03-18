@@ -564,9 +564,9 @@ $(document).ready(function() {
 		settings.vectorError = 'off';
 		storeSettings();
 	})
-	$('#vectorErrorArea').click(function() {
+	$('#vectorErrorDiff').click(function() {
 		activateOption(this);
-		settings.vectorError = 'area';
+		settings.vectorError = 'diff';
 		storeSettings();
 	})
 
@@ -623,7 +623,7 @@ $(document).ready(function() {
 	if (settings.vectorError === 'off') {
 		$('#vectorErrorOff').click();
 	} else {
-		$('#vectorErrorArea').click();
+		$('#vectorErrorDiff').click();
 	}
 
 	setActiveModel(modelA, settings.modelAId);
@@ -1513,11 +1513,11 @@ var updateFlowVis = function() {
 
 	errorLeft.forEach(function(d, i) {
 		d3.select('#flowL-cell-' + i)
-			.attr('fill', c(d))
+			.attr('fill', (settings.vectorError === 'diff') ? c(d) : c(0))
 	});
 	errorRight.forEach(function(d, i) {
 		d3.select('#flowR-cell-' + i)
-			.attr('fill', c(d))
+			.attr('fill', (settings.vectorError === 'diff') ? c(d) : c(0))
 	});
 }
 
