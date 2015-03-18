@@ -251,11 +251,11 @@ div.verticalGroupLabel{
 }
 
 div.circularLabel {
-	height: 400px;
+	height: 600px;
 }
 
 #circularAnalog {
-	height: 400px + 2 * $gutter;
+	height: 600px + 2 * $gutter;
 }
 
 div.plotArea, div.circularArea, div.linearArea {
@@ -274,8 +274,13 @@ div.plotArea {
 
 div.circularArea {
 	width: 800px;
-	height: 400px;
+	height: 600px;
 	padding: $gutter;
+}
+
+#matrixPlotLeft, #matrixPlotRight {
+	width: 394px;
+	display: inline-block;
 }
 
 div.linearArea {

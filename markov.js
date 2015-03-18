@@ -895,7 +895,6 @@ var updateGraph = function() {
 
 }
 
-
 var truncateHistory = function() {
 	// FIXME
 	// code duplication as fuck. My first approach in beeing smart did not work :(
@@ -926,8 +925,6 @@ var truncateHistory = function() {
 
 
 }
-
-
 
 var selfInformation = function(prop) {
 	if (prop === 0) {
@@ -1010,16 +1007,23 @@ var setupAnalog = function() {
 	})
 }
 
-
 var setupMatrixPlot = function() {
 	matrixIDs = discSampler.getAllIDs();
 	var size = matrixSize;
 
-	d3.select('#matrixPlot').selectAll('svg').data(matrixIDs)
+	d3.selectAll('#matrixPlotLeft').selectAll('svg').data(matrixIDs)
 		.enter()
 			.append('svg')
 			.attr('class', 'matrix')
-			.attr('id', function(d) { return 'matrix-' + d; })
+			.attr('id', function(d) { return 'matrixLeft-' + d; })
+			.attr('width', size + 'px')
+			.attr('height', size + 'px');
+
+	d3.selectAll('#matrixPlotRight').selectAll('svg').data(matrixIDs)
+		.enter()
+			.append('svg')
+			.attr('class', 'matrix')
+			.attr('id', function(d) { return 'matrixRight-' + d; })
 			.attr('width', size + 'px')
 			.attr('height', size + 'px');
 
@@ -1029,18 +1033,17 @@ var setupMatrixPlot = function() {
 
 
 	matrixIDs.forEach(function(id) {
+		var svgs = d3.selectAll('#matrixLeft-' + id + ', #matrixRight-' + id);
+		var gs = svgs.append('g');
 
-		var svg = d3.select('#matrix-' + id);
-		var g = svg.append('g');
-
-		svg.append('defs').append('clipPath')
+		svgs.append('defs').append('clipPath')
 			.attr('id', 'matrixClip')
 			.append('circle')
 				.attr('cx', x(0))
 				.attr('cy', x(0))
 				.attr('r', size / 2 - 4);
 
-		svg.append('circle')
+		svgs.append('circle')
 			.attr('cx', x(0))
 			.attr('cy', x(0))
 			.attr('r', size / 2 - 2)
@@ -1052,19 +1055,19 @@ var setupMatrixPlot = function() {
 	 			.y(function(d) { return x(d.y); })
 				.interpolate("linear");
 
+			var drawFunc = function(anchor) {
+				return function(d) {
+					d.attr('d', lineFunc(path.path))
+						.attr('fill', '#444')
+						.attr('class', anchor + ' cell-' + id + '-' + path.id)
+						.attr('clip-path', 'url(#matrixClip)');
+				};
+			};
+
 			if (id === path.id) {
-				svg.append('path')
-				.attr('d', lineFunc(path.path))
-				.attr('fill', '#444')
-				.attr('id', 'cell-' + id + '-' + path.id)
-				.attr('clip-path', 'url(#matrixClip)')
-				.attr('class', 'anchor');
+				svgs.append('path').call(drawFunc('anchor'))
 			} else {
-				g.append('path')
-				.attr('d', lineFunc(path.path))
-				.attr('fill', '#444')
-				.attr('id', 'cell-' + id + '-' + path.id)
-				.attr('clip-path', 'url(#matrixClip)');
+				gs.append('path').call(drawFunc(''));
 			}
 		});
 	})
@@ -1077,9 +1080,19 @@ var updateMatrixPlot = function() {
 	probs.forEach(function(element) {
 		// TODO: fixme somehow it is the other way round...
 		if (settings.pScale === 'linear') {
-			d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.p));
+			d3.select('#matrixPlotLeft .cell-' + id + '-' + element.id).attr('fill', c(element.p));
 		} else {
-			d3.select('#cell-' + id + '-' + element.id).attr('fill', c(element.pLog));
+			d3.select('#matrixPlotLeft .cell-' + id + '-' + element.id).attr('fill', c(element.pLog));
+		}
+	});
+
+	var probs = modelA.analogRight.transitionP(id);
+	probs.forEach(function(element) {
+		// TODO: fixme somehow it is the other way round...
+		if (settings.pScale === 'linear') {
+			d3.select('#matrixPlotRight .cell-' + id + '-' + element.id).attr('fill', c(element.p));
+		} else {
+			d3.select('#matrixPlotRight .cell-' + id + '-' + element.id).attr('fill', c(element.pLog));
 		}
 	});
 
@@ -1340,7 +1353,6 @@ var setupFlowVis = function() {
 	d3.selectAll('#flowL svg, #flowR svg').append('g')
 		.attr('class', 'quiverA');
 }
-
 
 var updateFlowVis = function() {
 	// arrows/glyphs
