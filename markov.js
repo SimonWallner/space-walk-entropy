@@ -99,7 +99,9 @@ resetModelArmed = false;
 var svgSize = {};
 var svgPadding = 5;
 var MatrixRoundRobin = 0;
+var linearMatrixRoundRobin = 0;
 var matrixIDs;
+var linearMatrixIDs;
 var linearSVGSize = {w: 280, h: 40};
 var linearMatrixSVGSize = {w: 110, h: 15}
 var linearSvgLeft;
@@ -684,8 +686,10 @@ libsw.onMessage = function(data) {
 						currentAnalogRightSample.y = data.payload.value;
 					}
 
-					if (data.payload.name === 'axis-5') { // right trigger (XB360)
-						linearCurrentID = linearSampler.getID(data.payload.value);
+					else if (mapping.id === 'L2') { // right trigger (XB360)
+						linearCurrentLeftID = linearSampler.getID(data.payload.value);
+					} else if (mapping.id === 'R2') { // right trigger (XB360)
+						linearCurrentRightID = linearSampler.getID(data.payload.value);
 					}
 				}
 			}
@@ -772,11 +776,16 @@ var sample = function() {
 
 
 	// linear
-	linearMCs.forEach(function(mc, i) {
-		mc.learn(linearLastID, linearCurrentID);
+	linearMCs.l.forEach(function(mc, i) {
+		mc.learn(linearLastLeftID, linearCurrentLeftID);
 		mc.truncate(windowLengths[i]);
 	});
-	linearLastID = linearCurrentID;
+	linearMCs.r.forEach(function(mc, i) {
+		mc.learn(linearLastRightID, linearCurrentRightID);
+		mc.truncate(windowLengths[i]);
+	});
+	linearLastLeftID = linearCurrentLeftID;
+	linearLastRightID = linearCurrentRightID;
 
 	// ready indicator check;
 	$('#modelAReady').toggleClass('ready', modelA.analogLeft.ready());
@@ -1087,7 +1096,6 @@ var updateMatrixPlot = function() {
 
 	var probs = modelA.analogLeft.transitionP(id);
 	probs.forEach(function(element) {
-		// TODO: fixme somehow it is the other way round...
 		if (settings.pScale === 'linear') {
 			d3.select('#matrixPlotLeft .cell-' + id + '-' + element.id).attr('fill', c(element.p));
 		} else {
@@ -1097,7 +1105,6 @@ var updateMatrixPlot = function() {
 
 	var probs = modelA.analogRight.transitionP(id);
 	probs.forEach(function(element) {
-		// TODO: fixme somehow it is the other way round...
 		if (settings.pScale === 'linear') {
 			d3.select('#matrixPlotRight .cell-' + id + '-' + element.id).attr('fill', c(element.p));
 		} else {
@@ -1282,17 +1289,14 @@ var setupLinearPlot = function() {
 			var path = $('#' + id + '-matrix-' + path.id + '-cell-' + path.id);
 			path.appendTo(path.parent().parent());
 		});
-
 	});
 
+	linearMatrixIDs = linearSampler.getAllIDs();
 }
 
 var updateLinearPlot = function() {
-	modelA.linear.transitionP(linearCurrentID).forEach(function(p) {
-		d3.select('#linearPlot-cell-' + p.id).attr('fill', c(p.p));
-	})
-
-	var sums = modelA.linear.sums();
+	// Left sums
+	var sums = modelA.linearLeft.sums();
 	var total = 0;
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
@@ -1302,9 +1306,48 @@ var updateLinearPlot = function() {
 
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
-			d3.select('#linearSums-cell-' + from).attr('fill', c(Math.max(0, Math.log(sums[from])) / Math.log(total)));
+			d3.select('#linearPlotLeft-cell-' + from).attr('fill', c(pScale(sums[from], total)));
 		}
 	}
+
+	// Right sums
+	var sums = modelA.linearRight.sums();
+	var total = 0;
+	for (var from in sums) {
+		if (sums.hasOwnProperty(from)) {
+			total += sums[from];
+		}
+	}
+
+	for (var from in sums) {
+		if (sums.hasOwnProperty(from)) {
+			d3.select('#linearPlotRight-cell-' + from).attr('fill', c(pScale(sums[from], total)));
+		}
+	}
+
+	// matrix left
+	var from = linearMatrixIDs[linearMatrixRoundRobin];
+	var transitionP = modelA.linearLeft.transitionP(from);
+	transitionP.forEach(function(t) {
+		if (settings.pScale === 'linear') {
+			d3.select('#leftLinear-matrix-' + from + '-cell-' + t.id).attr('fill', c(t.p));
+		} else {
+			d3.select('#leftLinear-matrix-' + from + '-cell-' + t.id).attr('fill', c(t.pLog));
+		}
+	})
+
+	// matrix right
+	var from = linearMatrixIDs[linearMatrixRoundRobin];
+	var transitionP = modelA.linearRight.transitionP(from);
+	transitionP.forEach(function(t) {
+		if (settings.pScale === 'linear') {
+			d3.select('#rightLinear-matrix-' + from + '-cell-' + t.id).attr('fill', c(t.p));
+		} else {
+			d3.select('#rightLinear-matrix-' + from + '-cell-' + t.id).attr('fill', c(t.pLog));
+		}
+	})
+
+	linearMatrixRoundRobin = (linearMatrixRoundRobin + 1) % linearMatrixIDs.length;
 }
 
 var setupFlowVis = function() {

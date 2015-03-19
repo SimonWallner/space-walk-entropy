@@ -18,8 +18,9 @@ var LinearSampler = function() {
 	}
 
 	this.getAllIDs = function() {
+		var that = this;
 		return upperLimits.map(function(limit) {
-			return this.getID(limit);
+			return that.getID(limit);
 		})
 	}
 
