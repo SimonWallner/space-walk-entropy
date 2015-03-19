@@ -26,12 +26,13 @@ var maxInformation = 1; // bits
 
 // Marcov Chains
 var digitalMCs = [];
-var linearMCs = [];
+var linearMCs = {l: [], r: []};
 var analogMCs = {l: [], r: []};
 
 for (var i = 0; i < windowLengths.length; i++) {
 	digitalMCs[i] = new MarkovChain(true, 16);
-	linearMCs[i] = new MarkovChain(false);
+	linearMCs.l[i] = new MarkovChain(false);
+	linearMCs.r[i] = new MarkovChain(false);
 	analogMCs.l[i] = new MarkovChain(false);
 	analogMCs.r[i] = new MarkovChain(false);
 }
@@ -39,7 +40,8 @@ var custom = {
 	digital: new StaticModel({}),
 	analogLeft: new StaticModel({}),
 	analogRight: new StaticModel({}),
-	linear: new StaticModel({})
+	linearLeft: new StaticModel({}),
+	linearRight: new StaticModel({})
 }
 
 // samplers
@@ -57,13 +59,16 @@ var lastAnalogLeftID = discSampler.getID(currentAnalogLeftSample);
 var lastAnalogRightID = discSampler.getID(currentAnalogRightSample);
 
 // linear stuff
-var linearCurrentID;
-var linearLastID;
+var linearCurrentLeftID;
+var linearCurrentRightID;
+var linearLastLeftID;
+var linearLastRightID;
 
 // current Models
 var modelA = {
 	id: '15',
-	linear: linearMCs[0],
+	linearLeft: linearMCs.l[0],
+	linearRight: linearMCs.r[0],
 	analogLeft: analogMCs.l[0],
 	analogRight: analogMCs.r[0],
 	digital: digitalMCs[0],
@@ -75,7 +80,8 @@ var modelA = {
 }
 var modelB = {
 	id: '15',
-	linear: linearMCs[0],
+	linearLeft: linearMCs.l[0],
+	linearRight: linearMCs.r[0],
 	analogLeft: analogMCs.l[0],
 	analogRight: analogMCs.r[0],
 	digital: digitalMCs[0],
@@ -96,7 +102,8 @@ var MatrixRoundRobin = 0;
 var matrixIDs;
 var linearSVGSize = {w: 280, h: 40};
 var linearMatrixSVGSize = {w: 110, h: 15}
-var linearSvg;
+var linearSvgLeft;
+var linearSvgRight;
 var svgScales = {};
 
 analogSize = 193;
@@ -394,7 +401,8 @@ $(document).ready(function() {
 	$('#modelStore').click(function() {
 		var data = {
 			linearModel: modelA.linear.serialize(),
-			analogModel: modelA.analogLeft.serialize(),
+			analogLeftModel: modelA.analogLeft.serialize(),
+			analogRightModel: modelA.analogRight.serialize(),
 			digitalModel: modelA.digital.serialize()
 		}
 		downloadJson(data, 'modelData.json');
@@ -408,9 +416,10 @@ $(document).ready(function() {
 			reader.onload = function(event) {
 				try {
 					var parsed = JSON.parse(event.target.result);
-					if (parsed.linearModel && parsed.analogModel && parsed.digitalModel) {
+					if (parsed.linearModel && parsed.analogLeftModel && parsed.analogRightModel && parsed.digitalModel) {
 						custom.linearModel = parsed.linearModel;
-						custom.analogModel = parsed.analogModel;
+						custom.analogLeftModel = parsed.analogLeftModel;
+						custom.analogRightModel = parsed.analogRightModel;
 						custom.digitalModel = parsed.digitalModel;
 
 						setActiveModel(modelB, 'custom');
@@ -1213,8 +1222,8 @@ var setupLinearPlot = function() {
 		d.attr('width', linearSVGSize.w)
 		.attr('height', linearSVGSize.h);
 	}
-	linearSvg = d3.select('#linearPlotLeft').append('svg').call(dimension);
-	linearSumsSvg = d3.select('#linearPlotRight').append('svg').call(dimension);
+	linearSvgLeft = d3.select('#linearPlotLeft').append('svg').call(dimension);
+	linearSvgRight = d3.select('#linearPlotRight').append('svg').call(dimension);
 
 	var x = d3.scale.linear()
 		.domain([0, 1])
@@ -1224,7 +1233,7 @@ var setupLinearPlot = function() {
 		.domain([0, 1])
 		.range([3, linearSVGSize.h - 3]);
 
-	[linearSvg, linearSumsSvg].forEach(function(svg) {
+	[linearSvgLeft, linearSvgRight].forEach(function(svg) {
 		linearSampler.getPaths().forEach(function(path) {
 			var lineFunc = d3.svg.line()
 				.x(function(d) { return x(d.x); })
@@ -1238,14 +1247,15 @@ var setupLinearPlot = function() {
 		});
 	});
 
-	// lienar matrix plot
+	// linear matrix plot
 	['leftLinear', 'rightLinear'].forEach(function(id) {
-
 		var svgs = d3.selectAll('#' + id + ' .linearP').append('svg');
 		svgs.attr("width", linearMatrixSVGSize.w)
 			.attr("height", linearMatrixSVGSize.h)
 			.attr('id', function(d, i) { return 'matrix-' + i})
 			.attr('class', 'matrix');
+
+		var gs = svgs.append('g');
 
 		var mX = d3.scale.linear()
 			.domain([0, 1])
@@ -1261,12 +1271,18 @@ var setupLinearPlot = function() {
 			.interpolate("linear");
 
 		linearSampler.getPaths().forEach(function(path) {
-			svgs.append('path')
-				.attr('d', lineFunc(path.path))
+
+			gs.append('path')
+				.attr('d', lineFunc(path.path) + 'Z')
 				.attr('fill', '#444')
 				.attr('id', function(d, i) { return id + '-matrix-' + i + '-cell-' + path.id; })
 				.attr('class', function(d, i) { return (i === path.id) ? 'anchor' : ''})
+
+			// moving things by hand
+			var path = $('#' + id + '-matrix-' + path.id + '-cell-' + path.id);
+			path.appendTo(path.parent().parent());
 		});
+
 	});
 
 }

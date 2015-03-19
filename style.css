@@ -281,8 +281,10 @@ div.linearPlot {
 div.linearP {
   display: inline-block;
   border: 1px solid white;
+  height: 16.6px;
   border-radius: 3px;
-  margin: 2px; }
+  margin: 2px;
+  margin-bottom: 4px; }
 
 #rightLinear, #leftLinear {
   width: 392px;
