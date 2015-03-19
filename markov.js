@@ -86,7 +86,7 @@ var modelB = {
 	analogRight: analogMCs.r[0],
 	digital: digitalMCs[0],
 	history: {
-		analogLeft: [],
+		analog: [],
 		digital: [],
 		mixed: []
 	}
@@ -277,7 +277,8 @@ var setActiveModel = function(model, id) {
 	var index = reverseWindowLookup[id];
 	if (typeof index != 'undefined') {
 		model.id = id;
-		model.linear = linearMCs[index];
+		model.linearLeft = linearMCs.l[index];
+		model.linearRight = linearMCs.r[index];
 		model.analogLeft = analogMCs.l[index],
 		model.analogRight = analogMCs.r[index],
 		model.digital = digitalMCs[index];
@@ -289,7 +290,8 @@ var setActiveModel = function(model, id) {
 		};
 	} else if (id === 'custom') {
 		model.id = 'custom';
-		model.linear = custom.linear;
+		model.linearLeft = custom.linearLeft;
+		model.linearRight = custom.linearRight;
 		model.analogLeft = custom.analogLeft;
 		model.analogRight = custom.analogRight;
 		model.digital = custom.digital;
@@ -402,7 +404,8 @@ $(document).ready(function() {
 
 	$('#modelStore').click(function() {
 		var data = {
-			linearModel: modelA.linear.serialize(),
+			linearLeftModel: modelA.linearLeft.serialize(),
+			linearRightModel: modelA.linearRight.serialize(),
 			analogLeftModel: modelA.analogLeft.serialize(),
 			analogRightModel: modelA.analogRight.serialize(),
 			digitalModel: modelA.digital.serialize()
@@ -418,15 +421,19 @@ $(document).ready(function() {
 			reader.onload = function(event) {
 				try {
 					var parsed = JSON.parse(event.target.result);
-					if (parsed.linearModel && parsed.analogLeftModel && parsed.analogRightModel && parsed.digitalModel) {
-						custom.linearModel = parsed.linearModel;
+
+					if (parsed.linearLeftModel && parsed.linearRightModel
+						&& parsed.analogLeftModel && parsed.analogRightModel
+						&& parsed.digitalModel) {
+						custom.linearLeftModel = parsed.linearLeftModel;
+						custom.linearRightModel = parsed.linearRightModel;
 						custom.analogLeftModel = parsed.analogLeftModel;
 						custom.analogRightModel = parsed.analogRightModel;
 						custom.digitalModel = parsed.digitalModel;
 
 						setActiveModel(modelB, 'custom');
-						settings.modelBId = 'custom';
-						storeSettings();
+						// settings.modelBId = 'custom';
+						// storeSettings();
 
 						activateOption('#modelBcustom');
 					} else {
@@ -442,12 +449,14 @@ $(document).ready(function() {
 		input.trigger('click');
 	});
 
-	$('#modelA15, #modelA30, #modelA60, #modelA120, #modelA240').click(function() {
+	$('#modelA15, #modelA30, #modelA60, #modelA120, #modelA240, #modelAcustom').click(function() {
 		var id = $(this).data().model;
 		setActiveModel(modelA, id)
 
-		settings.modelAId = modelA.id;
-		storeSettings();
+		if (id !== 'custom') {
+			settings.modelAId = modelA.id;
+			storeSettings();
+		}
 
 		activateOption(this);
 	});
@@ -456,8 +465,10 @@ $(document).ready(function() {
 		var id = $(this).data().model;
 		setActiveModel(modelB, id)
 
-		settings.modelBId = modelB.id;
-		storeSettings();
+		if (id !== 'custom') {
+			settings.modelBId = modelB.id;
+			storeSettings();
+		}
 
 		activateOption(this);
 	});
@@ -471,9 +482,11 @@ $(document).ready(function() {
 
 	$('#modelResetConfirm').click(function() {
 		if (resetModelArmed) {
-			for (var i = 0; i < windowLengths; i++) {
-				linearMCs[i].reset();
+			for (var i = 0; i < windowLengths.length; i++) {
+				linearMCs.l[i].reset();
+				linearMCs.r[i].reset();
 				analogMCs.l[i].reset();
+				analogMCs.r[i].reset();
 				digitalMCs[i].reset();
 			}
 
@@ -1126,11 +1139,9 @@ var updateSumSvg = function() {
 			}
 		}
 
-		for (var from in sums) {
-			if (sums.hasOwnProperty(from)) {
-				d3.select('#sumsL-cell-' + from).attr('fill', c(pScale(sums[from], total)));
-			}
-		}
+		matrixIDs.forEach(function(id) {
+			d3.select('#sumsL-cell-' + id).attr('fill', c(pScale((sums[id] || 0), total)));
+		});
 
 		// model B Left
 		var sums = modelB.analogLeft.sums();
@@ -1141,11 +1152,9 @@ var updateSumSvg = function() {
 			}
 		}
 
-		for (var from in sums) {
-			if (sums.hasOwnProperty(from)) {
-				d3.select('#sumsL-cell-' + from + '-diff').attr('fill', cDiff(pScale(sums[from], total)));
-			}
-		}
+		matrixIDs.forEach(function(id) {
+			d3.select('#sumsL-cell-' + id + '-diff').attr('fill', cDiff(pScale((sums[id] || 0), total)));
+		});
 
 		// model A Right
 		var sums = modelA.analogRight.sums();
@@ -1156,11 +1165,9 @@ var updateSumSvg = function() {
 			}
 		}
 
-		for (var from in sums) {
-			if (sums.hasOwnProperty(from)) {
-				d3.select('#sumsR-cell-' + from).attr('fill', c(pScale(sums[from], total)));
-			}
-		}
+		matrixIDs.forEach(function(id) {
+			d3.select('#sumsR-cell-' + id).attr('fill', c(pScale((sums[id] || 0), total)));
+		});
 
 		// model B Right
 		var sums = modelB.analogRight.sums();
@@ -1171,12 +1178,10 @@ var updateSumSvg = function() {
 			}
 		}
 
-		for (var from in sums) {
-			if (sums.hasOwnProperty(from)) {
-				d3.select('#sumsR-cell-' + from + '-diff').attr('fill', cDiff(pScale(sums[from], total)));
-			}
-		}
-	} else {
+		matrixIDs.forEach(function(id) {
+			d3.select('#sumsR-cell-' + id + '-diff').attr('fill', cDiff(pScale((sums[id] || 0), total)));
+		});
+	} else { // diff
 		// Left
 		var sumsA = modelA.analogLeft.sums();
 		var sumsB = modelB.analogLeft.sums();
@@ -1193,11 +1198,10 @@ var updateSumSvg = function() {
 			}
 		}
 
-		for (var from in sumsA) {
-			if (sumsA.hasOwnProperty(from) && sumsB.hasOwnProperty(from)) {
-				d3.select('#sumsL-cell-' + from).attr('fill', cDiffEncoding(pScale(sumsA[from], totalA) - pScale(sumsB[from], totalB)));
-			}
-		}
+		matrixIDs.forEach(function(id) {
+			d3.select('#sumsL-cell-' + id).attr('fill',
+				cDiffEncoding(pScale((sumsA[id] || 0), totalA) - pScale((sumsB[id] || 0), totalB)));
+		});
 
 		// Right
 		var sumsA = modelA.analogRight.sums();
@@ -1215,11 +1219,10 @@ var updateSumSvg = function() {
 			}
 		}
 
-		for (var from in sumsA) {
-			if (sumsA.hasOwnProperty(from) && sumsB.hasOwnProperty(from)) {
-				d3.select('#sumsR-cell-' + from).attr('fill', cDiffEncoding(pScale(sumsA[from], totalA) - pScale(sumsB[from], totalB)));
-			}
-		}
+		matrixIDs.forEach(function(id) {
+			d3.select('#sumsR-cell-' + id).attr('fill',
+				cDiffEncoding(pScale((sumsA[id] || 0), totalA) - pScale((sumsB[id] || 0), totalB)));
+		});
 	}
 }
 
