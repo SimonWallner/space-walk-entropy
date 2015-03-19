@@ -1107,6 +1107,10 @@ var setupMatrixPlot = function() {
 var updateMatrixPlot = function() {
 	var id = matrixIDs[MatrixRoundRobin]
 
+	// brute force clearing
+	d3.selectAll('#matrixLeft-' + MatrixRoundRobin + ' path').attr('fill', c(0));
+	d3.selectAll('#matrixRight-' + MatrixRoundRobin + ' path').attr('fill', c(0));
+
 	var probs = modelA.analogLeft.transitionP(id);
 	probs.forEach(function(element) {
 		if (settings.pScale === 'linear') {
