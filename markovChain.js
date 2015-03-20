@@ -182,9 +182,9 @@ StaticModel = function(q) {
 	}
 
 	this.pLog = function(from, to) {
-		var p = this.p(form, to);
+		var p = this.p(from, to);
 
-		return Math.max(0, Math.log(p));
+		return p;
 	}
 
 	// return a list of transitions probs starting at 'from'

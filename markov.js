@@ -297,9 +297,9 @@ var setActiveModel = function(model, id) {
 		model.digital = custom.digital;
 
 		model.history = {
-			analog: [],
-			digital: [],
-			mixed: []
+			analog: Array.apply(null, new Array(maxHistoryLength)).map(Number.prototype.valueOf,0),
+			digital: Array.apply(null, new Array(maxHistoryLength)).map(Number.prototype.valueOf,0),
+			mixed: Array.apply(null, new Array(maxHistoryLength)).map(Number.prototype.valueOf,0)
 		};
 	}
 }
@@ -425,11 +425,11 @@ $(document).ready(function() {
 					if (parsed.linearLeftModel && parsed.linearRightModel
 						&& parsed.analogLeftModel && parsed.analogRightModel
 						&& parsed.digitalModel) {
-						custom.linearLeftModel = parsed.linearLeftModel;
-						custom.linearRightModel = parsed.linearRightModel;
-						custom.analogLeftModel = parsed.analogLeftModel;
-						custom.analogRightModel = parsed.analogRightModel;
-						custom.digitalModel = parsed.digitalModel;
+						custom.linearLeft = new StaticModel(parsed.linearLeftModel);
+						custom.linearRight = new StaticModel(parsed.linearRightModel);
+						custom.analogLeft = new StaticModel(parsed.analogLeftModel);
+						custom.analogRight = new StaticModel(parsed.analogRightModel);
+						custom.digital = new StaticModel(parsed.digitalModel);
 
 						setActiveModel(modelB, 'custom');
 						// settings.modelBId = 'custom';
