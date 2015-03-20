@@ -144,7 +144,7 @@ var cHeatDiff = d3.scale.linear()
 	.domain([0, 0.5, 0.8, 1])
 	.range(['#444', '#55E091', '#55D3E0', '#008CFF']);
 
-var c = cHeat;
+var c = cMono;
 var cDiff = cHeatDiff;
 
 var cDiffEncoding = d3.scale.linear()

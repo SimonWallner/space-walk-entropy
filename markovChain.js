@@ -17,6 +17,7 @@ var MarkovChain = function(biased, numIndividualStates) {
 	var bias = 0;
 	var froms = {};
 	var tos = {};
+	var primed = false;
 
 	// get time in seconds
 	var getTime = function() {
@@ -29,6 +30,7 @@ var MarkovChain = function(biased, numIndividualStates) {
 		historyBuffer = [];
 		froms = {};
 		tos = {};
+		primed = false;
 	}
 
 	this.learn = function(from, to) {
@@ -92,6 +94,7 @@ var MarkovChain = function(biased, numIndividualStates) {
 			sums[historyBuffer[0].from]--;
 
 			historyBuffer = historyBuffer.slice(1);
+			primed = true;
 		}
 	}
 
@@ -160,7 +163,7 @@ var MarkovChain = function(biased, numIndividualStates) {
 
 	this.ready = function() {
 		// TODO check if we are ready
-		return false;
+		return primed;
 	}
 }
 
