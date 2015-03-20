@@ -732,12 +732,6 @@ var sample = function() {
 	digital.infoA = selfInformation(digital.pA);
 	digital.infoB = selfInformation(digital.pB);
 
-	modelA.history.digital.push(digital.infoA);
-	modelB.history.digital.push(digital.infoB);
-
-	maxInformation = Math.max(maxInformation, digital.infoA);
-	maxInformation = Math.max(maxInformation, digital.infoB);
-
 	lastSample = currentSample.slice(0); // force copy
 
 
@@ -766,19 +760,12 @@ var sample = function() {
 	analogRight.infoA = selfInformation(analogRight.pA);
 	analogRight.infoB = selfInformation(analogRight.pB);
 
-	modelA.history.analog.push(analogLeft.infoA + analogRight.infoA);
-	modelB.history.analog.push(analogLeft.infoB + analogRight.infoB);
-
 	maxInformation = Math.max(maxInformation, analogLeft.infoA + analogRight.infoA);
 	maxInformation = Math.max(maxInformation, analogLeft.infoB + analogRight.infoB);
 
 	lastAnalogLeftID = currentAnalogLeftId;
 	lastAnalogRightID = currentAnalogRightId;
 
-
-	// mixed
-	modelA.history.mixed.push(digital.infoA + analogLeft.infoA + analogRight.infoA);
-	modelB.history.mixed.push(digital.infoB + analogLeft.infoB + analogRight.infoB);
 
 
 	// linear
@@ -790,12 +777,39 @@ var sample = function() {
 		mc.learn(linearLastRightID, linearCurrentRightID);
 		mc.truncate(windowLengths[i]);
 	});
+
+	var linearLeft = {};
+	linearLeft.pA = modelA.linearLeft.p(linearLastLeftID, linearCurrentLeftID);
+	linearLeft.pB = modelB.linearLeft.p(linearLastLeftID, linearCurrentLeftID);
+	linearLeft.infoA = selfInformation(linearLeft.pA);
+	linearLeft.infoB = selfInformation(linearLeft.pB);
+
+	var linearRight = {};
+	linearRight.pA = modelA.linearRight.p(linearLastLeftID, linearCurrentLeftID);
+	linearRight.pB = modelB.linearRight.p(linearLastLeftID, linearCurrentLeftID);
+	linearRight.infoA = selfInformation(linearRight.pA);
+	linearRight.infoB = selfInformation(linearRight.pB);
+
 	linearLastLeftID = linearCurrentLeftID;
 	linearLastRightID = linearCurrentRightID;
 
 	// ready indicator check;
 	$('#modelAReady').toggleClass('ready', modelA.analogLeft.ready());
 	$('#modelBReady').toggleClass('ready', modelB.analogLeft.ready());
+
+	// history and max information
+	modelA.history.digital.push(digital.infoA);
+	modelB.history.digital.push(digital.infoB);
+
+	var analogA = analogLeft.infoA + analogRight.infoA + linearLeft.infoA + linearRight.infoA;
+	var analogB = analogLeft.infoB + analogRight.infoB + linearLeft.infoB + linearRight.infoB;
+	modelA.history.analog.push(analogA);
+	modelB.history.analog.push(analogB);
+
+	modelA.history.mixed.push(digital.infoA + analogA);
+	modelB.history.mixed.push(digital.infoB + analogB);
+
+	maxInformation = Math.max(maxInformation, digital.infoA + analogA, digital.infoB + analogB);
 }
 
 var setupGraph = function() {
