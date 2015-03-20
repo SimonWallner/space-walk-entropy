@@ -122,7 +122,7 @@ var MarkovChain = function(biased, numIndividualStates) {
 			return 0;
 		}
 
-		return Math.max(0, Math.log(Q[from][to])) / Math.log(sums[from]);
+		return Math.log(Q[from][to] + 1) / Math.log(sums[from] + 1);
 	}
 
 	// return a list of transitions probs starting at 'from'

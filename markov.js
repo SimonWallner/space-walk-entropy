@@ -157,7 +157,7 @@ var pScaleLinear = function(sum, total) {
 	return sum / total;
 }
 var pScaleLog = function(sum, total) {
-	return Math.max(0, Math.log(sum)) / Math.log(total);
+	return Math.log(sum+1) / Math.log(total+1);
 }
 var pScale = pScaleLog;
 
@@ -772,13 +772,6 @@ var sample = function() {
 	maxInformation = Math.max(maxInformation, analogLeft.infoA + analogRight.infoA);
 	maxInformation = Math.max(maxInformation, analogLeft.infoB + analogRight.infoB);
 
-
-
-	var probs = modelA.analogLeft.transitionP(currentAnalogLeftId);
-	probs.forEach(function(element) {
-		d3.select('#graph-cell-' + element.id).attr('fill', c(element.pLog));
-	});
-
 	lastAnalogLeftID = currentAnalogLeftId;
 	lastAnalogRightID = currentAnalogRightId;
 
@@ -1108,8 +1101,8 @@ var updateMatrixPlot = function() {
 	var id = matrixIDs[MatrixRoundRobin]
 
 	// brute force clearing
-	d3.selectAll('#matrixLeft-' + MatrixRoundRobin + ' path').attr('fill', c(0));
-	d3.selectAll('#matrixRight-' + MatrixRoundRobin + ' path').attr('fill', c(0));
+	d3.selectAll('#matrixLeft-' + id + ' path').attr('fill', c(0));
+	d3.selectAll('#matrixRight-' + id + ' path').attr('fill', c(0));
 
 	var probs = modelA.analogLeft.transitionP(id);
 	probs.forEach(function(element) {
