@@ -102,42 +102,6 @@ var DiscSampler = function() {
 		return centers;
 	}
 
-	// get flow data for a certain site
-	this.getFlowData = function(Q, sums) {
-		// compute center of mass
-		// return difference vector to site
-		// strength = excentricity...
-		var that = this;
-		return sites.map(function(site, from) {
-
-			var tos = Q[from];
-			if (tos && sums[from] && sums[from] > 0) {
-				var sum = {x: 0, y: 0}
-				for (var to in tos)
-					if (tos.hasOwnProperty(to)) {
-						var toSite = that.getSite(to);
-						// weight...
-						var weight = Q[from][to];
-						sum = mad(sum, toSite, weight);
-					}
-
-				var center = mul(sum, 1 / sums[from]);
-			} else {
-				var center = site;
-			}
-
-			return {
-				x: site.x,
-				y: site.y,
-				centerX: center.x,
-				centerY: center.y,
-				dirX: (center.x - site.x) / 2,
-				dirY: (center.y - site.y) / 2,
-			};
-		})
-	}
-
-
 
 
 	// --- utils ---------------------------------------------------------------

@@ -165,6 +165,39 @@ var MarkovChain = function(biased, numIndividualStates) {
 		// TODO check if we are ready
 		return primed;
 	}
+
+	// get flow data for a certain site
+	this.getFlowData = function(sampler) {
+		// compute center of mass
+		// return difference vector to site
+		return sampler.getSites().map(function(site, i) {
+			var from = i;
+
+			var tos = Q[from];
+			if (tos && sums[from] && sums[from] > 0) {
+				var sum = {x: 0, y: 0}
+				for (var to in tos)
+					if (tos.hasOwnProperty(to)) {
+						var position = sampler.getSite(to);
+						var weight = Q[from][to];
+						sum = mad(sum, position, weight);
+					}
+
+				var center = mul(sum, 1 / sums[from]);
+			} else {
+				var center = site;
+			}
+
+			return {
+				x: site.x,
+				y: site.y,
+				centerX: center.x,
+				centerY: center.y,
+				dirX: (center.x - site.x) / 2,
+				dirY: (center.y - site.y) / 2,
+			};
+		});
+	}
 }
 
 
@@ -172,6 +205,21 @@ var MarkovChain = function(biased, numIndividualStates) {
 // any form.
 StaticModel = function(q) {
 	var Q = q;
+
+	var accumulatedP = {};
+	for (var from in Q) {
+		if (Q.hasOwnProperty(from)) {
+			for (var to in Q[from]) {
+				if (Q[from].hasOwnProperty(to)) {
+					if (accumulatedP[to] === undefined) {
+						accumulatedP[to] = 0;
+					}
+					accumulatedP[to] += Q[from][to];
+				}
+			}
+		}
+	}
+
 
 	this.p = function(from, to) {
 		if (Q[from] === undefined || Q[from][to] === undefined) {
@@ -208,17 +256,42 @@ StaticModel = function(q) {
 	}
 
 	this.sums = function() {
-		// Q is already the transition p, hence sums is set to a constant 1
-		var sums = [];
-		for (var from in Q) {
-			if (Q.hasOwnProperty(from)) {
-				sums[from] = 1;
-			}
-		}
-		return sums;
+		return accumulatedP;
 	}
 
 	this.ready = function() {
 		return true;
+	}
+
+	this.getFlowData = function(sampler) {
+		// compute center of mass
+		// return difference vector to site
+		return sampler.getSites().map(function(site, i) {
+			var from = i;
+
+			var tos = Q[from];
+			if (tos && accumulatedP[from] && accumulatedP[from] > 0) {
+				var sum = {x: 0, y: 0}
+				for (var to in tos)
+					if (tos.hasOwnProperty(to)) {
+						var position = sampler.getSite(to);
+						var weight = Q[from][to];
+						sum = mad(sum, position, weight);
+					}
+
+				var center = mul(sum, 1);
+			} else {
+				var center = site;
+			}
+
+			return {
+				x: site.x,
+				y: site.y,
+				centerX: center.x,
+				centerY: center.y,
+				dirX: (center.x - site.x) / 2,
+				dirY: (center.y - site.y) / 2,
+			};
+		})
 	}
 }

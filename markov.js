@@ -1431,12 +1431,12 @@ var updateFlowVis = function() {
 	// arrows/glyphs
 	var data = {
 		left: {
-			a: discSampler.getFlowData(modelA.analogLeft.Q(), modelA.analogLeft.sums()),
-			b: discSampler.getFlowData(modelB.analogLeft.Q(), modelB.analogLeft.sums())
+			a: modelA.analogLeft.getFlowData(discSampler),
+			b: modelB.analogLeft.getFlowData(discSampler)
 		},
 		right: {
-			a: discSampler.getFlowData(modelA.analogRight.Q(), modelA.analogRight.sums()),
-			b: discSampler.getFlowData(modelB.analogRight.Q(), modelB.analogRight.sums())
+			a: modelA.analogRight.getFlowData(discSampler),
+			b: modelB.analogRight.getFlowData(discSampler)
 		}
 	}
 
