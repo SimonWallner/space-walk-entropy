@@ -7,6 +7,9 @@ var DiscSampler = function() {
 
 	var circleDistances = [0.3, 0.6, 0.86];
 	var circleCounts = [5, 10, 20];
+	// var circleCounts = [4, 8, 12];
+	var circleCounts = [5, 10, 16];
+
 	var sites = [{x: 0, y: 0}]
 
 	circleDistances.forEach(function(distance, index) {

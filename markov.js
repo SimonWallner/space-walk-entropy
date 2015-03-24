@@ -721,16 +721,16 @@ var sample = function() {
 	var currentStateID = generateId(currentSample);
 	var lastStateID = generateId(lastSample);
 
-	digitalMCs.forEach(function(mc, i) {
-		mc.learn(lastStateID, currentStateID);
-		mc.truncate(windowLengths[i]);
-	});
-
 	var digital = {};
 	digital.pA = modelA.digital.p(lastStateID, currentStateID);
 	digital.pB = modelB.digital.p(lastStateID, currentStateID);
 	digital.infoA = selfInformation(digital.pA);
 	digital.infoB = selfInformation(digital.pB);
+
+	digitalMCs.forEach(function(mc, i) {
+		mc.learn(lastStateID, currentStateID);
+		mc.truncate(windowLengths[i]);
+	});
 
 	lastSample = currentSample.slice(0); // force copy
 
@@ -738,15 +738,6 @@ var sample = function() {
 	// analog
 	var currentAnalogLeftId = discSampler.getID(currentAnalogLeftSample);
 	var currentAnalogRightId = discSampler.getID(currentAnalogRightSample);
-
-	analogMCs.l.forEach(function(mc, i) {
-		mc.learn(lastAnalogLeftID, currentAnalogLeftId);
-		mc.truncate(windowLengths[i]);
-	});
-	analogMCs.r.forEach(function(mc, i) {
-		mc.learn(lastAnalogRightID, currentAnalogRightId);
-		mc.truncate(windowLengths[i]);
-	});
 
 	var analogLeft = {};
 	analogLeft.pA = modelA.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
@@ -763,21 +754,20 @@ var sample = function() {
 	maxInformation = Math.max(maxInformation, analogLeft.infoA + analogRight.infoA);
 	maxInformation = Math.max(maxInformation, analogLeft.infoB + analogRight.infoB);
 
+	analogMCs.l.forEach(function(mc, i) {
+		mc.learn(lastAnalogLeftID, currentAnalogLeftId);
+		mc.truncate(windowLengths[i]);
+	});
+	analogMCs.r.forEach(function(mc, i) {
+		mc.learn(lastAnalogRightID, currentAnalogRightId);
+		mc.truncate(windowLengths[i]);
+	});
+
 	lastAnalogLeftID = currentAnalogLeftId;
 	lastAnalogRightID = currentAnalogRightId;
 
 
-
 	// linear
-	linearMCs.l.forEach(function(mc, i) {
-		mc.learn(linearLastLeftID, linearCurrentLeftID);
-		mc.truncate(windowLengths[i]);
-	});
-	linearMCs.r.forEach(function(mc, i) {
-		mc.learn(linearLastRightID, linearCurrentRightID);
-		mc.truncate(windowLengths[i]);
-	});
-
 	var linearLeft = {};
 	linearLeft.pA = modelA.linearLeft.p(linearLastLeftID, linearCurrentLeftID);
 	linearLeft.pB = modelB.linearLeft.p(linearLastLeftID, linearCurrentLeftID);
@@ -789,6 +779,15 @@ var sample = function() {
 	linearRight.pB = modelB.linearRight.p(linearLastLeftID, linearCurrentLeftID);
 	linearRight.infoA = selfInformation(linearRight.pA);
 	linearRight.infoB = selfInformation(linearRight.pB);
+
+	linearMCs.l.forEach(function(mc, i) {
+		mc.learn(linearLastLeftID, linearCurrentLeftID);
+		mc.truncate(windowLengths[i]);
+	});
+	linearMCs.r.forEach(function(mc, i) {
+		mc.learn(linearLastRightID, linearCurrentRightID);
+		mc.truncate(windowLengths[i]);
+	});
 
 	linearLastLeftID = linearCurrentLeftID;
 	linearLastRightID = linearCurrentRightID;
