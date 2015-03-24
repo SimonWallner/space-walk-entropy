@@ -4,7 +4,7 @@
 
 // Discrete time, discrete space markov model
 // states are identified as strings
-var MarkovChain = function(biased, numIndividualStates) {
+var MarkovChain = function() {
 
 	var Q = {}; // transition matrix storing transition counts;
 	// this ends up to be a 2D matrix that is addressed as
@@ -14,9 +14,9 @@ var MarkovChain = function(biased, numIndividualStates) {
 
 	var historyBuffer = [];
 
-	var bias = 0;
 	var froms = {};
 	var tos = {};
+
 	var primed = false;
 
 	// get time in seconds
@@ -34,47 +34,17 @@ var MarkovChain = function(biased, numIndividualStates) {
 	}
 
 	this.learn = function(from, to) {
-		if (biased) {
-			// fully expended setup
-			if (Q[from] === undefined) {
-				Q[from] = {};
-				sums[from] = 0;
-
-				for (t in tos) {
-					if (tos.hasOwnProperty(t)) {
-						Q[from][t] = bias;
-						sums[from] += bias;
-					}
-				}
-
-				froms[from] = true;
-			}
-
-			if (Q[from][to] === undefined) {
-				for (f in froms) {
-					if (froms.hasOwnProperty(f)) {
-						Q[f][to] = bias;
-						sums[f] += bias;
-					}
-				}
-
-				tos[to] = true;
-			}
-
-		} else {
-			// sparse setup
-			if (Q[from] === undefined) {
-				Q[from] = {};
-				sums[from] = 0;
-				froms[from] = true;
-			}
-
-			if (Q[from][to] === undefined) {
-				Q[from][to] = 0;
-				tos[to] = true;
-			}
+		// sparse setup
+		if (Q[from] === undefined) {
+			Q[from] = {};
+			sums[from] = 0;
+			froms[from] = true;
 		}
 
+		if (Q[from][to] === undefined) {
+			Q[from][to] = 0;
+			tos[to] = true;
+		}
 
 		Q[from][to]++;
 		sums[from]++;
@@ -107,12 +77,6 @@ var MarkovChain = function(biased, numIndividualStates) {
 			return 0;
 		}
 
-		if (biased) {
-			totalStatesCnt = Math.pow(2, numIndividualStates);
-			var b = 2;
-
-			return (Q[from][to] + b) / (sums[from] + (totalStatesCnt * b));
-		}
 		return Q[from][to] / sums[from];
 	}
 

@@ -30,11 +30,11 @@ var linearMCs = {l: [], r: []};
 var analogMCs = {l: [], r: []};
 
 for (var i = 0; i < windowLengths.length; i++) {
-	digitalMCs[i] = new MarkovChain(true, 16);
-	linearMCs.l[i] = new MarkovChain(false);
-	linearMCs.r[i] = new MarkovChain(false);
-	analogMCs.l[i] = new MarkovChain(false);
-	analogMCs.r[i] = new MarkovChain(false);
+	digitalMCs[i] = new MarkovChain();
+	linearMCs.l[i] = new MarkovChain();
+	linearMCs.r[i] = new MarkovChain();
+	analogMCs.l[i] = new MarkovChain();
+	analogMCs.r[i] = new MarkovChain();
 }
 var custom = {
 	digital: new StaticModel({}),
