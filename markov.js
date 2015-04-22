@@ -734,6 +734,7 @@ var sample = function() {
 
 	lastSample = currentSample.slice(0); // force copy
 
+	var sensitivity = 1;
 
 	// analog
 	var currentAnalogLeftId = discSampler.getID(currentAnalogLeftSample);
@@ -742,8 +743,10 @@ var sample = function() {
 	var analogLeft = {};
 	analogLeft.pA = modelA.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
 	analogLeft.pB = modelB.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
-	analogLeft.infoA = selfInformation(analogLeft.pA);
-	analogLeft.infoB = selfInformation(analogLeft.pB);
+	analogLeft.infoA = selfInformation(analogLeft.pA) / (Math.pow(modelA.analogLeft.sigma(lastAnalogLeftID, currentAnalogLeftId), sensitivity) || 666);
+	analogLeft.infoB = selfInformation(analogLeft.pB) / (Math.pow(modelB.analogLeft.sigma(lastAnalogLeftID, currentAnalogLeftId), sensitivity) || 666);
+	// analogLeft.infoA = Math.random();
+	// analogLeft.infoB = Math.random();
 
 	var analogRight = {};
 	analogRight.pA = modelA.analogRight.p(lastAnalogRightID, currentAnalogRightId);
@@ -751,8 +754,8 @@ var sample = function() {
 	analogRight.infoA = selfInformation(analogRight.pA);
 	analogRight.infoB = selfInformation(analogRight.pB);
 
-	maxInformation = Math.max(maxInformation, analogLeft.infoA + analogRight.infoA);
-	maxInformation = Math.max(maxInformation, analogLeft.infoB + analogRight.infoB);
+	// maxInformation = Math.max(maxInformation, analogLeft.infoA + analogRight.infoA);
+	// maxInformation = Math.max(maxInformation, analogLeft.infoB + analogRight.infoB);
 
 	analogMCs.l.forEach(function(mc, i) {
 		mc.learn(lastAnalogLeftID, currentAnalogLeftId);
@@ -800,21 +803,21 @@ var sample = function() {
 	modelA.history.digital.push(digital.infoA);
 	modelB.history.digital.push(digital.infoB);
 
-	var analogA = analogLeft.infoA + analogRight.infoA + linearLeft.infoA + linearRight.infoA;
-	var analogB = analogLeft.infoB + analogRight.infoB + linearLeft.infoB + linearRight.infoB;
+	var analogA = analogLeft.infoA;// + analogRight.infoA + linearLeft.infoA + linearRight.infoA;
+	var analogB = analogLeft.infoB;// + analogRight.infoB + linearLeft.infoB + linearRight.infoB;
 	modelA.history.analog.push(analogA);
 	modelB.history.analog.push(analogB);
 
 	modelA.history.mixed.push(digital.infoA + analogA);
 	modelB.history.mixed.push(digital.infoB + analogB);
 
-	maxInformation = Math.max(maxInformation, digital.infoA + analogA, digital.infoB + analogB);
+	maxInformation = Math.max(maxInformation, analogA);
 }
 
 var setupGraph = function() {
 	svgSize = {
-		w: $('#svgDigital').width(),
-		h: $('#svgDigital').height()
+		w: $('#svgLS').width(),
+		h: $('#svgLS').height()
 	};
 
 	svgSize.innerWidth = svgSize.w - 2 * svgPadding;
@@ -828,8 +831,8 @@ var setupGraph = function() {
 
 var updateGraph = function() {
 
-	d3.selectAll('g.labels text')
-		.text(maxInformation.toFixed(2));
+	// d3.selectAll('g.labels text')
+	// 	.text(maxInformation.toFixed(2));
 
 	svgScales.y = d3.scale.linear()
 		.domain([0, maxInformation])
@@ -845,31 +848,14 @@ var updateGraph = function() {
 
 	var plots = [
 		{
-			id: '#svgDigital',
-			dataA: modelA.history.digital,
-			dataB: modelB.history.digital
-		},
-		{
-			id: '#svgAnalog',
+			id: '#svgLS',
 			dataA: modelA.history.analog,
 			dataB: modelB.history.analog
-		},
-		{
-			id: '#svgMixed',
-			dataA: modelA.history.mixed,
-			dataB: modelB.history.mixed
 		}
 	];
 
 	plots.forEach(function(plot) {
 		var svg = d3.select(plot.id);
-
-		svg.selectAll('.dataA g.grid, .dataB g.grid')
-			.attr('transform', 'translate(5, 0)');
-		svg.select('.dataA')
-			.attr('transform', 'translate(0, ' + (svgSize.plotHeight + 1 * svgPadding) +') scale(1, -1)');
-		svg.select('.dataB')
-			.attr('transform', 'translate(0, ' + (svgSize.plotHeight + 2 * svgPadding) +')');
 
 		var barsA = svg.select('.dataA').selectAll('.barA').data(plot.dataA);
 		barsA.enter()
@@ -878,55 +864,76 @@ var updateGraph = function() {
 				.attr('class', 'barA');
 		barsA
 			.attr('x', function(d, i) { return svgScales.x(i); })
-			.attr('y', 0)
-			.attr('height', function(d, i) { return svgScales.y(d); });
+			.attr('y', function(d) { return svgScales.y(d); })
+			.attr('height', 2);
 
 		barsA.exit()
 			.remove();
 
 
-		var barsB = svg.select('.dataB').selectAll('.barB').data(plot.dataB);
+		// var barsB = svg.select('.dataB').selectAll('.barB').data(plot.dataB);
+		// barsB.enter()
+		// 	.append('rect')
+		// 		.attr('width', 4)
+		// 		.attr('class', 'barB');
+		// barsB
+		// 	.attr('x', function(d, i) { return svgScales.x(i); })
+		// 	.attr('y', 0)
+		// 	.attr('height', function(d, i) { return svgScales.y(d) });
+		//
+		// barsB.exit()
+		// 	.remove();
+
+
+
+		var diffDigital = plot.dataA.map(function(d, i) {
+			var diff = d - plot.dataB[i];
+			return {
+				y: Math.min(d, plot.dataB[i]),
+				height: Math.abs(diff),
+				c: (diff > 0) ? 'diffPos' : 'diffNeg'
+			}
+		})
+
+
+		var barsB = svg.select('.dataB').selectAll('.barB').data(diffDigital);
 		barsB.enter()
 			.append('rect')
 				.attr('width', 4)
 				.attr('class', 'barB');
 		barsB
 			.attr('x', function(d, i) { return svgScales.x(i); })
-			.attr('y', 0)
-			.attr('height', function(d, i) { return svgScales.y(d) });
+			.attr('y', function(d) { return svgScales.y(d.y); })
+			.attr('height', function(d) { return svgScales.y(d.height); })
+			.attr('class', function(d) { return 'barB ' + d.c; });
 
 		barsB.exit()
 			.remove();
 
-
-
-		var diffDigital = plot.dataA.map(function(d, i) {
-			return d - plot.dataB[i];
-		})
-
-		var barsDiff = svg.select('.diff').selectAll('.diffPos, .diffNeg').data(diffDigital);
-		barsDiff.enter()
-			.append('rect')
-				.attr('width', 4)
-		barsDiff
-			.attr('x', function(d, i) { return svgScales.x(maxHistoryLength - plot.dataB.length + i); })
-			.attr('y', function(d) {
-				if (d > 0) {
-					return (svgPadding + svgSize.plotHeight) - svgScales.y(d);
-				} else {
-					return (svgPadding + svgSize.plotHeight + svgPadding);
-				}
-			})
-			.attr('height', function(d) { return svgScales.y(Math.abs(d)) })
-			.attr('class', function(d) { return (d > 0) ? 'diffPos' : 'diffNeg'});
-
-		barsB.exit()
-			.remove();
-
-
-		svg.selectAll('.dataA .grid, .dataB .grid')
-			.attr("class", "grid")
-			.call(svgScales.yAxis)
+		//
+		// var barsDiff = svg.select('.diff').selectAll('.diffPos, .diffNeg').data(diffDigital);
+		// barsDiff.enter()
+		// 	.append('rect')
+		// 		.attr('width', 4)
+		// barsDiff
+		// 	.attr('x', function(d, i) { return svgScales.x(maxHistoryLength - plot.dataB.length + i); })
+		// 	.attr('y', function(d) {
+		// 		if (d > 0) {
+		// 			return (svgPadding + svgSize.plotHeight) - svgScales.y(d);
+		// 		} else {
+		// 			return (svgPadding + svgSize.plotHeight + svgPadding);
+		// 		}
+		// 	})
+		// 	.attr('height', function(d) { return svgScales.y(Math.abs(d)) })
+		// 	.attr('class', function(d) { return (d > 0) ? 'diffPos' : 'diffNeg'});
+		//
+		// barsB.exit()
+		// 	.remove();
+		//
+		//
+		// svg.selectAll('.dataA .grid, .dataB .grid')
+		// 	.attr("class", "grid")
+		// 	.call(svgScales.yAxis)
 	})
 
 
@@ -1609,18 +1616,6 @@ var updateFlowVis = function() {
 
 
 // ================================= util ================================
-
-// create a linear space of size 'size' spanning [a, b]
-// the first element is a, the last is b
-function linspace(a, b, size) {
-	var result = [];
-	for (var i = 0; i < size; i++) {
-		var t = i / (size - 1);
-		result[i] = (a * (1 - t) + b * t);
-	}
-
-	return result;
-}
 
 // half sided gaussian bell curve, with 0 at [0] and the max at [size-1]
 // non normalised

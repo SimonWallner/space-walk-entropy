@@ -6,8 +6,10 @@
 
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="//cdn.jsdelivr.net/jstat/1.1.3/jstat.min.js"></script>
 
 	<script type="text/javascript" src="lib/voronoi/rhill-voronoi-core.js"></script>
+	<script type='text/javascript' src="math.js"></script>
 	<script type="text/javascript" src="discSampler.js"></script>
 	<script type="text/javascript" src="linearSampler.js"></script>
 	<script type="text/javascript" src="markovChain.js"></script>
@@ -144,8 +146,64 @@
 	<div class="clear"></div>
 
 
-
 	<div class="box" id="plotBox">
+		<div class="group">
+			<div class="plotLabel verticalGroupLabel">
+				<span>LS</span>
+			</div>
+			<div class="plotArea">
+				<svg width="800" height="150" id="svgLS">
+					<g class="dataB">
+					</g>
+					<g class="dataA">
+					</g>
+				</svg>
+			</div>
+		</div>
+		<div class="clear"></div>
+
+		<!-- <div class="group">
+			<div class="plotLabel verticalGroupLabel">
+				<span>RS</span>
+			</div>
+			<div class="plotArea">
+				<svg width="800" height="150" id="svgRS">
+					<g class="dataA">
+					</g>
+					<g class="dataB">
+					</g>
+				</svg>
+			</div>
+		</div>
+		<div class="clear"></div>
+
+		<div class="group">
+			<div class="plotLabel verticalGroupLabel">
+				<span>Analog</span>
+			</div>
+			<div class="plotArea">
+				<svg width="800" height="150" id="svgAnalog">
+					<g class="dataA">
+						<g class="grid">
+						</g>
+					</g>
+					<g class="dataB">
+						<g class="grid">
+						</g>
+					</g>
+					<g class="diff"></g>
+
+					<g class="labels">
+						<text class="maxInformation" x="790" y="20">--</text>
+						<text class="maxInformation" x="790" y="140">--</text>
+					</g>
+				</svg>
+			</div> -->
+		</div>
+		<div class="clear"></div>
+	</div>
+
+	<!-- <div class="box" id="plotBox">
 		<div class="group">
 			<div class="plotLabel verticalGroupLabel">
 				<span>Digital</span>
@@ -220,7 +278,7 @@
 			</div>
 		</div>
 		<div class="clear"></div>
-	</div>
+	</div> -->
 
 	<div class="clear"></div>
 

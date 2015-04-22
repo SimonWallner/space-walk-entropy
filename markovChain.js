@@ -80,6 +80,23 @@ var MarkovChain = function() {
 		return Q[from][to] / sums[from];
 	}
 
+	this.sigma = function(from, to) {
+		// assuming beta distribution of p(x)
+		if (Q[from] === undefined || Q[from][to] === undefined) {
+			return 0;
+		}
+
+		if (sums[from] === undefined || sums[from] === 0) {
+			return 0;
+		}
+
+		var a = Q[from][to]
+		var b = sums[from] - a;
+
+
+		return Math.sqrt((a * b) / (Math.pow(a + b, 2) * (a + b + 1)));
+	}
+
 	this.pLog = function(from, to) {
 		if (Q[from] === undefined || Q[from][to] === undefined) {
 			return 0;
