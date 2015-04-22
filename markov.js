@@ -722,10 +722,8 @@ var sample = function() {
 	var lastStateID = generateId(lastSample);
 
 	var digital = {};
-	digital.pA = modelA.digital.p(lastStateID, currentStateID);
-	digital.pB = modelB.digital.p(lastStateID, currentStateID);
-	digital.infoA = selfInformation(digital.pA);
-	digital.infoB = selfInformation(digital.pB);
+	digital.infoA = modelA.digital.IPrime(lastStateID, currentStateID);
+	digital.infoB = modelB.digital.IPrime(lastStateID, currentStateID);
 
 	digitalMCs.forEach(function(mc, i) {
 		mc.learn(lastStateID, currentStateID);
@@ -734,7 +732,6 @@ var sample = function() {
 
 	lastSample = currentSample.slice(0); // force copy
 
-	var sensitivity = 1;
 
 	// analog
 	var currentAnalogLeftId = discSampler.getID(currentAnalogLeftSample);
@@ -747,7 +744,6 @@ var sample = function() {
 	var analogRight = {};
 	analogRight.infoA = modelA.analogRight.IPrime(lastAnalogRightID, currentAnalogRightId);
 	analogRight.infoB = modelB.analogRight.IPrime(lastAnalogRightID, currentAnalogRightId);
-
 
 	analogMCs.l.forEach(function(mc, i) {
 		mc.learn(lastAnalogLeftID, currentAnalogLeftId);
@@ -764,16 +760,12 @@ var sample = function() {
 
 	// linear
 	var linearLeft = {};
-	linearLeft.pA = modelA.linearLeft.p(linearLastLeftID, linearCurrentLeftID);
-	linearLeft.pB = modelB.linearLeft.p(linearLastLeftID, linearCurrentLeftID);
-	linearLeft.infoA = selfInformation(linearLeft.pA);
-	linearLeft.infoB = selfInformation(linearLeft.pB);
+	linearLeft.infoA = modelA.linearLeft.IPrime(linearLastLeftID, linearCurrentLeftID);
+	linearLeft.infoB = modelB.linearLeft.IPrime(linearLastLeftID, linearCurrentLeftID);
 
 	var linearRight = {};
-	linearRight.pA = modelA.linearRight.p(linearLastLeftID, linearCurrentLeftID);
-	linearRight.pB = modelB.linearRight.p(linearLastLeftID, linearCurrentLeftID);
-	linearRight.infoA = selfInformation(linearRight.pA);
-	linearRight.infoB = selfInformation(linearRight.pB);
+	linearRight.infoA = modelA.linearRight.IPrime(linearLastLeftID, linearCurrentLeftID);
+	linearRight.infoB = modelB.linearRight.IPrime(linearLastLeftID, linearCurrentLeftID);
 
 	linearMCs.l.forEach(function(mc, i) {
 		mc.learn(linearLastLeftID, linearCurrentLeftID);
@@ -787,6 +779,7 @@ var sample = function() {
 	linearLastLeftID = linearCurrentLeftID;
 	linearLastRightID = linearCurrentRightID;
 
+
 	// ready indicator check;
 	$('#modelAReady').toggleClass('ready', modelA.analogLeft.ready());
 	$('#modelBReady').toggleClass('ready', modelB.analogLeft.ready());
@@ -795,21 +788,21 @@ var sample = function() {
 	modelA.history.digital.push(digital.infoA);
 	modelB.history.digital.push(digital.infoB);
 
-	var analogA = analogLeft.infoA;// + analogRight.infoA + linearLeft.infoA + linearRight.infoA;
-	var analogB = analogLeft.infoB;// + analogRight.infoB + linearLeft.infoB + linearRight.infoB;
+	var analogA = analogLeft.infoA + analogRight.infoA + linearLeft.infoA + linearRight.infoA;
+	var analogB = analogLeft.infoB + analogRight.infoB + linearLeft.infoB + linearRight.infoB;
 	modelA.history.analog.push(analogA);
 	modelB.history.analog.push(analogB);
 
 	modelA.history.mixed.push(digital.infoA + analogA);
 	modelB.history.mixed.push(digital.infoB + analogB);
 
-	maxInformation = Math.max(maxInformation, analogA);
+	maxInformation = Math.max(maxInformation, analogA, digital.infoA);
 }
 
 var setupGraph = function() {
 	svgSize = {
-		w: $('#svgLS').width(),
-		h: $('#svgLS').height()
+		w: $('#svgAnalog').width(),
+		h: $('#svgAnalog').height()
 	};
 
 	svgSize.innerWidth = svgSize.w - 2 * svgPadding;
@@ -819,6 +812,12 @@ var setupGraph = function() {
 	svgScales.x = d3.scale.linear()
 		.domain([0, maxHistoryLength])
 		.range([svgPadding, svgSize.innerWidth + svgPadding]);
+
+	d3.selectAll('.dataA')
+		.attr('transform', 'translate(0, ' + (svgSize.plotHeight + 1 * svgPadding) +') scale(1, -1)');
+	d3.selectAll('.dataB')
+		.attr('transform', 'translate(0, ' + (svgSize.plotHeight + 2 * svgPadding) +')');
+
 }
 
 var updateGraph = function() {
@@ -840,9 +839,19 @@ var updateGraph = function() {
 
 	var plots = [
 		{
-			id: '#svgLS',
+			id: '#svgAnalog',
 			dataA: modelA.history.analog,
 			dataB: modelB.history.analog
+		},
+		{
+			id: '#svgDigital',
+			dataA: modelA.history.digital,
+			dataB: modelB.history.digital
+		},
+		{
+			id: '#svgMixed',
+			dataA: modelA.history.mixed,
+			dataB: modelB.history.mixed
 		}
 	];
 
@@ -856,37 +865,21 @@ var updateGraph = function() {
 				.attr('class', 'barA');
 		barsA
 			.attr('x', function(d, i) { return svgScales.x(i); })
-			.attr('y', function(d) { return svgScales.y(d); })
-			.attr('height', 2);
+			.attr('y', function(d) { return svgScales.y(0); })
+			.attr('height', function(d) { return Math.max(1, svgScales.y(d)); });
 
 		barsA.exit()
 			.remove();
 
 
-		// var barsB = svg.select('.dataB').selectAll('.barB').data(plot.dataB);
-		// barsB.enter()
-		// 	.append('rect')
-		// 		.attr('width', 4)
-		// 		.attr('class', 'barB');
-		// barsB
-		// 	.attr('x', function(d, i) { return svgScales.x(i); })
-		// 	.attr('y', 0)
-		// 	.attr('height', function(d, i) { return svgScales.y(d) });
-		//
-		// barsB.exit()
-		// 	.remove();
-
-
-
 		var diffDigital = plot.dataA.map(function(d, i) {
 			var diff = d - plot.dataB[i];
 			return {
-				y: Math.min(d, plot.dataB[i]),
+				diff: diff,
 				height: Math.abs(diff),
 				c: (diff > 0) ? 'diffPos' : 'diffNeg'
 			}
 		})
-
 
 		var barsB = svg.select('.dataB').selectAll('.barB').data(diffDigital);
 		barsB.enter()
@@ -895,7 +888,7 @@ var updateGraph = function() {
 				.attr('class', 'barB');
 		barsB
 			.attr('x', function(d, i) { return svgScales.x(i); })
-			.attr('y', function(d) { return svgScales.y(d.y); })
+			.attr('y', function(d) { return (d.diff < 0) ? 0: svgScales.y(-d.height) - svgPadding; })
 			.attr('height', function(d) { return svgScales.y(d.height); })
 			.attr('class', function(d) { return 'barB ' + d.c; });
 
