@@ -73,9 +73,20 @@ var integrate = function(f, a, b, steps) {
     return sum;
 }
 
-var selfInformationPrime = function(a, b) {
-
+var I = function(x) {
+    if (x === 0) {
+        return 0;
+    }
+    return Math.log2(1 / x);
 }
+
+var IPrime = function(a, b) {
+    return integrate(function(x) {
+        return jStat.beta.pdf(x, a, b) * I(x);
+    }, 0, 1, 100)
+}
+
+var IPrimeCached = new functionCache2D(IPrime);
 
 // create a linear space of length = 'size' spanning [a, b]
 // the first element is a, the last is b
