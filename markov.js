@@ -827,17 +827,8 @@ var updateGraph = function() {
 
 	svgScales.y = d3.scale.linear()
 		.domain([0, maxInformation])
-		.range([0, svgSize.plotHeight]);
-
-	svgScales.yBounded = function(x) {
-		if (x > maxInformation) {
-			return svgSize.plotHeight;
-		} else if (x < 0) {
-			return 0;
-		} else {
-			return svgScales.y(x);
-		}
-	}
+		.range([0, svgSize.plotHeight])
+		.clamp(true);
 
 	svgScales.yAxis = d3.svg.axis()
 		.scale(svgScales.y)
@@ -876,7 +867,7 @@ var updateGraph = function() {
 		barsA
 			.attr('x', function(d, i) { return svgScales.x(i); })
 			.attr('y', function(d) { return svgScales.y(0); })
-			.attr('height', function(d) { return Math.max(2, svgScales.yBounded(d)); })
+			.attr('height', function(d) { return Math.max(2, svgScales.y(d)); })
 			.attr('class', function(d) { return (d === 0 || d === Infinity) ? 'barA invalid' : 'barA'; });
 
 		barsA.exit()
@@ -906,8 +897,8 @@ var updateGraph = function() {
 				.attr('class', 'barB');
 		barsB
 			.attr('x', function(d, i) { return svgScales.x(i); })
-			.attr('y', function(d) { return (d.diff < 0) ? 0: -svgScales.yBounded(d.height) - svgPadding; })
-			.attr('height', function(d) { return svgScales.yBounded(d.height); })
+			.attr('y', function(d) { return (d.diff < 0) ? 0: -svgScales.y(d.height) - svgPadding; })
+			.attr('height', function(d) { return svgScales.y(d.height); })
 			.attr('class', function(d) { return 'barB ' + d.c; });
 
 		barsB.exit()
