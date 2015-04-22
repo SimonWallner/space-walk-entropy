@@ -80,8 +80,7 @@ var MarkovChain = function() {
 		return Q[from][to] / sums[from];
 	}
 
-	this.sigma = function(from, to) {
-		// assuming beta distribution of p(x)
+	this.IPrime = function(from, to) {
 		if (Q[from] === undefined || Q[from][to] === undefined) {
 			return 0;
 		}
@@ -93,8 +92,12 @@ var MarkovChain = function() {
 		var a = Q[from][to]
 		var b = sums[from] - a;
 
+		// probability is either one or 0
+		if (a === 0 || b === 0) {
+			return 0;
+		}
 
-		return Math.sqrt((a * b) / (Math.pow(a + b, 2) * (a + b + 1)));
+		return IPrimeCached.f(a, b);
 	}
 
 	this.pLog = function(from, to) {

@@ -741,21 +741,13 @@ var sample = function() {
 	var currentAnalogRightId = discSampler.getID(currentAnalogRightSample);
 
 	var analogLeft = {};
-	analogLeft.pA = modelA.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
-	analogLeft.pB = modelB.analogLeft.p(lastAnalogLeftID, currentAnalogLeftId);
-	analogLeft.infoA = selfInformation(analogLeft.pA) / (Math.pow(modelA.analogLeft.sigma(lastAnalogLeftID, currentAnalogLeftId), sensitivity) || 666);
-	analogLeft.infoB = selfInformation(analogLeft.pB) / (Math.pow(modelB.analogLeft.sigma(lastAnalogLeftID, currentAnalogLeftId), sensitivity) || 666);
-	// analogLeft.infoA = Math.random();
-	// analogLeft.infoB = Math.random();
+	analogLeft.infoA = modelA.analogLeft.IPrime(lastAnalogLeftID, currentAnalogLeftId);
+	analogLeft.infoB = modelB.analogLeft.IPrime(lastAnalogLeftID, currentAnalogLeftId);
 
 	var analogRight = {};
-	analogRight.pA = modelA.analogRight.p(lastAnalogRightID, currentAnalogRightId);
-	analogRight.pB = modelB.analogRight.p(lastAnalogRightID, currentAnalogRightId);
-	analogRight.infoA = selfInformation(analogRight.pA);
-	analogRight.infoB = selfInformation(analogRight.pB);
+	analogRight.infoA = modelA.analogRight.IPrime(lastAnalogRightID, currentAnalogRightId);
+	analogRight.infoB = modelB.analogRight.IPrime(lastAnalogRightID, currentAnalogRightId);
 
-	// maxInformation = Math.max(maxInformation, analogLeft.infoA + analogRight.infoA);
-	// maxInformation = Math.max(maxInformation, analogLeft.infoB + analogRight.infoB);
 
 	analogMCs.l.forEach(function(mc, i) {
 		mc.learn(lastAnalogLeftID, currentAnalogLeftId);

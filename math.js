@@ -58,8 +58,6 @@ var functionCache2D = function(functor) {
     }
 }
 
-
-
 var integrate = function(f, a, b, steps) {
     var samples = linspace(a, b, steps);
     var sum = 0;
