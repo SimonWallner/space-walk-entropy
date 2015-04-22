@@ -97,3 +97,13 @@ function linspace(a, b, size) {
 
 	return result;
 }
+
+var boundedMax = function(a, b) {
+    if (a === Infinity) {
+        return b;
+    } else if (b === Infinity) {
+        return a;
+    } else {
+        return Math.max(a, b);
+    }
+}

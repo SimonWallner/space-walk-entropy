@@ -93,7 +93,9 @@ var MarkovChain = function() {
 		var b = sums[from] - a;
 
 		// if probability is either one or 0
-		if (a === 0 || b === 0) {
+		if (a === 0) {
+			return Infinity;
+		} else if (b === 0) {
 			return 0;
 		}
 

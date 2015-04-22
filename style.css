@@ -317,6 +317,8 @@ svg path.quiverB {
   marker-end: url(#quiverArrowB); }
 svg .barA, svg .barB {
   fill: #5b5b5b; }
+svg .barA.invalid {
+  fill: #424242; }
 svg .diffPos {
   fill: #b6ce4e; }
 svg .diffNeg {

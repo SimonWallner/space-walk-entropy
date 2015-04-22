@@ -796,7 +796,7 @@ var sample = function() {
 	modelA.history.mixed.push(digital.infoA + analogA);
 	modelB.history.mixed.push(digital.infoB + analogB);
 
-	maxInformation = Math.max(maxInformation, analogA, digital.infoA);
+	maxInformation = boundedMax(boundedMax(maxInformation, analogA), digital.infoA);
 }
 
 var setupGraph = function() {
@@ -822,12 +822,22 @@ var setupGraph = function() {
 
 var updateGraph = function() {
 
-	// d3.selectAll('g.labels text')
-	// 	.text(maxInformation.toFixed(2));
+	d3.selectAll('g.labels text')
+		.text(maxInformation.toFixed(2));
 
 	svgScales.y = d3.scale.linear()
 		.domain([0, maxInformation])
 		.range([0, svgSize.plotHeight]);
+
+	svgScales.yBounded = function(x) {
+		if (x > maxInformation) {
+			return svgSize.plotHeight;
+		} else if (x < 0) {
+			return 0;
+		} else {
+			return svgScales.y(x);
+		}
+	}
 
 	svgScales.yAxis = d3.svg.axis()
 		.scale(svgScales.y)
@@ -866,14 +876,22 @@ var updateGraph = function() {
 		barsA
 			.attr('x', function(d, i) { return svgScales.x(i); })
 			.attr('y', function(d) { return svgScales.y(0); })
-			.attr('height', function(d) { return Math.max(1, svgScales.y(d)); });
+			.attr('height', function(d) { return Math.max(2, svgScales.yBounded(d)); })
+			.attr('class', function(d) { return (d === 0 || d === Infinity) ? 'barA invalid' : 'barA'; });
 
 		barsA.exit()
 			.remove();
 
 
 		var diffDigital = plot.dataA.map(function(d, i) {
-			var diff = d - plot.dataB[i];
+			var d2 = plot.dataB[i];
+			var diff;
+			if (d === Infinity && d2 === Infinity) {
+				diff = 0;
+			} else {
+				diff = d - d2;
+			}
+
 			return {
 				diff: diff,
 				height: Math.abs(diff),
@@ -888,40 +906,13 @@ var updateGraph = function() {
 				.attr('class', 'barB');
 		barsB
 			.attr('x', function(d, i) { return svgScales.x(i); })
-			.attr('y', function(d) { return (d.diff < 0) ? 0: svgScales.y(-d.height) - svgPadding; })
-			.attr('height', function(d) { return svgScales.y(d.height); })
+			.attr('y', function(d) { return (d.diff < 0) ? 0: -svgScales.yBounded(d.height) - svgPadding; })
+			.attr('height', function(d) { return svgScales.yBounded(d.height); })
 			.attr('class', function(d) { return 'barB ' + d.c; });
 
 		barsB.exit()
 			.remove();
-
-		//
-		// var barsDiff = svg.select('.diff').selectAll('.diffPos, .diffNeg').data(diffDigital);
-		// barsDiff.enter()
-		// 	.append('rect')
-		// 		.attr('width', 4)
-		// barsDiff
-		// 	.attr('x', function(d, i) { return svgScales.x(maxHistoryLength - plot.dataB.length + i); })
-		// 	.attr('y', function(d) {
-		// 		if (d > 0) {
-		// 			return (svgPadding + svgSize.plotHeight) - svgScales.y(d);
-		// 		} else {
-		// 			return (svgPadding + svgSize.plotHeight + svgPadding);
-		// 		}
-		// 	})
-		// 	.attr('height', function(d) { return svgScales.y(Math.abs(d)) })
-		// 	.attr('class', function(d) { return (d > 0) ? 'diffPos' : 'diffNeg'});
-		//
-		// barsB.exit()
-		// 	.remove();
-		//
-		//
-		// svg.selectAll('.dataA .grid, .dataB .grid')
-		// 	.attr("class", "grid")
-		// 	.call(svgScales.yAxis)
 	})
-
-
 }
 
 var truncateHistory = function() {

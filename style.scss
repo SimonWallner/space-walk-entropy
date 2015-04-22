@@ -392,6 +392,10 @@ svg {
 		fill: $barColor;
 	}
 
+	.barA.invalid {
+		fill: darken($barColor, 10);
+	}
+
 	.diffPos {
 		fill: $lime;
 	}
