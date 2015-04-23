@@ -318,7 +318,7 @@ svg path.quiverB {
 svg .barA, svg .barB {
   fill: #5b5b5b; }
 svg .barA.invalid {
-  fill: invalidBarColor; }
+  fill: #444444; }
 svg .diffPos {
   fill: #b6ce4e; }
   svg .diffPos.invalid {

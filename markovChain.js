@@ -14,6 +14,7 @@ var MarkovChain = function() {
 
 	var historyBuffer = [];
 
+	// needed for serialization
 	var froms = {};
 	var tos = {};
 
@@ -82,11 +83,11 @@ var MarkovChain = function() {
 
 	this.IPrime = function(from, to) {
 		if (Q[from] === undefined || Q[from][to] === undefined) {
-			return 0;
+			return Infinity;
 		}
 
 		if (sums[from] === undefined || sums[from] === 0) {
-			return 0;
+			return Infinity;
 		}
 
 		var a = Q[from][to]
@@ -141,7 +142,13 @@ var MarkovChain = function() {
 		for (var f in froms) {
 			q[f] = {};
 			for (var t in tos) {
-				q[f][t] = this.p(f, t)
+				if (this.p(f, t) > 0) {
+					q[f][t] = {
+						p: this.p(f, t),
+						alpha: Q[f][t],
+						beta: sums[f] - Q[f][t]
+					}
+				}
 			}
 		}
 		return q;
@@ -200,7 +207,7 @@ StaticModel = function(q) {
 					if (accumulatedP[to] === undefined) {
 						accumulatedP[to] = 0;
 					}
-					accumulatedP[to] += Q[from][to];
+					accumulatedP[to] += Q[from][to].p;
 				}
 			}
 		}
@@ -212,13 +219,31 @@ StaticModel = function(q) {
 			return 0;
 		}
 
-		return Q[from][to];
+		return Q[from][to].p;
 	}
 
 	this.pLog = function(from, to) {
 		var p = this.p(from, to);
 
 		return p;
+	}
+
+	this.IPrime = function(from, to) {
+		if (Q[from] === undefined || Q[from][to] === undefined) {
+			return Infinity;
+		}
+
+		var a = Q[from][to].alpha
+		var b = Q[from][to].beta;
+
+		// if probability is either one or 0
+		if (a === 0) {
+			return Infinity;
+		} else if (b === 0) {
+			return 0;
+		}
+
+		return IPrimeCached.f(a, b);
 	}
 
 	// return a list of transitions probs starting at 'from'
@@ -261,7 +286,7 @@ StaticModel = function(q) {
 				for (var to in tos)
 					if (tos.hasOwnProperty(to)) {
 						var position = sampler.getSite(to);
-						var weight = Q[from][to];
+						var weight = Q[from][to].p;
 						sum = mad(sum, position, weight);
 					}
 

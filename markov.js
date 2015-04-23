@@ -868,7 +868,8 @@ var updateGraph = function() {
 			.attr('x', function(d, i) { return svgScales.x(i); })
 			.attr('y', function(d) { return svgScales.y(0); })
 			.attr('height', function(d) { return Math.max(2, svgScales.y(d)); })
-			.attr('class', function(d) { return (d === 0 || d === Infinity) ? 'barA invalid' : 'barA'; });
+			.attr('class', function(d) { return (d === 0 || d === Infinity) ? 'barA invalid' : 'barA'; })
+			.attr('data-value', function(d) { return d; });
 
 		barsA.exit()
 			.remove();
@@ -877,7 +878,7 @@ var updateGraph = function() {
 		var diffDigital = plot.dataA.map(function(d, i) {
 			var d2 = plot.dataB[i];
 			var diff;
-			if (d === Infinity && d2 === Infinity) {
+			if (d === Infinity || d2 === Infinity) {
 				diff = 0;
 			} else {
 				diff = d - d2;
@@ -899,7 +900,9 @@ var updateGraph = function() {
 			.attr('x', function(d, i) { return svgScales.x(i); })
 			.attr('y', function(d) { return (d.diff < 0) ? 0: -svgScales.y(d.height) - svgPadding; })
 			.attr('height', function(d) { return svgScales.y(d.height); })
-			.attr('class', function(d) { return 'barB ' + d.c; });
+			.attr('class', function(d) { return 'barB ' + d.c; })
+			.attr('data-value', function(d) { return d.diff; })
+
 
 		barsB.exit()
 			.remove();
