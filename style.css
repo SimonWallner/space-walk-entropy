@@ -318,11 +318,15 @@ svg path.quiverB {
 svg .barA, svg .barB {
   fill: #5b5b5b; }
 svg .barA.invalid {
-  fill: #424242; }
+  fill: invalidBarColor; }
 svg .diffPos {
   fill: #b6ce4e; }
+  svg .diffPos.invalid {
+    fill: #444444; }
 svg .diffNeg {
   fill: #e25454; }
+  svg .diffNeg.invalid {
+    fill: #444444; }
 svg .grid .tick line {
   stroke: #5b5b5b;
   stroke-width: 2px;

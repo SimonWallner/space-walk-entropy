@@ -21,7 +21,10 @@ $labelColor: #787878;
 $buttonColor: $blue;
 $optionColor: $turquoise;
 
-$barColor: #5b5b5b;
+$barColor: #5B5B5B;
+$invalidBarColor: #444444;
+$invalidBarPos: $invalidBarColor;
+$invalidBarNeg: $invalidBarColor;
 
 $innerRadius: 3px;
 $outerRadius: 5px;
@@ -393,15 +396,21 @@ svg {
 	}
 
 	.barA.invalid {
-		fill: darken($barColor, 10);
+		fill: invalidBarColor;
 	}
 
 	.diffPos {
 		fill: $lime;
+		&.invalid {
+			fill: $invalidBarPos;
+		}
 	}
 
 	.diffNeg {
 		fill: $red;
+		&.invalid {
+			fill: $invalidBarNeg;
+		}
 	}
 
 	.grid {

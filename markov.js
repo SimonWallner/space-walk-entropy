@@ -886,7 +886,7 @@ var updateGraph = function() {
 			return {
 				diff: diff,
 				height: Math.abs(diff),
-				c: (diff > 0) ? 'diffPos' : 'diffNeg'
+				c: ((diff > 0) ? 'diffPos' : 'diffNeg') + (Math.abs(diff) === Infinity ? ' invalid' : '')
 			}
 		})
 
