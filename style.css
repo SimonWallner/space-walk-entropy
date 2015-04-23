@@ -262,7 +262,6 @@ div.linearLabel {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   margin-top: 0.5em;
-  background-color: #4d4d4d;
   display: inline-block;
   float: left;
   border-radius: 3px;
@@ -270,13 +269,13 @@ div.linearLabel {
   letter-spacing: 0.12em;
   line-height: 1.2em;
   text-align: center;
-  width: 70px; }
+  width: 73px; }
 
 div.linearPlot {
   border: 1px solid white;
   border-radius: 3px;
   display: inline-block;
-  margin-bottom: 8px; }
+  margin-bottom: 12px; }
 
 div.linearP {
   display: inline-block;

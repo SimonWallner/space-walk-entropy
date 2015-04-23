@@ -315,7 +315,7 @@ div.linearLabel {
 	padding-top: 0.5em;
 	padding-bottom: 0.5em;
 	margin-top: 0.5em;
-	background-color: $boxBGColor;
+	// background-color: $boxBGColor;
 	display: inline-block;
 	float: left;
 	border-radius: $innerRadius;
@@ -323,14 +323,14 @@ div.linearLabel {
 	letter-spacing: 0.12em;
 	line-height: 1.2em;
 	text-align: center;
-	width: 70px;
+	width: 73px;
 }
 
 div.linearPlot {
 	border: 1px solid white;
 	border-radius: $innerRadius;
 	display: inline-block;
-	margin-bottom: 2 * $gutter;
+	margin-bottom: 3 * $gutter;
 }
 
 div.linearP {
