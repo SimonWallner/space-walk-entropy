@@ -224,6 +224,38 @@ var mappings = {
 			'axis-2': {id: 'RS', property: 'x'},
 			'axis-3': {id: 'RS', property: 'y'},
 		}
+	},
+    unityXbox360: {
+		digital: {
+			'button-16': 'cross',
+			'button-17': 'circle',
+			'button-18': 'square',
+			'button-19': 'triangle',
+
+			'button-13': 'L1',
+			'button-14': 'R1',
+			'button-11': 'L3',
+			'button-12': 'R3',
+
+			'button-5': 'Dpad-up',
+			'button-6': 'Dpad-down',
+			'button-7': 'Dpad-left',
+			'button-8': 'Dpad-right',
+
+			'button-9': 'start',
+			'button-10': 'select',
+			'button-15': 'special'
+		},
+		analog: {
+            'axis-0': {id: 'LS', property: 'x'},
+			'axis-1': {id: 'LS', property: 'y'},
+
+			'axis-2': {id: 'RS', property: 'x'},
+			'axis-3': {id: 'RS', property: 'y'},
+
+			'axis-4': {id: 'L2'},
+			'axis-5': {id: 'R2'}
+		}
 	}
 }
 
@@ -360,6 +392,13 @@ $(document).ready(function() {
 	$('#mappingPS3').click(function() {
 		currentMapping = mappings.ps3;
 		settings.currentMapping = 'ps3';
+		storeSettings();
+		activateOption(this);
+	});
+
+	$('#mappingX360Unity').click(function() {
+		currentMapping = mappings.unityXbox360;
+		settings.currentMapping = 'unityXbox360';
 		storeSettings();
 		activateOption(this);
 	});
@@ -604,8 +643,13 @@ $(document).ready(function() {
 	} else {
 		currentMapping = mappings[settings.currentMapping];
 		if (settings.currentMapping === 'xbox360') {
+			currentMapping = mappings.xbox360;
 			activateOption('#mappingX360');
+		} else if (settings.currentMapping === 'unityXbox360') {
+			currentMapping = mappings.unityXbox360;
+			activateOption('#mappingX360Unity');
 		} else if (settings.currentMapping === 'ps3') {
+			currentMapping = mappings.ps3;
 			activateOption('#mappingPS3');
 		}
 	}
@@ -680,8 +724,8 @@ var drawControllerSelect = function() {
 
 libsw.onMessage = function(data) {
 	if (data.type === "ext.input.gamePad.sample") {
-
-		if (data.payload.controllerNumber === activeController) {
+		var controllerNumber = parseInt(data.payload.controllerNumber);
+		if (controllerNumber === activeController) {
 			if (data.payload.type === 'digital') {
 				if (currentMapping.digital[data.payload.name]) {
 					currentSample[data.payload.buttonNumber] = data.payload.value;
@@ -707,8 +751,8 @@ libsw.onMessage = function(data) {
 				}
 			}
 		} else {
-			if (knownControllers.indexOf(data.payload.controllerNumber) === -1) {
-				knownControllers.push(data.payload.controllerNumber);
+			if (knownControllers.indexOf(controllerNumber) === -1) {
+				knownControllers.push(controllerNumber);
 
 				drawControllerSelect();
 			}
