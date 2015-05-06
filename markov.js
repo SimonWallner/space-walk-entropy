@@ -161,7 +161,7 @@ var pScaleLog = function(sum, total) {
 }
 var pScale = pScaleLog;
 
-var mapping = {
+var mappings = {
 	xbox360: {
 		digital: {
 			'button-11': 'cross',
