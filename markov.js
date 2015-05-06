@@ -225,38 +225,38 @@ var mappings = {
 			'axis-3': {id: 'RS', property: 'y'},
 		}
 	},
-    unityXbox360: {
+	xbox360Win: {
 		digital: {
-			'button-16': 'cross',
-			'button-17': 'circle',
-			'button-18': 'square',
-			'button-19': 'triangle',
+			'button-0': 'cross',
+			'button-1': 'circle',
+			'button-2': 'square',
+			'button-3': 'triangle',
 
-			'button-13': 'L1',
-			'button-14': 'R1',
-			'button-11': 'L3',
-			'button-12': 'R3',
+			'button-4': 'L1',
+			'button-5': 'R1',
+			'button-8': 'L3',
+			'button-9': 'R3',
 
-			'button-5': 'Dpad-up',
-			'button-6': 'Dpad-down',
-			'button-7': 'Dpad-left',
-			'button-8': 'Dpad-right',
+			'button-10': 'Dpad-up',
+			'button-12': 'Dpad-down',
+			'button-13': 'Dpad-left',
+			'button-11': 'Dpad-right',
 
-			'button-9': 'start',
-			'button-10': 'select',
-			'button-15': 'special'
+			'button-7': 'start',
+			'button-6': 'select',
+			'unassigned': 'special'
 		},
 		analog: {
-            'axis-0': {id: 'LS', property: 'x'},
+			'axis-0': {id: 'LS', property: 'x'},
 			'axis-1': {id: 'LS', property: 'y'},
 
-			'axis-2': {id: 'RS', property: 'x'},
+			'axis-4': {id: 'RS', property: 'x'},
 			'axis-3': {id: 'RS', property: 'y'},
 
-			'axis-4': {id: 'L2'},
-			'axis-5': {id: 'R2'}
+			// 'axis-2': {id: 'L2'}, L2 and R2 are botched together to form a single axis...
+			'axis-2': {id: 'R2'}
 		}
-	}
+    }
 }
 
 var currentMapping = mappings.xbox360;
@@ -396,9 +396,9 @@ $(document).ready(function() {
 		activateOption(this);
 	});
 
-	$('#mappingX360Unity').click(function() {
-		currentMapping = mappings.unityXbox360;
-		settings.currentMapping = 'unityXbox360';
+	$('#mappingX360Win').click(function() {
+		currentMapping = mappings.xbox360Win;
+		settings.currentMapping = 'xbox360Win';
 		storeSettings();
 		activateOption(this);
 	});
@@ -645,9 +645,9 @@ $(document).ready(function() {
 		if (settings.currentMapping === 'xbox360') {
 			currentMapping = mappings.xbox360;
 			activateOption('#mappingX360');
-		} else if (settings.currentMapping === 'unityXbox360') {
-			currentMapping = mappings.unityXbox360;
-			activateOption('#mappingX360Unity');
+		} else if (settings.currentMapping === 'xbox360win') {
+			currentMapping = mappings.xbox360Win;
+			activateOption('#mappingX360Win');
 		} else if (settings.currentMapping === 'ps3') {
 			currentMapping = mappings.ps3;
 			activateOption('#mappingPS3');
