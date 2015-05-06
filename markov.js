@@ -161,36 +161,36 @@ var pScaleLog = function(sum, total) {
 }
 var pScale = pScaleLog;
 
-var mappings = {
+var mapping = {
 	xbox360: {
 		digital: {
-			'button-0': 'cross',
-			'button-1': 'circle',
-			'button-2': 'square',
-			'button-3': 'triangle',
+			'button-11': 'cross',
+			'button-12': 'circle',
+			'button-13': 'square',
+			'button-14': 'triangle',
 
-			'button-4': 'L1',
-			'button-5': 'R1',
+			'button-8': 'L1',
+			'button-9': 'R1',
 			'button-6': 'L3',
 			'button-7': 'R3',
 
-			'button-11': 'Dpad-up',
-			'button-12': 'Dpad-down',
-			'button-13': 'Dpad-left',
-			'button-14': 'Dpad-right',
+			'button-0': 'Dpad-up',
+			'button-1': 'Dpad-down',
+			'button-2': 'Dpad-left',
+			'button-3': 'Dpad-right',
 
-			'button-8': 'start',
-			'button-9': 'select',
+			'button-4': 'start',
+			'button-5': 'select',
 			'button-10': 'special'
 		},
 		analog: {
 			'axis-0': {id: 'LS', property: 'x'},
 			'axis-1': {id: 'LS', property: 'y'},
 
-			'axis-3': {id: 'RS', property: 'x'},
-			'axis-4': {id: 'RS', property: 'y'},
+			'axis-2': {id: 'RS', property: 'x'},
+			'axis-3': {id: 'RS', property: 'y'},
 
-			'axis-2': {id: 'L2'},
+			'axis-4': {id: 'L2'},
 			'axis-5': {id: 'R2'}
 		}
 	},
@@ -223,38 +223,6 @@ var mappings = {
 
 			'axis-2': {id: 'RS', property: 'x'},
 			'axis-3': {id: 'RS', property: 'y'},
-		}
-	},
-    unityXbox360: {
-		digital: {
-			'button-16': 'cross',
-			'button-17': 'circle',
-			'button-18': 'square',
-			'button-19': 'triangle',
-
-			'button-13': 'L1',
-			'button-14': 'R1',
-			'button-11': 'L3',
-			'button-12': 'R3',
-
-			'button-5': 'Dpad-up',
-			'button-6': 'Dpad-down',
-			'button-7': 'Dpad-left',
-			'button-8': 'Dpad-right',
-
-			'button-9': 'start',
-			'button-10': 'select',
-			'button-15': 'special'
-		},
-		analog: {
-            'axis-0': {id: 'LS', property: 'x'},
-			'axis-1': {id: 'LS', property: 'y'},
-
-			'axis-2': {id: 'RS', property: 'x'},
-			'axis-3': {id: 'RS', property: 'y'},
-
-			'axis-4': {id: 'L2'},
-			'axis-5': {id: 'R2'}
 		}
 	}
 }
