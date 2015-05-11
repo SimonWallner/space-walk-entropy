@@ -264,8 +264,8 @@ var storageKey = '71710660-85cd-11e4-b4a9-0800200c9a66';
 var settings = {
 	currentMapping: 'xbox360',
 	customMapping: mappings.xbox360,
-	modelAId: '15',
-	modelBId: '15',
+	modelAId: '30',
+	modelBId: '60',
 };
 
 var loadSettings = function() {
@@ -636,11 +636,11 @@ $(document).ready(function() {
 		}
 	}
 
-	if (settings.color === 'heat') {
-		$('#colorHeat').click();
-	} else {
-		$('#colorMono').click();
-	}
+	// if (settings.color === 'heat') {
+	// 	$('#colorHeat').click();
+	// } else {
+	// 	$('#colorMono').click();
+	// }
 
 	if (settings.diff === 'off') {
 		$('#diffOff').click();
@@ -650,18 +650,18 @@ $(document).ready(function() {
 		$('#diffDiff').click();
 	}
 
-	if (settings.vectorADisplay === 'quiver') {
-		$('#vectorADisplayQuiver').click();
-	} else {
+	if (settings.vectorADisplay === 'arrow') {
 		$('#vectorADisplayArrow').click();
+	} else {
+		$('#vectorADisplayQuiver').click();
 	}
 
 	if (settings.vectorBDisplay === 'off') {
 		$('#vectorBDisplayOff').click();
-	} else if (settings.vectorBDisplay === 'quiver') {
-		$('#vectorBDisplayQuiver').click();
-	} else {
+	} else if (settings.vectorBDisplay === 'arrow') {
 		$('#vectorBDisplayArrow').click();
+	} else {
+		$('#vectorBDisplayQuiver').click();
 	}
 
 	if (settings.vectorError === 'off') {
