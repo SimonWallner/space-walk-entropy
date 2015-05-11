@@ -103,17 +103,6 @@ var MarkovChain = function() {
 		return IPrimeCached.f(a, b);
 	}
 
-	this.pLog = function(from, to) {
-		if (Q[from] === undefined || Q[from][to] === undefined) {
-			return 0;
-		}
-
-		if (sums[from] === undefined || sums[from] <= 1) {
-			return 0;
-		}
-
-		return Math.log(Q[from][to] + 1) / Math.log(sums[from] + 1);
-	}
 
 	// return a list of transitions probs starting at 'from'
 	this.transitionP = function(from) {
@@ -122,8 +111,8 @@ var MarkovChain = function() {
 			if (tos.hasOwnProperty(t)) {
 				transition.push({
 					id: t,
-					p: this.p(from, t),
-					pLog: this.pLog(from, t)})
+					p: this.p(from, t)
+				});
 			}
 		}
 		return transition;
@@ -222,12 +211,6 @@ StaticModel = function(q) {
 		return Q[from][to].p;
 	}
 
-	this.pLog = function(from, to) {
-		var p = this.p(from, to);
-
-		return p;
-	}
-
 	this.IPrime = function(from, to) {
 		if (Q[from] === undefined || Q[from][to] === undefined) {
 			return Infinity;
@@ -254,8 +237,8 @@ StaticModel = function(q) {
 				if (Q[from].hasOwnProperty(to)) {
 					transition.push({
 						id: to,
-						p: this.p(from, to),
-						pLog: this.pLog(from, to)})
+						p: this.p(from, to)
+					});
 				}
 			}
 		}

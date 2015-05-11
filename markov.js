@@ -153,15 +153,11 @@ var cDiffEncoding = d3.scale.linear()
 	.domain([-1, -0.01, 0, 0.01, 1])
 	.range(['#E25454', '#674848', '#444', '#5D6346', '#B6CE4E']);
 
-var pScaleLinear = function(sum, total) {
-	return sum / total;
+var pGamma = function(x) {
+	return Math.pow(x, 1.0/2.2);
 }
-var pScaleLog = function(sum, total) {
-	return Math.log(sum+1) / Math.log(total+1);
-}
-var pScale = pScaleLog;
 
-var mapping = {
+var mappings = {
 	xbox360: {
 		digital: {
 			'button-11': 'cross',
@@ -536,20 +532,6 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#scale1').click(function() {
-		pScale = pScaleLinear;
-		activateOption(this);
-		settings.pScale = 'linear';
-		storeSettings();
-	})
-
-	$('#scaleLog').click(function() {
-		pScale = pScaleLog;
-		activateOption(this);
-		settings.pScale = 'log';
-		storeSettings();
-	})
-
 	$('#colorHeat').click(function() {
 		c = cHeat;
 		cDiff = cHeatDiff;
@@ -658,12 +640,6 @@ $(document).ready(function() {
 		$('#colorHeat').click();
 	} else {
 		$('#colorMono').click();
-	}
-
-	if (settings.pScale === 'linear') {
-		$('#scale1').click();
-	} else {
-		$('#scaleLog').click();
 	}
 
 	if (settings.diff === 'off') {
@@ -1140,20 +1116,12 @@ var updateMatrixPlot = function() {
 
 	var probs = modelA.analogLeft.transitionP(id);
 	probs.forEach(function(element) {
-		if (settings.pScale === 'linear') {
-			d3.select('#matrixPlotLeft .cell-' + id + '-' + element.id).attr('fill', c(element.p));
-		} else {
-			d3.select('#matrixPlotLeft .cell-' + id + '-' + element.id).attr('fill', c(element.pLog));
-		}
+		d3.select('#matrixPlotLeft .cell-' + id + '-' + element.id).attr('fill', c(pGamma(element.p)));
 	});
 
 	var probs = modelA.analogRight.transitionP(id);
 	probs.forEach(function(element) {
-		if (settings.pScale === 'linear') {
-			d3.select('#matrixPlotRight .cell-' + id + '-' + element.id).attr('fill', c(element.p));
-		} else {
-			d3.select('#matrixPlotRight .cell-' + id + '-' + element.id).attr('fill', c(element.pLog));
-		}
+		d3.select('#matrixPlotRight .cell-' + id + '-' + element.id).attr('fill', c(pGamma(element.p)));
 	});
 
 	MatrixRoundRobin = (MatrixRoundRobin + 1) % matrixIDs.length;
@@ -1171,7 +1139,7 @@ var updateSumSvg = function() {
 		}
 
 		matrixIDs.forEach(function(id) {
-			d3.select('#sumsL-cell-' + id).attr('fill', c(pScale((sums[id] || 0), total)));
+			d3.select('#sumsL-cell-' + id).attr('fill', c(pGamma((sums[id] || 0) / total)));
 		});
 
 		// model B Left
@@ -1184,7 +1152,7 @@ var updateSumSvg = function() {
 		}
 
 		matrixIDs.forEach(function(id) {
-			d3.select('#sumsL-cell-' + id + '-diff').attr('fill', cDiff(pScale((sums[id] || 0), total)));
+			d3.select('#sumsL-cell-' + id + '-diff').attr('fill', cDiff(pGamma((sums[id] || 0) / total)));
 		});
 
 		// model A Right
@@ -1197,7 +1165,7 @@ var updateSumSvg = function() {
 		}
 
 		matrixIDs.forEach(function(id) {
-			d3.select('#sumsR-cell-' + id).attr('fill', c(pScale((sums[id] || 0), total)));
+			d3.select('#sumsR-cell-' + id).attr('fill', c(pGamma((sums[id] || 0) / total)));
 		});
 
 		// model B Right
@@ -1210,7 +1178,7 @@ var updateSumSvg = function() {
 		}
 
 		matrixIDs.forEach(function(id) {
-			d3.select('#sumsR-cell-' + id + '-diff').attr('fill', cDiff(pScale((sums[id] || 0), total)));
+			d3.select('#sumsR-cell-' + id + '-diff').attr('fill', cDiff(pGamma((sums[id] || 0) / total)));
 		});
 	} else { // diff
 		// Left
@@ -1231,7 +1199,7 @@ var updateSumSvg = function() {
 
 		matrixIDs.forEach(function(id) {
 			d3.select('#sumsL-cell-' + id).attr('fill',
-				cDiffEncoding(pScale((sumsA[id] || 0), totalA) - pScale((sumsB[id] || 0), totalB)));
+				cDiffEncoding(pGamma(((sumsA[id] || 0) / totalA) - ((sumsB[id] || 0) / totalB))));
 		});
 
 		// Right
@@ -1252,7 +1220,7 @@ var updateSumSvg = function() {
 
 		matrixIDs.forEach(function(id) {
 			d3.select('#sumsR-cell-' + id).attr('fill',
-				cDiffEncoding(pScale((sumsA[id] || 0), totalA) - pScale((sumsB[id] || 0), totalB)));
+				cDiffEncoding(pGamma(((sumsA[id] || 0) / totalA) - ((sumsB[id] || 0) / totalB))));
 		});
 	}
 }
@@ -1340,7 +1308,7 @@ var updateLinearPlot = function() {
 
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
-			d3.select('#linearPlotLeft-cell-' + from).attr('fill', c(pScale(sums[from], total)));
+			d3.select('#linearPlotLeft-cell-' + from).attr('fill', c(pGamma(sums[from] / total)));
 		}
 	}
 
@@ -1355,7 +1323,7 @@ var updateLinearPlot = function() {
 
 	for (var from in sums) {
 		if (sums.hasOwnProperty(from)) {
-			d3.select('#linearPlotRight-cell-' + from).attr('fill', c(pScale(sums[from], total)));
+			d3.select('#linearPlotRight-cell-' + from).attr('fill', c(pGamma(sums[from] / total)));
 		}
 	}
 
@@ -1363,22 +1331,14 @@ var updateLinearPlot = function() {
 	var from = linearMatrixIDs[linearMatrixRoundRobin];
 	var transitionP = modelA.linearLeft.transitionP(from);
 	transitionP.forEach(function(t) {
-		if (settings.pScale === 'linear') {
-			d3.select('#leftLinear-matrix-' + from + '-cell-' + t.id).attr('fill', c(t.p));
-		} else {
-			d3.select('#leftLinear-matrix-' + from + '-cell-' + t.id).attr('fill', c(t.pLog));
-		}
+		d3.select('#leftLinear-matrix-' + from + '-cell-' + t.id).attr('fill', c(pGamma(t.p)));
 	})
 
 	// matrix right
 	var from = linearMatrixIDs[linearMatrixRoundRobin];
 	var transitionP = modelA.linearRight.transitionP(from);
 	transitionP.forEach(function(t) {
-		if (settings.pScale === 'linear') {
-			d3.select('#rightLinear-matrix-' + from + '-cell-' + t.id).attr('fill', c(t.p));
-		} else {
-			d3.select('#rightLinear-matrix-' + from + '-cell-' + t.id).attr('fill', c(t.pLog));
-		}
+		d3.select('#rightLinear-matrix-' + from + '-cell-' + t.id).attr('fill', c(pGamma(t.p)));
 	})
 
 	linearMatrixRoundRobin = (linearMatrixRoundRobin + 1) % linearMatrixIDs.length;
