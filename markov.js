@@ -59,10 +59,10 @@ var lastAnalogLeftID = discSampler.getID(currentAnalogLeftSample);
 var lastAnalogRightID = discSampler.getID(currentAnalogRightSample);
 
 // linear stuff
-var linearCurrentLeftID;
-var linearCurrentRightID;
-var linearLastLeftID;
-var linearLastRightID;
+var linearCurrentLeftID = 'not set';
+var linearCurrentRightID ='not set';
+var linearLastLeftID ='not set';
+var linearLastRightID ='not set';
 
 // current Models
 var modelA = {
@@ -784,8 +784,8 @@ var sample = function() {
 	linearLeft.infoB = modelB.linearLeft.IPrime(linearLastLeftID, linearCurrentLeftID);
 
 	var linearRight = {};
-	linearRight.infoA = modelA.linearRight.IPrime(linearLastLeftID, linearCurrentLeftID);
-	linearRight.infoB = modelB.linearRight.IPrime(linearLastLeftID, linearCurrentLeftID);
+	linearRight.infoA = modelA.linearRight.IPrime(linearLastRightID, linearCurrentRightID);
+	linearRight.infoB = modelB.linearRight.IPrime(linearLastRightID, linearCurrentRightID);
 
 	linearMCs.l.forEach(function(mc, i) {
 		mc.learn(linearLastLeftID, linearCurrentLeftID);
