@@ -309,28 +309,22 @@ svg path.quiverB {
   stroke: #e89f49;
   stroke-width: 1px;
   marker-end: url(#quiverArrowB); }
+svg .gridLine {
+  stroke-width: 1px;
+  stroke: #e25454;
+  opacity: 0.3; }
 svg .barA, svg .barB {
   fill: #5B5B5B; }
   svg .barA.invalid, svg .barB.invalid {
     fill: #444444; }
-svg .diffPos {
-  fill: #b6ce4e; }
-  svg .diffPos.invalid {
-    fill: #444444; }
-svg .diffNeg {
-  fill: #e25454; }
-  svg .diffNeg.invalid {
-    fill: #444444; }
-svg .grid .tick line {
-  stroke: #5B5B5B;
-  stroke-width: 2px;
+svg .barADiff, svg .barBDiff {
+  fill: white;
   opacity: 0.3; }
-svg .grid g.tick text {
-  opacity: 0; }
 svg .labels text {
   font-family: 'Dosis';
   font-size: 16px;
-  fill: #5B5B5B;
+  opacity: 0.5;
+  fill: white;
   text-anchor: end; }
   svg .labels text.ABLabel {
     font-size: 60px;

@@ -24,8 +24,6 @@ $optionColor: $turquoise;
 
 $barColor: #5B5B5B;
 $invalidBarColor: #444444;
-$invalidBarPos: $invalidBarColor;
-$invalidBarNeg: $invalidBarColor;
 
 $innerRadius: 3px;
 $outerRadius: 5px;
@@ -392,6 +390,13 @@ svg {
 		marker-end: url(#quiverArrowB);
 	}
 
+
+	.gridLine {
+		stroke-width: 1px;
+		stroke: $red;
+		opacity: 0.3;
+	}
+
 	.barA, .barB {
 		fill: $barColor;
 		&.invalid {
@@ -399,37 +404,17 @@ svg {
 		}
 	}
 
-	.diffPos {
-		fill: $lime;
-		&.invalid {
-			fill: $invalidBarPos;
-		}
-	}
-
-	.diffNeg {
-		fill: $red;
-		&.invalid {
-			fill: $invalidBarNeg;
-		}
-	}
-
-	.grid {
-		.tick line {
-			stroke: $barColor;
-			stroke-width: 2px;
-			opacity: 0.3;
-		}
-
-		g.tick text {
-			opacity: 0;
-		}
+	.barADiff, .barBDiff {
+		fill: white;
+		opacity: 0.3;
 	}
 
 	.labels {
 		text {
 			font-family: 'Dosis';
 			font-size: 16px;
-			fill: $barColor;
+			opacity: 0.5;
+			fill: white;
 			text-anchor: end;
 
 			&.ABLabel {

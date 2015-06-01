@@ -21,7 +21,7 @@ windowLengths.forEach(function(l, i) {
 })
 var samplingF = 100; // ms
 var maxHistoryLength = 120;
-var maxInformation = 1; // bits
+var maxInformation = 10; // bits
 
 
 // Marcov Chains
@@ -833,30 +833,34 @@ var setupGraph = function() {
 		.domain([0, maxHistoryLength])
 		.range([svgPadding, svgSize.innerWidth + svgPadding]);
 
-	d3.selectAll('.dataA')
+	d3.selectAll('.dataA, .dataADiff, .gridA')
 		.attr('transform', 'translate(0, ' + (svgSize.plotHeight + 1 * svgPadding) +') scale(1, -1)');
-	d3.selectAll('.dataB')
+	d3.selectAll('.dataB, .dataBDiff, .gridB')
 		.attr('transform', 'translate(0, ' + (svgSize.plotHeight + 2 * svgPadding) +')');
-
 }
 
 var updateGraph = function() {
 
+	// max information
+	var infmax = function(prev, current) {
+		if (current == Infinity) {
+			return prev;
+		} else {
+			return Math.max(prev, current)
+		}
+	};
+	var maxA = modelA.history.mixed.reduce(infmax, 0);
+	var maxB = modelB.history.mixed.reduce(infmax, 0);
+
+	maxInformation = infmax(infmax(10, maxA), maxB);
+
 	d3.selectAll('g.labels .maxInformation')
-		.text(maxInformation.toFixed(2));
+		.text(maxInformation.toFixed(2) + ' bits');
 
 	svgScales.y = d3.scale.linear()
 		.domain([0, maxInformation])
 		.range([0, svgSize.plotHeight])
 		.clamp(true);
-
-	svgScales.yAxis = d3.svg.axis()
-		.scale(svgScales.y)
-		.orient("left")
-		.ticks(3)
-		.innerTickSize(-svgSize.innerWidth)
-		.outerTickSize(0)
-
 
 	var plots = [
 		{
@@ -909,21 +913,72 @@ var updateGraph = function() {
 			barsB.exit()
 				.remove();
 
-		// var diffDigital = plot.dataA.map(function(d, i) {
-		// 	var d2 = plot.dataB[i];
-		// 	var diff;
-		// 	if (d === Infinity || d2 === Infinity) {
-		// 		diff = 0;
-		// 	} else {
-		// 		diff = d - d2;
-		// 	}
-		//
-		// 	return {
-		// 		diff: diff,
-		// 		height: Math.abs(diff),
-		// 		c: ((diff > 0) ? 'diffPos' : 'diffNeg') + (Math.abs(diff) === Infinity ? ' invalid' : '')
-		// 	}
-		// })
+
+		var diffData = plot.dataA.map(function(a, i) {
+			var b = plot.dataB[i];
+			var output;
+			if (a === Infinity || b === Infinity) {
+				output = {
+					aExtra: 0,
+					aOffset: b,
+					bExtra: 0,
+					bOffset: a
+				}
+			} else {
+				output = {
+					aExtra: Math.max(0, a - b),
+					aOffset: b,
+					bExtra: Math.max(0, b - a),
+					bOffset: a
+				}
+			}
+
+			return output;
+		})
+
+		var barsADiff = svg.select('.dataADiff').selectAll('.barADiff').data(diffData);
+		barsADiff.enter()
+			.append('rect')
+				.attr('width', 4)
+				.attr('class', 'barADiff');
+		barsADiff
+			.attr('x', function(d, i) { return svgScales.x(i); })
+			.attr('y', function(d) { return svgScales.y(d.aOffset); })
+			.attr('height', function(d) { return svgScales.y(d.aExtra); })
+			.attr('class', function(d) { return (d === 0 || d === Infinity) ? 'barADiff invalid' : 'barADiff'; })
+			.attr('data-value', function(d) { return d.min; });
+
+		barsADiff.exit()
+			.remove();
+
+		var barsBDiff = svg.select('.dataBDiff').selectAll('.barBDiff').data(diffData);
+		barsBDiff.enter()
+			.append('rect')
+				.attr('width', 4)
+				.attr('class', 'barBDiff');
+		barsBDiff
+			.attr('x', function(d, i) { return svgScales.x(i); })
+			.attr('y', function(d) { return svgScales.y(d.bOffset); })
+			.attr('height', function(d) { return svgScales.y(d.bExtra); })
+			.attr('class', function(d) { return (d === 0 || d === Infinity) ? 'barBDiff invalid' : 'barBDiff'; })
+			.attr('data-value', function(d) { return d.min; });
+
+		barsADiff.exit()
+			.remove();
+
+		// grid lines
+		var ticks = [5, 10];
+
+		var gridLines = svg.selectAll('.gridA, .gridB').selectAll('.gridLine').data(ticks)
+		gridLines.enter().append('line');
+		gridLines
+			.attr('x1', svgScales.x.range()[0])
+			.attr('x2', svgScales.x.range()[1])
+			.attr('y1', function(d) { return svgScales.y(d); })
+			.attr('y2', function(d) { return svgScales.y(d); })
+			.attr('class', 'gridLine');
+
+		gridLines.exit().remove()
 
 
 	})
