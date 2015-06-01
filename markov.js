@@ -842,7 +842,7 @@ var setupGraph = function() {
 
 var updateGraph = function() {
 
-	d3.selectAll('g.labels text')
+	d3.selectAll('g.labels .maxInformation')
 		.text(maxInformation.toFixed(2));
 
 	svgScales.y = d3.scale.linear()

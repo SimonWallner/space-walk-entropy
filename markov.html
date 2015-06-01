@@ -19,7 +19,7 @@
 </head>
 <body>
 	<div class="box">
-		<h1>Self Information</h1>
+		<h1>Information Content</h1>
 	</div>
 
 	<div class="box">
@@ -146,8 +146,28 @@
 
 	<div class="clear"></div>
 
-
 	<div class="box" id="plotBox">
+		<div class="group">
+			<div class="plotLabel verticalGroupLabel">
+				<span>Combined</span>
+			</div>
+			<div class="plotArea">
+				<svg width="800" height="150" id="svgMixed">
+					<g class="dataA">
+					</g>
+					<g class="dataB">
+					</g>
+					<g class="labels">
+						<text class="maxInformation" x="790" y="20">--</text>
+						<text class="ABLabel" x="40" y="60">A</text>
+						<text class="ABLabel" x="40" y="133">B</text>
+					</g>
+				</svg>
+			</div>
+		</div>
+		<div class="clear"></div>
+
+
 		<div class="group">
 			<div class="plotLabel verticalGroupLabel">
 				<span>Analog</span>
@@ -160,6 +180,8 @@
 					</g>
 					<g class="labels">
 						<text class="maxInformation" x="790" y="20">--</text>
+						<text class="ABLabel" x="40" y="60">A</text>
+						<text class="ABLabel" x="40" y="133">B</text>
 					</g>
 				</svg>
 			</div>
@@ -178,24 +200,8 @@
 					</g>
 					<g class="labels">
 						<text class="maxInformation" x="790" y="20">--</text>
-					</g>
-				</svg>
-			</div>
-		</div>
-		<div class="clear"></div>
-
-		<div class="group">
-			<div class="plotLabel verticalGroupLabel">
-				<span>Combined</span>
-			</div>
-			<div class="plotArea">
-				<svg width="800" height="150" id="svgMixed">
-					<g class="dataA">
-					</g>
-					<g class="dataB">
-					</g>
-					<g class="labels">
-						<text class="maxInformation" x="790" y="20">--</text>
+						<text class="ABLabel" x="40" y="60">A</text>
+						<text class="ABLabel" x="40" y="133">B</text>
 					</g>
 				</svg>
 			</div>
@@ -291,7 +297,7 @@
 				<span>Prob Mapping</span>
 			</div>
 		</div>
-		
+
 		<!-- <div class="group">
 			<div class="label wide">
 				<span>Color</span>
