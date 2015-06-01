@@ -431,6 +431,12 @@ svg {
 			font-size: 16px;
 			fill: $barColor;
 			text-anchor: end;
+
+			&.ABLabel {
+				font-size: 60px;
+				opacity: 0.15;
+				fill: white;
+			}
 		}
 	}
 
