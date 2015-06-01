@@ -80,7 +80,7 @@ a:visited {
     border: 1px solid white; }
 
 .option {
-  background-color: #517467; }
+  background-color: #527567; }
   .option:active {
     background-color: #5dd1a4; }
   .option.active {
@@ -126,7 +126,7 @@ a:visited {
     margin-right: 0px; }
 
 .indicator {
-  background-color: #6c734d;
+  background-color: #6d744d;
   margin: 4px;
   margin-top: 2px;
   width: 36.2px;
@@ -134,20 +134,17 @@ a:visited {
 
 @-webkit-keyframes fadeReady {
   from {
-    background-color: #6c734d; }
-
+    background-color: #6d744d; }
   to {
     background-color: #b6ce4e; } }
 @-moz-keyframes fadeReady {
   from {
-    background-color: #6c734d; }
-
+    background-color: #6d744d; }
   to {
     background-color: #b6ce4e; } }
 @keyframes fadeReady {
   from {
-    background-color: #6c734d; }
-
+    background-color: #6d744d; }
   to {
     background-color: #b6ce4e; } }
 .indicator.ready {
@@ -161,26 +158,23 @@ a:visited {
 @-webkit-keyframes flash {
   from {
     background-color: #e25454; }
-
   to {
     background-color: #b21e1e; } }
 @-moz-keyframes flash {
   from {
     background-color: #e25454; }
-
   to {
     background-color: #b21e1e; } }
 @keyframes flash {
   from {
     background-color: #e25454; }
-
   to {
     background-color: #b21e1e; } }
 .button.danger {
   background-color: #b6ce4e;
-  background-color: #975050; }
+  background-color: #985151; }
   .button.danger:active {
-    background-color: #b55151; }
+    background-color: #b55252; }
   .button.danger.armed {
     background-color: #e25454; }
   .button.danger.flashing {
@@ -316,9 +310,9 @@ svg path.quiverB {
   stroke-width: 1px;
   marker-end: url(#quiverArrowB); }
 svg .barA, svg .barB {
-  fill: #5b5b5b; }
-svg .barA.invalid {
-  fill: #444444; }
+  fill: #5B5B5B; }
+  svg .barA.invalid, svg .barB.invalid {
+    fill: #444444; }
 svg .diffPos {
   fill: #b6ce4e; }
   svg .diffPos.invalid {
@@ -328,7 +322,7 @@ svg .diffNeg {
   svg .diffNeg.invalid {
     fill: #444444; }
 svg .grid .tick line {
-  stroke: #5b5b5b;
+  stroke: #5B5B5B;
   stroke-width: 2px;
   opacity: 0.3; }
 svg .grid g.tick text {
@@ -336,7 +330,7 @@ svg .grid g.tick text {
 svg .labels text {
   font-family: 'Dosis';
   font-size: 16px;
-  fill: #5b5b5b;
+  fill: #5B5B5B;
   text-anchor: end; }
 svg .hidden {
   opacity: 0; }
@@ -355,3 +349,5 @@ text.label {
   font-family: 'Dosis';
   font-size: 16px;
   fill: white; }
+
+/*# sourceMappingURL=style.css.map */

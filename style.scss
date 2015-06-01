@@ -394,10 +394,9 @@ svg {
 
 	.barA, .barB {
 		fill: $barColor;
-	}
-
-	.barA.invalid {
-		fill: $invalidBarColor;
+		&.invalid {
+			fill: $invalidBarColor;
+		}
 	}
 
 	.diffPos {

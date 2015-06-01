@@ -894,38 +894,38 @@ var updateGraph = function() {
 		barsA.exit()
 			.remove();
 
+		var barsB = svg.select('.dataB').selectAll('.barB').data(plot.dataB);
+			barsB.enter()
+				.append('rect')
+					.attr('width', 4)
+					.attr('class', 'barB');
+			barsB
+				.attr('x', function(d, i) { return svgScales.x(i); })
+				.attr('y', function(d) { return svgScales.y(0); })
+				.attr('height', function(d) { return Math.max(2, svgScales.y(d)); })
+				.attr('class', function(d) { return (d === 0 || d === Infinity) ? 'barB invalid' : 'barB'; })
+				.attr('data-value', function(d) { return d; })
 
-		var diffDigital = plot.dataA.map(function(d, i) {
-			var d2 = plot.dataB[i];
-			var diff;
-			if (d === Infinity || d2 === Infinity) {
-				diff = 0;
-			} else {
-				diff = d - d2;
-			}
+			barsB.exit()
+				.remove();
 
-			return {
-				diff: diff,
-				height: Math.abs(diff),
-				c: ((diff > 0) ? 'diffPos' : 'diffNeg') + (Math.abs(diff) === Infinity ? ' invalid' : '')
-			}
-		})
-
-		var barsB = svg.select('.dataB').selectAll('.barB').data(diffDigital);
-		barsB.enter()
-			.append('rect')
-				.attr('width', 4)
-				.attr('class', 'barB');
-		barsB
-			.attr('x', function(d, i) { return svgScales.x(i); })
-			.attr('y', function(d) { return (d.diff < 0) ? 0: -svgScales.y(d.height) - svgPadding; })
-			.attr('height', function(d) { return svgScales.y(d.height); })
-			.attr('class', function(d) { return 'barB ' + d.c; })
-			.attr('data-value', function(d) { return d.diff; })
+		// var diffDigital = plot.dataA.map(function(d, i) {
+		// 	var d2 = plot.dataB[i];
+		// 	var diff;
+		// 	if (d === Infinity || d2 === Infinity) {
+		// 		diff = 0;
+		// 	} else {
+		// 		diff = d - d2;
+		// 	}
+		//
+		// 	return {
+		// 		diff: diff,
+		// 		height: Math.abs(diff),
+		// 		c: ((diff > 0) ? 'diffPos' : 'diffNeg') + (Math.abs(diff) === Infinity ? ' invalid' : '')
+		// 	}
+		// })
 
 
-		barsB.exit()
-			.remove();
 	})
 }
 
