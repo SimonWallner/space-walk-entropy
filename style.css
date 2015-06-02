@@ -311,8 +311,8 @@ svg path.quiverB {
   marker-end: url(#quiverArrowB); }
 svg .gridLine {
   stroke-width: 1px;
-  stroke: #e25454;
-  opacity: 0.3; }
+  stroke: #3fc0c9;
+  opacity: 0.4; }
 svg .barA, svg .barB {
   fill: #5B5B5B; }
   svg .barA.invalid, svg .barB.invalid {

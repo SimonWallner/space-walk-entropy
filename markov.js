@@ -150,11 +150,12 @@ var cDiff = cMonoDiff;
 var cDiffEncoding = d3.scale.linear()
 	// .domain([-1, 0, 1])
 	// .range(['#E25454', '#444', '#B6CE4E']);
-	.domain([-1, -0.01, 0, 0.01, 1])
-	.range(['#E25454', '#674848', '#444', '#5D6346', '#B6CE4E']);
+	.domain([-1, 0, 1])
+	.range(['#E25454', '#444', '#B6CE4E']);
 
 var pGamma = function(x) {
-	return Math.pow(x, 1.0/2.2);
+	var sign = (x > 0) ? 1 : -1;
+	return Math.pow(Math.abs(x), 1.0/2.2) * sign;
 }
 
 var mappings = {
@@ -266,6 +267,7 @@ var settings = {
 	customMapping: mappings.xbox360,
 	modelAId: '30',
 	modelBId: '60',
+	diff: 'off'
 };
 
 var loadSettings = function() {
