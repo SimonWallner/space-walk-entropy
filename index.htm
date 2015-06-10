@@ -1,25 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Space Walk Entropy</title>
-	
+	<title>Information Flow Analysis</title>
+
 	<link href='http://spacewalk.simonwallner.at/app/css/documentation.css' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="http://spacewalk.simonwallner.at/app/js/documentation.js"></script>
 </head>
 
 <body>
-	<h1>Space Walk Entropy</h1>
+	<h1>Information Flow Analysis</h1>
 	<p>
-		The idea behind the Entropy plugin is to determine the information content (self information) of raw user input. The intended use of this plugin is during playtesting, to see how complex user interaction is on this abstract level, and how it changes during gameplay or in different parts of the game.
+		The idea behind the Information Flow Analysis plugin is to determine the information content (self information) of raw user input. The intended use of this plugin is during playtesting, to see how complex user interaction is on this abstract level, and how it changes during gameplay or in different parts of the game.
 	</p>
 	<p>
-		The computation of <a href="http://en.wikipedia.org/wiki/Self-information">self information</a> (not to be mixed up with <a href="http://en.wikipedia.org/wiki/Entropy_(information_theory)">Entropy</a>)	is based on some kind probabilistic model of the information source. Finding the real probabilistic distribution is usually not possible, thus we have to use/find a model that comes close enough to the real distribution.
+		The computation of the <a href="http://en.wikipedia.org/wiki/Self-information">information content</a> (not to be mixed up with <a href="http://en.wikipedia.org/wiki/Entropy_(information_theory)">Entropy</a>)	is based on a probabilistic model of the information source. Finding the real probabilistic distribution is usually not possible, thus we have to use/find a model that comes close enough to the real distribution.
 	</p>
 	<p>
-		I decided to use a simple Markov Chain, to model the time between interactions...
-	</p>
-	<p>
-		The Markov Chain plugin is available at: <a href="markov.html">link</a>
+		The Iformation Flow Analysis plugin is available at: <a href="markov.html">link</a>
 	</p>
 
 	<h2>License</h2>
