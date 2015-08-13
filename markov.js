@@ -161,33 +161,33 @@ var pGamma = function(x) {
 var mappings = {
 	xbox360: {
 		digital: {
-			'button-11': 'cross',
-			'button-12': 'circle',
-			'button-13': 'square',
-			'button-14': 'triangle',
+			'button-0': 'cross',
+			'button-1': 'circle',
+			'button-2': 'square',
+			'button-3': 'triangle',
 
-			'button-8': 'L1',
-			'button-9': 'R1',
+			'button-4': 'L1',
+			'button-5': 'R1',
 			'button-6': 'L3',
 			'button-7': 'R3',
 
-			'button-0': 'Dpad-up',
-			'button-1': 'Dpad-down',
-			'button-2': 'Dpad-left',
-			'button-3': 'Dpad-right',
+			'button-11': 'Dpad-up',
+			'button-12': 'Dpad-down',
+			'button-13': 'Dpad-left',
+			'button-14': 'Dpad-right',
 
-			'button-4': 'start',
-			'button-5': 'select',
+			'button-8': 'start',
+			'button-9': 'select',
 			'button-10': 'special'
 		},
 		analog: {
 			'axis-0': {id: 'LS', property: 'x'},
 			'axis-1': {id: 'LS', property: 'y'},
 
-			'axis-2': {id: 'RS', property: 'x'},
-			'axis-3': {id: 'RS', property: 'y'},
+			'axis-3': {id: 'RS', property: 'x'},
+			'axis-4': {id: 'RS', property: 'y'},
 
-			'axis-4': {id: 'L2'},
+			'axis-2': {id: 'L2'},
 			'axis-5': {id: 'R2'}
 		}
 	},
