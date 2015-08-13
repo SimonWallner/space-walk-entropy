@@ -80,7 +80,7 @@ var I = function(x) {
 
 var IPrime = function(a, b) {
     return integrate(function(x) {
-        return jStat.beta.pdf(x, a, b) * I(x);
+        return jStat.beta.pdf(x, a+1, b+1) * I(x);
     }, 0, 1, 100)
 }
 
