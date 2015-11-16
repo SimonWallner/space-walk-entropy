@@ -159,7 +159,6 @@ var pGamma = function(x) {
 }
 
 var mappings = {
-	var mapping = {
     rewired: {
 		digital: {
 			'A': 'cross',
