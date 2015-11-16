@@ -755,11 +755,11 @@ libsw.onMessage = function(data) {
 					if (mapping.id === 'LS' && mapping.property === 'x') {
 						currentAnalogLeftSample.x = data.payload.value;
 					} else if (mapping.id === 'LS' && mapping.property === 'y') {
-						currentAnalogLeftSample.y = data.payload.value;
+						currentAnalogLeftSample.y = data.payload.value * -1;
 					} else if (mapping.id === 'RS' && mapping.property === 'x') {
 						currentAnalogRightSample.x = data.payload.value;
 					} else if (mapping.id === 'RS' && mapping.property === 'y') {
-						currentAnalogRightSample.y = data.payload.value;
+						currentAnalogRightSample.y = data.payload.value * -1;
 					}
 
 					else if (mapping.id === 'L2') { // right trigger (XB360)
