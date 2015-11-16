@@ -159,6 +159,39 @@ var pGamma = function(x) {
 }
 
 var mappings = {
+	var mapping = {
+    rewired: {
+		digital: {
+			'A': 'cross',
+			'B': 'circle',
+			'X': 'square',
+			'Y': 'triangle',
+
+			'LShoulder': 'L1',
+			'RShoulder': 'R1',
+			'L3': 'L3',
+			'R3': 'R3',
+
+			'DPadUp': 'Dpad-up',
+			'DPadDown': 'Dpad-down',
+			'DPadLeft': 'Dpad-left',
+			'DPadRight': 'Dpad-right',
+
+			'Start': 'start',
+			'Back': 'select',
+			'Special': 'special'
+		},
+		analog: {
+			'LS-x': {id: 'LS', property: 'x'},
+			'LS-y': {id: 'LS', property: 'y'},
+
+			'RS-x': {id: 'RS', property: 'x'},
+			'RS-y': {id: 'RS', property: 'y'},
+
+			'LT': {id: 'L2'},
+			'RT': {id: 'R2'}
+		}
+	},
 	xbox360: {
 		digital: {
 			'button-0': 'cross',
@@ -256,15 +289,15 @@ var mappings = {
     }
 }
 
-var currentMapping = mappings.xbox360;
+var currentMapping = mappings.rewired;
 
 
 // various plugins might reside on the same origin, hence we are using
 // a pseudo random storage key.
 var storageKey = '71710660-85cd-11e4-b4a9-0800200c9a66';
 var settings = {
-	currentMapping: 'xbox360',
-	customMapping: mappings.xbox360,
+	currentMapping: 'rewired',
+	customMapping: mappings.rewired,
 	modelAId: '30',
 	modelBId: '60',
 	diff: 'off'
@@ -397,6 +430,12 @@ $(document).ready(function() {
 	$('#mappingX360Win').click(function() {
 		currentMapping = mappings.xbox360Win;
 		settings.currentMapping = 'xbox360Win';
+		storeSettings();
+		activateOption(this);
+	});
+	$('#mappingRewired').click(function() {
+		currentMapping = mappings.rewired;
+		settings.currentMapping = 'rewired';
 		storeSettings();
 		activateOption(this);
 	});
@@ -635,6 +674,10 @@ $(document).ready(function() {
 		} else if (settings.currentMapping === 'ps3') {
 			currentMapping = mappings.ps3;
 			activateOption('#mappingPS3');
+		}
+	} else if (settings.currentMapping === 'rewired') {
+			currentMapping = mappings.rewired;
+			activateOption('#mappingRewired');
 		}
 	}
 
