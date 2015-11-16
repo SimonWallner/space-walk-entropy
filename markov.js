@@ -673,8 +673,7 @@ $(document).ready(function() {
 		} else if (settings.currentMapping === 'ps3') {
 			currentMapping = mappings.ps3;
 			activateOption('#mappingPS3');
-		}
-	} else if (settings.currentMapping === 'rewired') {
+		} else if (settings.currentMapping === 'rewired') {
 			currentMapping = mappings.rewired;
 			activateOption('#mappingRewired');
 		}
